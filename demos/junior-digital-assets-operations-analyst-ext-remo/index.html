@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Junior Digital Assets Operations Analyst – Interactive Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Tailwind dark mode config */
+    .dark .bg-primary { background-color: #0f172a; } /* slate-900 */
+    .dark .text-primary { color: #e2e8f0; } /* slate-200 */
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+  <!-- Sticky Header Banner -->
+  <header class="fixed inset-x-0 top-0 z-40 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-4 py-2">
+    <div class="flex items-center space-x-2 text-sm">
+      <span class="inline-flex items-center"><svg class="w-5 h-5 mr-1"><use href="#rocket"/></svg>Live Interactive Prototype for: Junior Digital Assets Operations Analyst</span>
+      <span class="text-slate-400">| Built autonomously by Antigravity OS | Ready for deployment</span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20ext-remoteok-remoteok-1137418"
+       class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1 rounded-md text-sm flex items-center">
+      Hire Team ($150 - $500)
+      <svg class="w-4 h-4 ml-1"><use href="#mail"/></svg>
+    </a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 pt-16 p-6 max-w-7xl mx-auto space-y-8">
+    <!-- Hero -->
+    <section class="text-center">
+      <h1 class="text-3xl font-bold mb-2">Junior Digital Assets Operations Analyst</h1>
+      <p class="text-slate-300 max-w-2xl mx-auto">
+        Join Omega Enterprises, an international digital‑assets leader, and dive into cryptocurrency markets,
+        market intelligence, and data‑driven financial operations. Build practical knowledge, sharpen analytical
+        skills, and grow with a fast‑moving team.
+      </p>
+    </section>
+
+    <!-- Dashboard Controls -->
+    <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <!-- Filter Toggles -->
+      <div class="flex space-x-2">
+        <button data-filter="all" class="filter-btn active bg-indigo-600 text-white px-3 py-1 rounded-md">All</button>
+        <button data-filter="crypto" class="filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1 rounded-md">Crypto</button>
+        <button data-filter="stable" class="filter-btn bg-slate-700 hover:bg-slate-600 text-slate-200 px-3 py-1 rounded-md">Stablecoins</button>
+      </div>
+      <!-- Search -->
+      <div class="relative w-full md:w-64">
+        <input type="text" id="searchInput" placeholder="Search assets…" class="w-full pl-10 pr-3 py-1 rounded-md bg-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><use href="#search"/></svg>
+      </div>
+    </section>
+
+    <!-- Charts & Progress -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Price Trend Chart -->
+      <div class="bg-slate-800 p-4 rounded-lg shadow-lg">
+        <h2 class="text-lg font-medium mb-2 flex items-center"><svg class="w-5 h-5 mr-2"><use href="#chart-line"/></svg>Price Trend</h2>
+        <canvas id="priceChart" class="w-full h-64"></canvas>
+      </div>
+
+      <!-- Onboarding Progress -->
+      <div class="bg-slate-800 p-4 rounded-lg shadow-lg flex flex-col justify-center">
+        <h2 class="text-lg font-medium mb-4 flex items-center"><svg class="w-5 h-5 mr-2"><use href="#loader"/></svg>Onboarding Progress</h2>
+        <div class="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
+          <div id="progressBar" class="bg-indigo-600 h-4 w-0 rounded-full transition-all duration-300"></div>
+        </div>
+        <p id="progressText" class="mt-2 text-sm text-slate-300 text-center">0% Complete</p>
+      </div>
+    </section>
+
+    <!-- Assets Table -->
+    <section class="bg-slate-800 p-4 rounded-lg shadow-lg overflow-x-auto">
+      <h2 class="text-lg font-medium mb-4 flex items-center"><svg class="w-5 h-5 mr-2"><use href="#list"/></svg>Asset Overview</h2>
+      <table class="w-full table-auto text-sm">
+        <thead class="bg-slate-700">
+          <tr>
+            <th class="px-4 py-2 text-left">Name</th>
+            <th class="px-4 py-2 text-left">Symbol</th>
+            <th class="px-4 py-2 text-right">Price (USD)</th>
+            <th class="px-4 py-2 text-right">24h Change</th>
+          </tr>
+        </thead>
+        <tbody id="assetTableBody" class="divide-y divide-slate-700">
+          <!-- Rows injected by JS -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Lucide Icons -->
+  <svg style="display:none;">
+    <symbol id="rocket" viewBox="0 0 24 24"><path d="M2.5 19.5l4-4 5 5-4 4-5-5zM13 2l5 5-2 2-5-5 2-2zM9.5 9.5l5 5M6 12l6 6"/></symbol>
+    <symbol id="mail" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><polyline points="22,6 12,13 2,6"/></symbol>
+   

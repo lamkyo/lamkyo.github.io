@@ -1,0 +1,32 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Senior Integration Engineer for Enterprise API & Integration Products</h1><p># Engineering Application: Senior Integration Engineer for Enterprise API & Integration Products at Toptal
+
+## 1. Executive Summary & Value Proposition
+
+The core engineering challenge in this role is not simply connecting Salesforce, SAP, and a carrier data lake. It is designing a reliable integration fabric that prevents system-to-system coupling, makes failures diagnosable, and allows the business to evolve without accumulating fragile point-to-point dependencies.
+
+I would approach the engagement as an API-led integration platform with a canonical enterprise data model, explicit system-of-record boundaries, idempotent event processing, contract-first testing, and production ownership from discovery through recovery. The design would support:
+
+- **Salesforce:** Composite API, REST, Bulk API, Platform Events, Change Data Capture, or an event-streaming pattern where appropriate.
+- **SAP:** OData APIs where available, BAPI/RFC for transactional operations, and IDoc processing for batch-oriented or legacy flows.
+- **Carrier data lake:** Decoupled ingestion through a durable event or file-delivery layer, schema validation, deduplication, lineage tracking, and replayable processing.
+- **MuleSoft:** API-led orchestration, reusable connectors, DataWeave transformations, policies, error handling, monitoring, and deployment through MuleSoft CI/CD.
+- **Production operations:** OpenTelemetry and Prometheus-compatible telemetry, structured logs, distributed correlation IDs, SLOs, alerting, retry automation, dead-letter handling, and runbook-driven recovery.
+- **AI-assisted delivery:** AI copilots and agents used for mapping drafts, API stubs, fixture generation, documentation, test generation, and incident triage, with mandatory human validation against production standards.
+
+My operating principle would be:
+
+> **Every integration must be observable, replayable, idempotent, contract-tested, and removable without destabilizing its consumers.**
+
+This approach directly supports the role’s stated goals: avoiding new integration debt, owning production issues, reducing MTTR, and improving reliability continuously.
+
+### Alignment with Toptal’s stack and domain challenges
+
+| Toptal requirement | Engineering response |
+|---|---|
+| Reliable Salesforce–SAP–data lake integrations | Canonical business model and asynchronous, event-driven integration boundaries |
+| MuleSoft/API design | API-led architecture with reusable contracts, policies, and orchestration |
+| IDoc, BAPI, API experience | Adapter-specific handling, transactional boundaries, acknowledgment semantics, and reconciliation |
+| Data lake ingestion | Durable landing zones, schema enforcement, partition-aware processing, deduplication, and replay |
+| Production ownership | Observability, SLOs, runbooks, retry/replay automation, and incident RCA |
+| Avoiding integration debt | No system-to-system shortcuts; canonical contracts and anti-corruption layers |
+| AI-assisted engineering | Controlled AI use with revi</p></body></html>

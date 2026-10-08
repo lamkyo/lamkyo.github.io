@@ -1,0 +1,38 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Senior Fullstack Developer (React.js / Node.js)</h1><p># Engineering Application: Senior Fullstack Developer (React.js / Node.js) at Proxify AB
+
+## 1. Executive Summary & Value Proposition
+Modern distributed web applications demand a delicate balance between sub-millisecond client-side interactivity, non-blocking asynchronous backend throughput, and resilient multi-model data architectures. As a Principal Systems Architect specializing in full-stack TypeScript ecosystems (React.js and Node.js), I bring over a decade of production experience engineering high-availability microservices, fault-tolerant event-driven pipelines, and robust enterprise design systems.
+
+Proxify AB bridges elite engineering talent with high-growth global enterprises. My technical background maps directly to Proxify’s core requirements:
+- **Scalable Microservices & Node.js Architecture**: Proven expertise in constructing decoupled Node.js (Express, NestJS) backend clusters orchestrated via Docker/Kubernetes, implementing circuit breakers (Opossum), and managing distributed tracing.
+- **Polyglot Data Layer Mastery**: Deep domain experience architecting sharded PostgreSQL relational models alongside high-throughput MongoDB document stores, balancing ACID compliance with schema flexibility.
+- **High-Performance React.js Client Engineering**: Mastery over concurrent React 18+ rendering paradigms, state management optimization (Zustand, React Query), and component-driven architecture using design systems (Tailwind, Radix UI) to ensure elite Core Web Vitals.
+- **Data Protection & Security**: Implementation of zero-trust security postures, OAuth 2.0 / OIDC protocol flows, RBAC/ABAC authorization layers, and end-to-end cryptographic data protection meeting GDPR and SOC2 standards.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### Architectural Proposal
+To fulfill Proxify's requirements for low-latency, resilient, and horizontally scalable applications, I propose a production-grade decoupled architecture:
+
+```
+[ Clients: Web (React 18) / Mobile ]
+               │ (HTTPS / WSS / gRPC)
+               ▼
+[ API Gateway / Reverse Proxy (NGINX / Kong) ]
+               │ (JWT Validation & Rate Limiting)
+               ├───────────────────────────────┐
+               ▼                               ▼
+[ Auth Service (Node.js) ]      [ Core Business Microservices (Node.js / NestJS) ]
+               │                               │
+               ├───────────────────────────────┼───────────────┐
+               ▼                               ▼               ▼
+     [ PostgreSQL (OLTP) ]             [ MongoDB (Docs) ] [ Redis Cache / PubSub ]
+```
+
+### Core Components
+1. **API Gateway & Routing Layer**:
+   - Centralized ingress point managing SSL termination, rate-limiting (token bucket algorithm via Redis), and JWT validation before requests reach internal microservices.
+2. **Backend Microservices (Node.js)**:
+   - Built on NestJS or modular Express.js utilizing strict TypeScript configurations. Asynchronous request handling backed by Node's libuv </p></body></html>

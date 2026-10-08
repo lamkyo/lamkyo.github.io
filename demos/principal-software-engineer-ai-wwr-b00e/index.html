@@ -1,0 +1,43 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Principal Software Engineer, AI</h1><p># Engineering Application: Principal Software Engineer, AI at Salesloft
+
+## 1. Executive Summary & Value Proposition
+
+Salesloft’s mission to build the industry's first **Predictive Revenue System** requires solving one of the most challenging problems in modern applied engineering: bridging the gap between non-deterministic, probabilistic AI outputs (LLMs, multi-agent frameworks, vector search pipelines) and enterprise-grade deterministic requirements (strict SLAs, predictable latency, zero-hallucination guardrails, and immutable audit logs). 
+
+As a Principal Systems Architect and AI Engineer specializing in distributed LLM infrastructure, real-time agentic orchestration, and high-throughput vector systems, my background maps directly onto Salesloft's core technical challenges:
+* **Production-Grade Non-Determinism:** Architecting closed-loop evaluation pipelines, continuous assertion engines, and semantic guardrails that constrain agent behavior to domain-specific enterprise constraints.
+* **Distributed AI Infrastructure:** Designing multi-tier model-serving layers leveraging vLLM/TGI, speculative decoding, dynamic batching, and intelligent semantic caching layers (Redis/Milvus) to reduce latency and infrastructure overhead at enterprise scale.
+* **Agentic Workflows & Enterprise Context:** Building autonomous, multi-step agent graphs (utilizing LangGraph / custom state machines) that synthesize complex telemetry, CRM activity, and historical revenue signals into actionable decisions with deterministic fallbacks.
+* **Evidence Over Ego:** Relying on quantitative evaluation benchmarks (Ragas, TruLens, custom LLM-as-a-judge pipelines) rather than hype to make architectural bets that survive production realities.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+To scale Salesloft’s Predictive Revenue System reliably across thousands of enterprise customers, I propose the following architectural blueprint for the **AI Serving, Agentic Orchestration, and Guardrails Layer**:
+
+### Architectural Overview & Data Flow
+```
+[Client / Revenue UI] 
+       │
+       ▼ (gRPC / HTTP/2)
+[API Gateway / Rate Limiting / Auth]
+       │
+       ▼
+[AI Orchestration Service (Go/Python)] ──(Semantic Cache Hit)──> [Redis Enterprise]
+       │ (Cache Miss)
+       ├─► [RAG Engine: Hybrid Search (BM25 + Milvus Vector Store)]
+       │
+       ├─► [Model Serving Cluster: vLLM on AWS EKS (Auto-scaling GPU Nodes)]
+       │         │
+       │         ▼
+       │   [Guardrails & Eval Engine (NeMo Guardrails / Custom Pydantic Validators)]
+       │
+       └─► [Multi-Agent State Machine (LangGraph / Temporal)] ──► [Deterministic Actions / CRM Write]
+```
+
+### Core Components
+1. **Model Serving & Concurrency Control:**
+   - Deploy foundation models on AWS EKS utilizing **vLLM** with PagedAttention and continuous batching to maximize GPU throughput and minimize TTFT (Time-to-First-Token).
+   - Implement speculative decoding using draft models to accelerate inference on larger reasoning models.
+  </p></body></html>

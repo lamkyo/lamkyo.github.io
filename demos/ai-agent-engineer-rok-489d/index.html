@@ -1,0 +1,24 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: AI agent engineer</h1><p># Engineering Application: AI agent engineer at Sticker Mule
+
+**Candidate:** Principal Systems Architect — Distributed Systems / Applied AI Infrastructure
+**Target:** Sticker Mule — AI Agent Engineer (Remote, US)
+**Source:** RemoteOK US — [remoteOK.com/remote-jobs/remote-ai-agent-engineer-sticker-mule-1137399](https://remoteok.com/remote-jobs/remote-ai-agent-engineer-sticker-mule-1137399)
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Sticker Mule is not a sticker company that uses software — it is a vertically integrated manufacturing platform that happens to sell stickers. That distinction matters enormously for this role, because it defines the failure mode: an agent that hallucinates in a pure SaaS product produces a bad support reply; an agent that hallucinates here **prints 40,000 misregistered die-cut vinyl sheets**, ships them, and eats the margin.
+
+My background is in exactly the discipline this requires: **durable distributed execution with human gates and hard financial circuit breakers**. I have spent a career building systems where autonomous components operate on real money and real physical inventory — the class of problem where "the agent runs on its own" is table stakes and the actual engineering is *making autonomous failure recoverable, observable, and cheap*.
+
+### 1.1 Why this background maps to Sticker Mule's problem space
+
+| Sticker Mule need | What I bring |
+|---|---|
+| "Build agents that run on their own and do meaningful work" | Durable workflow engines with Postgres-backed state machines — every agent step is a persisted, resumable, idempotent unit of work. No in-memory agent loops that die with a pod. |
+| "Identify where agents can help" | A scoring rubric for agent *candidacy* (volume × variability × tolerance for error × verifiability). I've learned that the highest-ROI agents are boring: quoting, order triage, prepress file QA, ticket classification — not "autonomous manufacturing." |
+| "Connect agents to third-party and internal tools" | MCP-first tool gateway design: typed schemas, allowlists, per-tool rate limits, PII redaction, and a capability model where an agent's authority is declared, not implied. |
+| "Measure results and remove agents that don't deliver" | **Evals as infrastructure.** Every agent ships with a golden set, an automated scoring harness gated in CI, a unit-economics dashboard (cost per resolved task vs. human baseline), and an auto-retirement policy. Agents that can't beat their baseline get flagged and killed. |
+| "Test new tools and models as they ship" | Provider-agnostic router (Grok / Claude / OpenAI / open-source) behind one interface, with model *shadow traffic* — new models run in parallel on production inputs at zero customer risk, scored offline, promoted only on measured lift. |
+| Go, TypeScript, GraphQL, Postgres, GCP | Day-one productive: Go for the runtime and tool mesh, TypeScript for the agent SDK and operator tooling, Postgres as the system of record, Cloud Run + Pub/Sub + </p></body></html>

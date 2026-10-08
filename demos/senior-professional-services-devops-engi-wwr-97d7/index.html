@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JFrog DevOps Platform — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: { colors: {
+    slate: { 950: '#0a0e17' },
+    accent: { DEFAULT: '#22d3ee', dim: '#0891b2' }
+  }}}
+}
+</script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  .glow { box-shadow: 0 0 24px -4px rgba(34,211,238,.35); }
+  .pulse-dot { animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .fade-in { animation: fadeIn .35s ease-out; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased">
+
+<!-- Sticky Banner -->
+<div class="sticky top-0 z-50 bg-gradient-to-r from-cyan-950 via-slate-900 to-slate-900 border-b border-cyan-800/40">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <p class="text-xs sm:text-sm text-cyan-100 flex items-center gap-2">
+      <span class="pulse-dot inline-block w-2 h-2 rounded-full bg-cyan-400"></span>
+      🚀 Live Interactive Prototype for: <span class="font-semibold text-white">Senior Professional Services DevOps Engineer</span>
+      <span class="hidden md:inline text-slate-400">| Built autonomously by Antigravity OS | Ready for deployment</span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-97d70ce7"
+       class="shrink-0 text-xs font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-3.5 py-1.5 rounded-lg transition glow">
+      Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- Nav -->
+<header class="border-b border-slate-800/70 bg-slate-950/80 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-emerald-500 flex items-center justify-center">
+        <i data-lucide="box" class="w-4.5 h-4.5 text-slate-950"></i>
+      </div>
+      <span class="font-semibold tracking-tight text-white">Artifactory<span class="text-cyan-400">Ops</span></span>
+      <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">v7.84 HA</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-6 text-sm text-slate-400">
+      <a href="#pipeline" class="hover:text-cyan-400 transition">Pipeline</a>
+      <a href="#repos" class="hover:text-cyan-400 transition">Repositories</a>
+      <a href="#xray" class="hover:text-cyan-400 transition">Xray Security</a>
+      <a href="#metrics" class="hover:text-cyan-400 transition">Metrics</a>
+    </nav>
+    <div class="flex items-center gap-3 text-xs">
+      <span class="flex items-center gap-1.5 text-emerald-400"><span class="pulse-dot w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Cluster Healthy</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+
+  <!-- Hero -->
+  <section class="fade-in">
+    <h1 class="text-3xl sm:text-4xl font-bold text-white tracking-tight">Liquid Software Delivery Control Plane</h1>
+    <p class="mt-2 text-slate-400 max-w-3xl">High-availability, multi-region JFrog Platform with GitOps-driven Kubernetes delivery. Live simulation of repository provisioning, Xray scanning, and ArgoCD rollout.</p>
+    <div class="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="text-xs text-slate-500">Deploy Lead Time</div>
+        <div class="text-2xl font-bold text-white mt-1" id="kpi-lead">—</div>
+        <div class="text-[11px] text-emerald-400 mt-0.5">▼ 70% vs baseline</div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="text-xs text-slate-500">Artifacts Stored</div>
+        <div class="text-2xl font-bold text-white mt-1" id="kpi-artifacts">—</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">petabyte-scale metadata</div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="text-xs text-slate-500">Cache Hit Rate</div>
+        <div class="text-2xl font-bold text-cyan-400 mt-1" id="kpi-cache">—</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">virtual repos active</div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="text-xs text-slate-500">Xray CVEs Blocked</div>
+        <div class="text-2xl font-bold text-amber-400 mt-1" id="kpi-cve">—</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">compliance gates</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pipeline -->
+  <section id="pipeline" class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 fade-in">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+      <h2 class="text-lg font-semibold text-white flex items-center gap-2"><i data-lucide="git-branch" class="w-4.5 h-4.5 text-cyan-400"></i> CI/CD Pipeline Simulation</h2>
+      <button id="runBtn" class="text-sm font-semibold bg-cyan-500 hover:bg-cyan-400 text-slate-950 px-4 py-2 rounded-lg transition flex items-center gap-2">
+        <i data-lucide="play" class="w-4 h-4"></i> Run Pipeline
+      </button>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3" id="stages"></div>
+    <div class="mt-4 bg-slate-950 border border-slate-800 rounded-xl p-3 h-40 overflow-y-auto font-mono text-xs text-slate-400" id="log"></div>
+  </section>
+
+  <!-- Repositories -->
+  <section id="repos" class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 fade-in">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+      <h2 class="text-lg font-semibold text-white flex items-center gap-2"><i data-lucide="database" class="w-4.5 h-4.5 text-cyan-400"></i> Repository Topology</h2>
+      <div class="flex gap-2" id="repoFilters">
+        <button data-f="all" class="filter-btn text-xs px-3 py-1.5 rounded-lg border border-cyan-500 bg-cyan-500/10 text-cyan-300">All</button>
+        <button data-f="local" class="filter-btn text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:border-slate-500">Local</button>
+        <button data-f="remote" class="filter-btn text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:border-slate-500">Remote</button>
+        <button data-f="virtual" class="filter-btn text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:border-slate-500">Virtual</button>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-xs text-slate-500 border-b border-slate-800">
+            <th class="py-2 pr-4">Repository</th><th class="py-2 pr-4">Type</th><th class="py-2 pr-4">Package</th>
+            <th class="py-2 pr-4">Size</th><th class="py-2 pr-4">Health</th><th class="py-2">Last Sync</th>
+          </tr>
+        </thead>
+        <tbody id="repoBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Xray + Metrics -->
+  <div class="grid lg:grid-cols-2 gap-6">
+    <section id="xray" class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 fade-in">
+      <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-4"><i data-lucide="shield-check" class="w-4.5 h-4.5 text-amber-400"></i> Xray Vulnerability Scan</h2>
+      <div class="space-y-3" id="vulnList"></div>
+      <button id="scanBtn" class="mt-4 w-full text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-lg transition flex items-center justify-center gap-2">
+        <i data-lucide="scan-line" class="w-4 h-4"></i> Re-scan Artifacts
+      </button>
+    </section>
+
+    <section id="metrics" class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 fade-in">
+      <h2 class="text-lg font-semibold text-white flex items-center gap-2 mb-4"><i data-lucide="activity" class="w-4.5 h-4.5 text-emerald-400"></i> Cluster Metrics (live)</h2>
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Artifactory Node CPU</span><span class="text-cyan-400" id="cpuVal">0%</span></div>
+          <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div id="cpuBar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 transition-all duration-700" style="width:0%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Binary Storage I/O</span><span class="text-cyan-400" id="ioVal">0 MB/s</span></div>
+          <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div id="ioBar" class="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 transition-all duration-700" style="width:0%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-slate-400">ArgoCD Sync Queue</span><span class="text-cyan-400" id="argoVal">0</span></div>
+          <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div id="argoBar" class="h-full bg-gradient-to-r from-amber-500 to-orange-400 transition-all duration-700" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="mt-5 grid grid-cols-3 gap-3 text-center">
+        <div class="bg-slate-950 border border-slate-800 rounded-lg py-3"><div class="text-lg font-bold text-white" id="podCount">0</div><div class="text-[10px] text-slate-500">Pods</div></div>
+        <div class="bg-slate-950 border border-slate-800 rounded-lg py-3"><div class="text-lg font-bold text-white" id="nodeCount">0</div><div class="text-[10px] text-slate-500">Nodes</div></div>
+        <div class="bg-slate-950 border border-slate-800 rounded-lg py-3"><div class="text-lg font-bold text-emerald-400">99.99%</div><div class="text-[10px] text-slate-500">Uptime</div></div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="text-center text-xs text-slate-600 pt-4 pb-8">
+    Prototype by Antigravity OS · JFrog Professional Services · <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-97d70ce7" class="text-cyan-500 hover:underline">Contact Team</a>
+  </footer>
+</main>
+
+<script>
+lucide.createIcons();
+
+/* ---------- KPI counters ---------- */
+function animate(id, target, suffix='', dur=1200){
+  const el = document.getElementById(id); let start=0, t0=null;
+  function step(ts){ if(!t0)t0=ts; const p=Math.min((ts-t0)/dur,1);
+    const v = Math.floor(start + (target-start)*p);
+    el.textContent = v.toLocaleString() + suffix;
+    if(p<1) requestAnimationFrame(step);
+  } requestAnimationFrame(step);
+}
+animate('kpi-lead', 42, ' min');
+animate('kpi-artifacts', 1847293);
+animate('kpi-cache', 94, '%');
+animate('kpi-cve', 137);
+
+/* ---------- Pipeline ---------- */
+const stages = [
+  {name:'Commit', icon:'git-commit'},
+  {name:'CI Build', icon:'hammer'},
+  {name:'Artifactory Push', icon:'upload-cloud'},
+  {name:'Xray Scan', icon:'shield'},
+  {name:'ArgoCD Deploy', icon:'rocket'}
+];
+const stageEl = document.getElementById('stages');
+stages.forEach((s,i)=>{
+  stageEl.innerHTML += `<div id="stage-${i}" class="bg-slate-950 border border-slate-800 rounded-xl p-3 text-center transition">
+    <i data-lucide="${s.icon}" class="w-5 h-5 mx-auto text-slate-500"></i>
+    <div class="text-xs mt-2 text-slate-400">${s.name}</div>
+    <div class="text-[10px] mt-1 text-slate-600 status">idle</div>
+  </div>`;
+});
+lucide.createIcons();
+
+const logEl = document.getElementById('log');
+function log(msg, color='text-slate-400'){
+  const t = new Date().toLocaleTimeString('en-GB');
+  logEl.innerHTML += `<div class="${color}">[${t}] ${msg}</div>`;
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+const runBtn = document.getElementById('runBtn');
+runBtn.addEventListener('click', async ()=>{
+  runBtn.disabled = true; runBtn.classList.add('opacity-50');
+  logEl.innerHTML = '';
+  log('Pipeline triggered — commit a3f9c21 on main', 'text-cyan-400');
+  for(let i=0;i<stages.length;i++){
+    const el = document.getElementById('stage-'+i);
+    el.classList.add('border-cyan-500','glow');
+    el.querySelector('.status').textContent = 'running';
+    el.querySelector('.status').className = 'text-[10px] mt-1 text-cyan-400 status';
+    log(`▶ ${stages[i].name} started...`);
+    await new Promise(r=>setTimeout(r, 700 + Math.random()*500));
+    el.classList.remove('border-cyan-500','glow');
+    el.classList.add('border-emerald-600/50');
+    el.querySelector('.status').textContent = 'success';
+    el.querySelector('.status').className = 'text-[10px] mt-1 text-emerald-400 status';
+    log(`✔ ${stages[i].name} complete`, 'text-emerald-400');
+  }
+  log('Deployment live — revision 42 rolled out to EKS', 'text-cyan-400');
+  runBtn.disabled = false; runBtn.classList.remove('opacity-50');
+});
+
+/* ---------- Repositories ---------- */
+const repos = [
+  {name:'libs-release-local', type:'local', pkg:'Maven', size:'412 GB', health:'healthy', sync:'2m ago'},
+  {name:'docker-prod-local', type:'local', pkg:'Docker', size:'1.2 TB', health:'healthy', sync:'5m ago'},
+  {name:'npm-remote', type:'remote', pkg:'npm', size:'88 GB', health:'healthy', sync:'12m ago'},
+  {name:'pypi-remote', type:'remote', pkg:'PyPI', size:'64 GB', health:'degraded', sync:'1h ago'},
+  {name:'maven-virtual', type:'virtual', pkg:'Maven', size:'—', health:'healthy', sync:'live'},
+  {name:'docker-virtual', type:'virtual', pkg:'Docker', size:'—', health:'healthy', sync:'live'},
+  {name:'generic-edge-local', type:'local', pkg:'Generic', size:'230 GB', health:'healthy', sync:'8m ago'}
+];
+const repoBody = document.getElementById('repoBody');
+function renderRepos(filter='all'){
+  repoBody.innerHTML = '';
+  repos.filter(r=> filter==='all' || r.type===filter).forEach(r=>{
+    const hc = r.health==='healthy' ? 'text-emerald-400' : 'text-amber-400';
+    const dot = r.health==='healthy' ? 'bg-emerald-400' : 'bg-amber-400';
+    repoBody.innerHTML += `<tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition fade-in">
+      <td class="py-2.5 pr-4 font-mono text-xs text-slate-200">${r.name}</td>
+      <td class="py-2.5 pr-4"><span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">${r.type}</span></td>
+      <td class="py-2.5 pr-4 text-slate-400">${r.pkg}</td>
+      <td class="py-2.5 pr-4 text-slate-300">${r.size}</td>
+      <td class="py-2.5 pr-4"><span class="flex items-center gap-1.5 ${hc} text-xs"><span class="w-1.5 h-1.5 rounded-full ${dot}"></span>${r.health}</span></td>
+      <td class="py-2.5 text-slate-500 text-xs">${r.sync}</td>
+    </tr>`;
+  });
+}
+renderRepos();
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>{
+      b.className='filter-btn text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:border-slate-500';
+    });
+    btn.className='filter-btn text-xs px-3 py-1.5 rounded-lg border border-cyan-500 bg-cyan-500/10 text-cyan-300';
+    renderRepos(btn.dataset.f);
+  });
+});
+
+/* ---------- Xray ---------- */
+const vulns = [
+  {pkg:'log4j-core:2.14.1', sev:'Critical', cve:'CVE-2021-44228'},
+  {pkg:'spring-core:5.3.0', sev:'High', cve:'CVE-2022-22965'},
+  {pkg:'lodash:4.17.15', sev:'Medium', cve:'CVE-2020-8203'},
+  {pkg:'openssl:1.1.1k', sev:'Low', cve:'CVE-2022-0778'}
+];
+const sevColor = {Critical:'text-red-400 bg-red-500/10 border-red-500/30', High:'text-orange-400 bg-orange-500/10 border-orange-500/30', Medium:'text-amber-400 bg-amber-500/10 border-amber-500/30', Low:'text-slate-400 bg-slate-500/10 border-slate-500/30'};
+const vulnList = document.getElementById('vulnList');
+function renderVulns(){
+  vulnList.innerHTML = '';
+  vulns.forEach(v=>{
+    vulnList.innerHTML += `<div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 fade-in">
+      <div><div class="font-mono text-xs text-slate-200">${v.pkg}</div><div class="text-[10px] text-slate-500">${v.cve}</div></div>
+      <span class="text-[10px] px-2 py-1 rounded border ${sevColor[v.sev]}">${v.sev}</span>
+    </div>`;
+  });
+}
+renderVulns();
+document.getElementById('scanBtn').addEventListener('click', function(){
+  const btn = this; btn.disabled = true;
+  vulnList.innerHTML = '<div class="text-center text-xs text-cyan-400 py-6">Scanning artifacts...</div>';
+  setTimeout(()=>{ renderVulns(); btn.disabled = false; }, 1400);
+});
+
+/* ---------- Live metrics ---------- */
+function tick(){
+  const cpu = 30 + Math.random()*45;
+  const io = 200 + Math.random()*600;
+  const argo = Math.floor(Math.random()*12);
+  document.getElementById('cpuVal').textContent = cpu.toFixed(0)+'%';
+  document.getElementById('cpuBar').style.width = cpu+'%';
+  document.getElementById('ioVal').textContent = io.toFixed(0)+' MB/s';
+  document.getElementById('ioBar').style.width = (io/9)+'%';
+  document.getElementById('argoVal').textContent = argo;
+  document.getElementById('argoBar').style.width = (argo/15*100)+'%';
+  document.getElementById('podCount').textContent = 40 + Math.floor(Math.random()*8);
+  document.getElementById('nodeCount').textContent = 6 + Math.floor(Math.random()*3);
+}
+tick(); setInterval(tick, 2000);
+</script>
+</body>
+</html>

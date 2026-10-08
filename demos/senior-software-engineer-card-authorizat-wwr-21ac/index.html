@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Senior Software Engineer, Card Authorization – Interactive Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            slate: {
+              800: '#1e293b',
+              900: '#0f172a',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+  <!-- Sticky Header Banner -->
+  <header class="fixed inset-x-0 top-0 z-50 bg-slate-800 border-b border-slate-700">
+    <div class="max-w-7xl mx-auto flex items-center justify-between p-3">
+      <div class="flex items-center space-x-2 text-sm">
+        <i data-lucide="rocket" class="w-5 h-5 text-primary"></i>
+        <span>Live Interactive Prototype for: Senior Software Engineer, Card Authorization</span>
+        <span class="ml-2">| Built autonomously by Antigravity OS | Ready for deployment</span>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-21acae6a"
+         class="inline-flex items-center gap-2 bg-primary hover:bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded transition">
+        <i data-lucide="user-check" class="w-4 h-4"></i>Hire Team ($150 - $500)
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 pt-20 pb-10">
+    <section class="max-w-5xl mx-auto px-4">
+      <h1 class="text-3xl font-bold mb-6 text-center text-primary">Card Authorization Dashboard</h1>
+
+      <!-- Controls -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+        <div class="flex items-center space-x-3">
+          <input type="text" id="searchInput" placeholder="Search Transaction ID..."
+                 class="bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+          <label class="inline-flex items-center space-x-2">
+            <input type="checkbox" id="declineToggle" class="form-checkbox h-4 w-4 text-primary bg-slate-800 border-slate-600 rounded">
+            <span class="text-sm">Show Declined Only</span>
+          </label>
+        </div>
+        <button id="addTxnBtn"
+                class="flex items-center gap-2 bg-primary hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition">
+          <i data-lucide="plus-circle"></i>Simulate Transaction
+        </button>
+      </div>
+
+      <!-- Progress Bar (hidden by default) -->
+      <div id="progressOverlay" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden">
+        <div class="w-64 bg-slate-800 rounded p-4">
+          <p class="text-center mb-2">Processing transaction...</p>
+          <div class="w-full bg-slate-700 rounded h-2 overflow-hidden">
+            <div id="progressBar" class="bg-primary h-2 w-0 transition-all duration-200"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="bg-slate-800 rounded-lg p-4 mb-8 shadow-lg">
+        <canvas id="statusChart" height="120"></canvas>
+      </div>
+
+      <!-- Transactions Table -->
+      <div class="overflow-x-auto bg-slate-800 rounded-lg shadow-lg">
+        <table class="min-w-full divide-y divide-slate-700">
+          <thead class="bg-slate-700">
+            <tr>
+              <th class="px-4 py-2 text-left text-sm font-medium text-slate-200">ID</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-slate-200">Amount ($)</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-slate-200">Status</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-slate-200">Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="txnTableBody" class="divide-y divide-slate-700"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Mock data store
+    const transactions = [];
+
+    // Utility to generate random transaction
+    function generateTransaction() {
+      const id = 'TXN-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+      const amount = (Math.random() * 500).toFixed(2);
+      const status = Math.random() < 0.78 ? 'Approved' : 'Declined'; // 78% approve
+      const timestamp = new Date().toLocaleString();
+      return { id, amount, status, timestamp };
+    }
+
+    // Render table rows based on filters
+    function renderTable() {
+     

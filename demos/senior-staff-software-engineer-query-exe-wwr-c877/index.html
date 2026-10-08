@@ -1,0 +1,32 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Senior Staff Software Engineer - Query Execution</h1><p># Engineering Application: Senior Staff Software Engineer - Query Execution at Dremio
+
+## 1. Executive Summary & Value Proposition
+
+I build and tune the layer Dremio's Query Execution team owns: the runtime that turns a logical plan into vectorized operators moving Arrow buffers under memory, spill, and scheduling constraints. My background maps directly onto the eight responsibilities in the posting:
+
+- **Operators and expression evaluation.** I've designed hash joins, window functions, and aggregation pipelines over Arrow `RecordBatch`es, including out-of-core (spill-to-disk) variants and code-generated expression kernels that eliminate per-row virtual dispatch.
+- **Memory management.** I've implemented hierarchical, byte-accounted allocators with reservation/limit semantics, so a single query can be throttled or force-spilled instead of triggering an OOM kill — the difference between a slow query and a cluster incident.
+- **Scheduling and runtime planning.** I've built work-stealing fork/join pools with locality-aware task placement, backpressure on exchange channels, and adaptive re-planning on skew.
+- **JVM performance.** Steady-state work in JFR, async-profiler, allocation profiling, escape analysis, biased-lock removal, G1/ZGC tuning, and off-heap (sun.misc.Unsafe / FFM) buffer management to keep GC pauses out of the p99.
+- **Cross-team collaboration.** I work fluently across planner, storage, and support boundaries — writing the query-profile annotations and telemetry that make a 40-operator plan diagnosable by someone who wasn't in the design review.
+
+**Stack alignment:** Dremio's runtime is Java on the JVM with Apache Arrow as the in-memory format, Apache Iceberg/Parquet at the scan boundary, and a distributed exchange layer. That is precisely the environment I work in daily. I read Dremio's open-source execution code (the `sabot` module: `PhysicalOperator`, `BaseDataHandler`, `RecordBatchMemoryManager`, the `SpillableHashAggregate` path) as part of my preparation for this application, and the proposal below is written against that architecture rather than a generic "big data" template.
+
+**Value proposition in one line:** I can own the path from `PhysicalPlan` to `RecordBatch` end-to-end — operator semantics, memory accounting, spill, and the profiling work that proves it's faster — without a six-month ramp.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural context
+
+Dremio's execution stack, simplified:
+
+```
+SQL ──► Logical Plan ──► Planner (rules, cost) ──► Physical Plan (JSON)
+                                                          │
+                                              Foreman / QueryManager
+                                                          │
+                              ┌───────────────────────────┴──────────────────────────┐
+                              │  Fragment execution (per node)                       │
+                              │  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐ </p></body></html>

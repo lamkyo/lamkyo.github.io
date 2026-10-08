@@ -1,0 +1,28 @@
+<!-- Top KPI strip -->
+<section class="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-5">
+  <div class="rounded-2xl border border-line bg-panel p-4 shadow-glow">
+    <div class="mb-2 flex items-center justify-between text-xs text-slate-500"><span>Target Accounts</span><i data-lucide="building-2" class="h-4 w-4"></i></div>
+    <div id="kpiAccounts" class="text-2xl font-bold text-white">186</div>
+    <div class="mt-1 text-[11px] text-cyan-300">50–3,000 employees</div>
+  </div>
+  <div class="rounded-2xl border border-line bg-panel p-4">
+    <div class="mb-2 flex items-center justify-between text-xs text-slate-500"><span>Contacts Mapped</span><i data-lucide="users" class="h-4 w-4"></i></div>
+    <div id="kpiContacts" class="text-2xl font-bold text-white">412</div>
+    <div class="mt-1 text-[11px] text-violet-300">2.2 / account</div>
+  </div>
+  <div class="rounded-2xl border border-line bg-panel p-4">
+    <div class="mb-2 flex items-center justify-between text-xs text-slate-500"><span>Active Sequences</span><i data-lucide="send" class="h-4 w-4"></i></div>
+    <div id="kpiSequences" class="text-2xl font-bold text-white">74</div>
+    <div class="mt-1 text-[11px] text-emerald-300">+12 this week</div>
+  </div>
+  <div class="rounded-2xl border border-line bg-panel p-4">
+    <div class="mb-2 flex items-center justify-between text-xs text-slate-500"><span>Meetings Booked</span><i data-lucide="calendar-check-2" class="h-4 w-4"></i></div>
+    <div id="kpiMeetings" class="text-2xl font-bold text-white">19</div>
+    <div class="mt-1 text-[11px] text-amber-300">24% reply → meeting</div>
+  </div>
+  <div class="col-span-2 rounded-2xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/[.08] to-violet-400/[.06] p-4 lg:col-span-1">
+    <div class="mb-2 flex items-center justify-between text-xs text-slate-500"><span>Pipeline Coverage</span><i data-lucide="activity" class="h-4 w-4 text-cyan-300"></i></div>
+    <div class="flex items-end gap-2"><div id="kpiCoverage" class="text-2xl font-bold text-white">3.4×</div><span class="mb-1 text-[11px] text-cyan-300">healthy</span></div>
+    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800"><div id="coverageBar" class="bar h-full w-[68%] rounded-full bg-gradient-to-r from-cyan-300 to-violet-400"></div></div>
+  </div>
+</section>

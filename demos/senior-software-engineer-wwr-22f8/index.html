@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AccuLynx Systems Architecture Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <style>
+        body { @apply bg-slate-950 text-slate-200 antialiased; }
+        .glass { @apply bg-slate-900/50 backdrop-blur-md border border-slate-800; }
+    </style>
+</head>
+<body>
+
+    <!-- Sticky Banner -->
+    <div class="sticky top-0 z-50 bg-indigo-600 px-4 py-2 flex items-center justify-between text-white text-sm font-medium shadow-lg">
+        <span>🚀 Live Interactive Prototype: Senior Software Engineer at AccuLynx | Built by Antigravity OS</span>
+        <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-22f88183" 
+           class="bg-white text-indigo-700 px-4 py-1 rounded-full text-xs font-bold hover:bg-slate-100 transition">
+           HIRE TEAM ($150 - $500)
+        </a>
+    </div>
+
+    <main class="max-w-6xl mx-auto p-6 space-y-8">
+        <header class="py-8">
+            <h1 class="text-4xl font-extrabold text-white mb-2">Systems Architecture Prototype</h1>
+            <p class="text-slate-400">Concurrency handling and event-driven projections for field service operations.</p>
+        </header>
+
+        <!-- Dashboard Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass p-6 rounded-xl">
+                <h3 class="text-slate-400 text-sm">Active Crew Locks</h3>
+                <p id="crew-count" class="text-3xl font-mono font-bold mt-2">142</p>
+                <div class="w-full bg-slate-700 h-1 mt-4 rounded-full overflow-hidden">
+                    <div class="bg-emerald-500 h-full w-2/3"></div>
+                </div>
+            </div>
+            <div class="glass p-6 rounded-xl">
+                <h3 class="text-slate-400 text-sm">Real-time Sync Latency</h3>
+                <p class="text-3xl font-mono font-bold mt-2 text-emerald-400">42ms</p>
+                <p class="text-xs text-slate-500 mt-2">SignalR backplane operational</p>
+            </div>
+            <div class="glass p-6 rounded-xl">
+                <h3 class="text-slate-400 text-sm">Elasticsearch Index</h3>
+                <p class="text-3xl font-mono font-bold mt-2">99.9% health</p>
+                <p class="text-xs text-slate-500 mt-2">Last reindex: 2m ago</p>
+            </div>
+        </div>
+
+        <!-- Interactive Job Table -->
+        <div class="glass rounded-xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold">Active Dispatch Queue</h2>
+                <div class="flex gap-2">
+                    <button onclick="toggleSync()" class="px-4 py-2 bg-slate-800 rounded-lg hover:bg-slate-700 text-sm">Toggle Live Feed</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="pb-4">Job ID</th>
+                            <th class="pb-4">Crew Lead</th>
+                            <th class="pb-4">Status</th>
+                            <th class="pb-4">Sync State</th>
+                        </tr>
+                    </thead>
+                    <tbody id="job-table">
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 font-mono text-indigo-400">#AC-8821</td>
+                            <td class="py-4">Miller, S.</td>
+                            <td class="py-4"><span class="px-2 py-1 rounded bg-indigo-900/30 text-indigo-300 text-xs border border-indigo-900">In Progress</span></td>
+                            <td class="py-4 text-emerald-400">✓ Synced</td>
+                        </tr>
+                        <tr class="border-b border-slate-800/50">
+                            <td class="py-4 font-mono text-indigo-400">#AC-8822</td>
+                            <td class="py-4">Davis, M.</td>
+                            <td class="py-4"><span class="px-2 py-1 rounded bg-emerald-900/30 text-emerald-300 text-xs border border-emerald-900">Dispatched</span></td>
+                            <td class="py-4 text-emerald-400">✓ Synced</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simulate real-time updates
+        function toggleSync() {
+            const table = document.getElementById('job-table');
+            const row = document.createElement('tr');
+            row.className = 'border-b border-slate-800/50 animate-fade-in';
+            row.innerHTML = `
+                <td class="py-4 font-mono text-indigo-400">#AC-${Math.floor(Math.random() * 9000)}</td>
+                <td class="py-4">System Event</td>
+                <td class="py-4"><span class="px-2 py-1 rounded bg-amber-900/30 text-amber-300 text-xs border border-amber-900">Pending</span></td>
+                <td class="py-4 text-amber-400">Syncing...</td>
+            `;
+            table.prepend(row);
+            
+            // Update stats
+            const counter = document.getElementById('crew-count');
+            counter.innerText = parseInt(counter.innerText) + 1;
+        }
+
+        // Initialize icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>

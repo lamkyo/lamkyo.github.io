@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B2B Invoicing SaaS – Interactive Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            slate: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-200 min-h-screen flex flex-col">
+
+  <!-- Sticky Header Banner -->
+  <header class="fixed inset-x-0 top-0 z-40 bg-slate-800 border-b border-slate-700">
+    <div class="max-w-7xl mx-auto flex items-center justify-between p-2">
+      <div class="flex items-center space-x-2 text-sm">
+        <span class="inline-flex items-center"><i data-lucide="rocket" class="w-4 h-4"></i> Live Interactive Prototype for: B2B Invoicing SaaS</span>
+        <span>|</span>
+        <span>Built autonomously by Antigravity OS</span>
+        <span>|</span>
+        <span>Ready for deployment</span>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20test-123"
+         class="inline-flex items-center gap-1 bg-primary hover:bg-primary/90 text-white text-sm font-medium px-3 py-1 rounded-md transition">
+        <i data-lucide="mail"></i> Hire Team ($150 - $500)
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-1 pt-16 pb-8 max-w-7xl w-full mx-auto px-4 lg:px-8 space-y-12">
+
+    <!-- Invoice Generator -->
+    <section class="bg-slate-800 rounded-xl p-6 shadow-lg">
+      <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2"><i data-lucide="file-plus"></i>Invoice Generator</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium">Client Name</label>
+          <input id="clientName" type="text" class="w-full rounded-md bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-primary px-3 py-2" placeholder="Acme Corp">
+        </div>
+        <div class="space-y-2">
+          <label class="block text-sm font-medium">Invoice #</label>
+          <input id="invoiceNumber" type="text" class="w-full rounded-md bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-primary px-3 py-2" placeholder="2023-001">
+        </div>
+      </div>
+
+      <!-- Line Items Table -->
+      <div class="mt-6 overflow-x-auto">
+        <table class="w-full table-auto border-collapse">
+          <thead class="bg-slate-700">
+            <tr>
+              <th class="px-3 py-2 text-left">Description</th>
+              <th class="px-3 py-2 text-left w-24">Qty</th>
+              <th class="px-3 py-2 text-left w-32">Unit Price</th>
+              <th class="px-3 py-2 text-left w-32">Total</th>
+              <th class="px-3 py-2 w-12"></th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody" class="bg-slate-800">
+            <!-- rows injected by JS -->
+          </tbody>
+          <tfoot class="bg-slate-700">
+            <tr>
+              <td colspan="5" class="p-2">
+                <button id="addItemBtn" class="inline-flex items-center gap-1 bg-primary hover:bg-primary/90 text-white text-sm font-medium px-3 py-1 rounded-md transition">
+                  <i data-lucide="plus-circle"></i> Add Line Item
+                </button>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Summary -->
+      <div class="mt-6 flex flex-col md:flex-row md:justify-end gap-4">
+        <div class="space-y-1">
+          <div class="flex justify-between"><span>Subtotal:</span> <span id="subtotal">$0.00</span></div>
+          <div class="flex justify-between"><span>Tax (10%):</span> <span id="tax">$0.00</span></div>
+          <div class="flex justify-between font-semibold text-lg"><span>Total:</span> <span id="total">$0.00</span></div>
+        </div>
+        <button id="generateBtn" class="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white font-medium px-4 py-2 rounded-md transition">
+          <i data-lucide="loader" class="animate-spin hidden" id="genSpinner"></i> Generate Invoice
+        </button>
+      </div>
+
+      <!-- Simulated Progress Bar -->
+      <div id="progressContainer" class="mt-4 hidden">
+        <div class="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
+          <div id="progressBar" class="bg-primary h-4 w-0 transition-all duration-300"></div>
+        </div>
+        <p class="mt-1 text-sm text-slate-400" id="progressText">Generating...</p>
+      </div>
+    </section>
+
+    <!-- Invoice List -->
+    <section class="bg-slate-800 rounded-xl p-6 shadow-lg">
+      <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2"><i data-lucide="list"></i>Recent Invoices</h2>
+
+      <div class="flex items-center gap-4 mb-4">
+        <input id="searchInput" type="text" placeholder="Search client…" class="rounded-md bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-primary px-3 py-1 text-sm">
+        <label class="flex items-center gap-1">
+          <input type="checkbox" id="showPaidToggle" class="form-checkbox h-4 w-4 text-primary bg-slate-700 border-slate-600 rounded">
+          Show Paid
+        </label>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full table-auto border-collapse">
+          <thead class="bg-slate-700">
+            <tr>
+              <th class="px-3 py-2 text-left">#</th>
+              <th class="px-3 py-2 text-left">Client</th>
+              <th class="px-3 py-2 text-left">Amount</th>
+              <th class="px-3 py

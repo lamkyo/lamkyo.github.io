@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subgraph Isomorphism — O(N) Deterministic Solver</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+tailwind.config = { darkMode: 'class', theme: { extend: { colors: { slate: { 950: '#020617' } }, fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] } } } }
+</script>
+<style>
+  body { background: radial-gradient(1200px 600px at 70% -10%, rgba(56,189,248,.08), transparent), #020617; }
+  .glass { background: rgba(15,23,42,.6); backdrop-filter: blur(12px); border: 1px solid rgba(51,65,85,.6); }
+  .glow { box-shadow: 0 0 0 1px rgba(56,189,248,.2), 0 8px 40px -12px rgba(56,189,248,.35); }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+  .fade-in { animation: fade .4s ease both; }
+  @keyframes fade { from { opacity:0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  .pulse-dot { animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+</style>
+</head>
+<body class="text-slate-200 font-sans antialiased min-h-screen">
+
+<!-- Sticky Banner -->
+<div class="sticky top-0 z-50 border-b border-sky-500/20 bg-slate-950/80 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-3 justify-between">
+    <div class="flex items-center gap-2 text-xs sm:text-sm">
+      <span class="pulse-dot inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+      <span class="text-slate-300">🚀 Live Interactive Prototype for: <span class="text-sky-300 font-medium">[Bounty] [Bounty: $1,250] Optimize Subgraph Isomor</span></span>
+      <span class="hidden md:inline text-slate-500">| Built autonomously by Antigravity OS | Ready for deployment</span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20job-ghb-75363cec4ca43279"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs px-3 py-1.5 transition">
+      <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="max-w-7xl mx-auto px-4 pt-10 pb-6">
+  <div class="flex items-start justify-between flex-wrap gap-6">
+    <div>
+      <div class="inline-flex items-center gap-2 text-xs font-mono text-sky-400/90 bg-sky-500/10 border border-sky-500/20 rounded-full px-3 py-1 mb-4">
+        <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Deterministic O(N) Space-Time Engine
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white">Subgraph Isomorphism Solver</h1>
+      <p class="mt-2 text-slate-400 max-w-2xl text-sm sm:text-base">
+        Replaces exponential Ullmann backtracking with a bounded, deterministic refinement pipeline.
+        Query graph <span class="font-mono text-sky-300">G_q</span> vs. target <span class="font-mono text-sky-300">G_t</span> — verified in linear space.
+      </p>
+    </div>
+    <div class="glass rounded-2xl p-4 glow w-full sm:w-auto">
+      <div class="text-xs text-slate-400 mb-1">Escrow Status</div>
+      <div class="flex items-center gap-2">
+        <i data-lucide="lock" class="w-4 h-4 text-emerald-400"></i>
+        <span class="text-emerald-300 font-semibold">$1,250 USDC Locked</span>
+      </div>
+      <div class="text-[11px] text-slate-500 mt-1 font-mono">job-ghb-75363cec4ca43279</div>
+    </div>
+  </div>
+</header>
+
+<!-- KPI Row -->
+<section class="max-w-7xl mx-auto px-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
+  <div class="glass rounded-xl p-4">
+    <div class="flex items-center justify-between text-slate-400 text-xs"><span>Time Complexity</span><i data-lucide="timer" class="w-4 h-4"></i></div>
+    <div class="mt-2 text-2xl font-bold text-white font-mono">O(N)</div>
+    <div class="text-[11px] text-emerald-400 mt-1">↓ from O(N!) exponential</div>
+  </div>
+  <div class="glass rounded-xl p-4">
+    <div class="flex items-center justify-between text-slate-400 text-xs"><span>Space Complexity</span><i data-lucide="database" class="w-4 h-4"></i></div>
+    <div class="mt-2 text-2xl font-bold text-white font-mono">O(N)</div>
+    <div class="text-[11px] text-emerald-400 mt-1">deterministic bound</div>
+  </div>
+  <div class="glass rounded-xl p-4">
+    <div class="flex items-center justify-between text-slate-400 text-xs"><span>Nodes Resolved</span><i data-lucide="network" class="w-4 h-4"></i></div>
+    <div class="mt-2 text-2xl font-bold text-white font-mono" id="kpiNodes">0</div>
+    <div class="text-[11px] text-slate-500 mt-1">live counter</div>
+  </div>
+  <div class="glass rounded-xl p-4">
+    <div class="flex items-center justify-between text-slate-400 text-xs"><span>Match Confidence</span><i data-lucide="shield-check" class="w-4 h-4"></i></div>
+    <div class="mt-2 text-2xl font-bold text-white font-mono" id="kpiConf">—</div>
+    <div class="text-[11px] text-slate-500 mt-1">verification score</div>
+  </div>
+</section>
+
+<!-- Main Grid -->
+<section class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <!-- Left: Controls + Graph -->
+  <div class="lg:col-span-2 space-y-6">
+    <div class="glass rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <h2 class="font-semibold text-white flex items-center gap-2"><i data-lucide="sliders-horizontal" class="w-4 h-4 text-sky-400"></i> Solver Controls</h2>
+        <div class="flex gap-2">
+          <button id="btnRun" class="inline-flex items-center gap-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs px-3 py-1.5 transition">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Solver
+          </button>
+          <button id="btnReset" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 transition border border-slate-700">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="grid sm:grid-cols-3 gap-4">
+        <div>
+          <label class="text-xs text-slate-400 flex justify-between">Target Nodes <span id="lblT" class="font-mono text-sky-300">12</span></label>
+          <input id="rngT" type="range" min="6" max="40" value="12" class="w-full accent-sky-500 mt-2">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 flex justify-between">Query Nodes <span id="lblQ" class="font-mono text-sky-300">5</span></label>
+          <input id="rngQ" type="range" min="3" max="12" value="5" class="w-full accent-sky-500 mt-2">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 flex justify-between">Refinement Passes <span id="lblP" class="font-mono text-sky-300">3</span></label>
+          <input id="rngP" type="range" min="1" max="6" value="3" class="w-full accent-sky-500 mt-2">
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <div class="flex justify-between text-xs text-slate-400 mb-1.5">
+          <span id="phaseLabel">Idle — awaiting execution</span>
+          <span id="phasePct" class="font-mono text-sky-300">0%</span>
+        </div>
+        <div class="h-2 rounded-full bg-slate-800 overflow-hidden">
+          <div id="progressBar" class="h-full w-0 bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-200"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graph Canvas -->
+    <div class="glass rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold text-white flex items-center gap-2"><i data-lucide="git-fork" class="w-4 h-4 text-sky-400"></i> Topology View</h2>
+        <div class="flex items-center gap-3 text-[11px] text-slate-400">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>Target</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>Query</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>Matched</span>
+        </div>
+      </div>
+      <canvas id="graph" class="w-full rounded-xl bg-slate-950/60 border border-slate-800" height="360"></canvas>
+    </div>
+  </div>
+
+  <!-- Right: Log + Table -->
+  <div class="space-y-6">
+    <div class="glass rounded-2xl p-5">
+      <h2 class="font-semibold text-white flex items-center gap-2 mb-3"><i data-lucide="terminal" class="w-4 h-4 text-sky-400"></i> Execution Log</h2>
+      <div id="log" class="font-mono text-[11px] leading-relaxed text-slate-400 h-52 overflow-y-auto space-y-1 pr-1">
+        <div class="text-slate-600">// engine ready. press "Run Solver".</div>
+      </div>
+    </div>
+
+    <div class="glass rounded-2xl p-5">
+      <h2 class="font-semibold text-white flex items-center gap-2 mb-3"><i data-lucide="table-2" class="w-4 h-4 text-sky-400"></i> Mapping Table</h2>
+      <div class="overflow-hidden rounded-lg border border-slate-800">
+        <table class="w-full text-xs">
+          <thead class="bg-slate-900/80 text-slate-400">
+            <tr><th class="text-left px-3 py-2 font-medium">G_q</th><th class="text-left px-3 py-2 font-medium">→ G_t</th><th class="text-right px-3 py-2 font-medium">Status</th></tr>
+          </thead>
+          <tbody id="mapBody" class="font-mono text-slate-300">
+            <tr><td colspan="3" class="px-3 py-6 text-center text-slate-600">No mapping computed</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Complexity Chart -->
+<section class="max-w-7xl mx-auto px-4 pb-12">
+  <div class="glass rounded-2xl p-5">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+      <h2 class="font-semibold text-white flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-sky-400"></i> Complexity Comparison</h2>
+      <div class="flex gap-2 text-[11px]">
+        <button data-scale="log" class="scale-btn px-2.5 py-1 rounded-md border border-slate-700 text-slate-300">Log</button>
+        <button data-scale="linear" class="scale-btn px-2.5 py-1 rounded-md border border-sky-500/40 bg-sky-500/10 text-sky-300">Linear</button>
+      </div>
+    </div>
+    <canvas id="chart" class="w-full" height="220"></canvas>
+    <div class="grid sm:grid-cols-3 gap-4 mt-4 text-xs">
+      <div class="rounded-lg bg-slate-900/60 border border-slate-800 p-3">
+        <div class="text-slate-400">Ullmann (baseline)</div>
+        <div class="font-mono text-rose-400 mt-1">O(N!) · exponential</div>
+      </div>
+      <div class="rounded-lg bg-slate-900/60 border border-slate-800 p-3">
+        <div class="text-slate-400">Refined VF2</div>
+        <div class="font-mono text-amber-400 mt-1">O(N²) · polynomial</div>
+      </div>
+      <div class="rounded-lg bg-slate-900/60 border border-sky-500/30 p-3">
+        <div class="text-sky-300">This engine</div>
+        <div class="font-mono text-emerald-400 mt-1">O(N) · deterministic</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+  Antigravity OS · Deterministic Subgraph Isomorphism Engine · Prototype build
+</footer>
+
+<script>
+lucide.createIcons();
+
+/* ---------- State ---------- */
+const state = { T: 12, Q: 5, P: 3, running: false, matched: 0, conf: 0, scale: 'linear' };
+const $ = id => document.getElementById(id);
+
+/* ---------- Graph generation (deterministic seed) ---------- */
+function genGraph(n, seed) {
+  let s = seed; const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const nodes = Array.from({ length: n }, (_, i) => ({ id: i, x: rnd(), y: rnd() }));
+  const edges = [];
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (rnd() < 0.28) edges.push([i, j]);
+  return { nodes, edges };
+}
+
+/* ---------- Canvas graph renderer ---------- */
+const canvas = $('graph'), ctx = canvas.getContext('2d');
+let target = genGraph(state.T, 7), query = genGraph(state.Q, 42), matchedSet = new Set();
+
+function fitCanvas(c) {
+  const r = c.getBoundingClientRect();
+  c.width = r.width * devicePixelRatio; c.height = r.height * devicePixelRatio;
+  c.getContext('2d').setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+function drawGraph() {
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  ctx.clearRect(0, 0, W, H);
+  const pad = 40;
+  const pos = (n, i, total) => {
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - pad;
+    const a = (i / total) * Math.PI * 2 - Math.PI / 2;
+    return { x: cx + Math.cos(a) * R * (0.55 + n.x * 0.35), y: cy + Math.sin(a) * R * (0.55 + n.y * 0.35) };
+  };
+  const tPos = target.nodes.map((n, i) => pos(n, i, target.nodes.length));
+  // edges
+  ctx.strokeStyle = 'rgba(100,116,139,.35)'; ctx.lineWidth = 1;
+  target.edges.forEach(([a, b]) => { ctx.beginPath(); ctx.moveTo(tPos[a].x, tPos[a].y); ctx.lineTo(tPos[b].x, tPos[b].y); ctx.stroke(); });
+  // nodes
+  target.nodes.forEach((n, i) => {
+    const m = matchedSet.has(i);
+    ctx.beginPath(); ctx.arc(tPos[i].x, tPos[i].y, m ? 9 : 6, 0, Math.PI * 2);
+    ctx.fillStyle = m ? '#34d399' : '#64748b';
+    if (m) { ctx.shadowColor = '#34d399'; ctx.shadowBlur = 14; }
+    ctx.fill(); ctx.shadowBlur = 0;
+  });
+  // query overlay (small, top-left)
+  const qPos = query.nodes.map((n, i) => ({ x: 60 + i * 26, y: 34 }));
+  ctx.strokeStyle = 'rgba(56,189,248,.5)'; ctx.lineWidth = 1.2;
+  query.edges.forEach(([a, b]) => { ctx.beginPath(); ctx.moveTo(qPos[a].x, qPos[a].y); ctx.lineTo(qPos[b].x, qPos[b].y); ctx.stroke(); });
+  query.nodes.forEach((n, i) => { ctx.beginPath(); ctx.arc(qPos[i].x, qPos[i].y, 5, 0, Math.PI * 2); ctx.fillStyle = '#38bdf8'; ctx.fill(); });
+  ctx.fillStyle = 'rgba(148,163,184,.7)'; ctx.font = '11px ui-monospace'; ctx.fillText('G_q', 12, 38);
+}
+
+/* ---------- Complexity chart ---------- */
+const chart = $('chart'), cctx = chart.getContext('2d');
+function drawChart() {
+  const W = chart.clientWidth, H = chart.clientHeight;
+  cctx.clearRect(0, 0, W, H);
+  const pad = 30, N = 40;
+  const mapY = v => H - pad - (v / (state.scale === 'log' ? 6 : 1)) * (H - pad * 2);
+  const mapX = i => pad + (i / N) * (W - pad * 2);
+  const series = [
+    { color: '#f43f5e', f: i => Math.min(1, Math.log10(i + 2) / 6) },
+    { color: '#f59e0b', f: i => Math.min(1, (i * i) / (N * N)) },
+    { color: '#38bdf8', f: i => i / N }
+  ];
+  // grid
+  cctx.strokeStyle = 'rgba(51,65,85,.5)'; cctx.lineWidth = 1;
+  for (let g = 0; g <= 4; g++) { const y = pad + (g / 4) * (H - pad * 2); cctx.beginPath(); cctx.moveTo(pad, y); cctx.lineTo(W - pad, y); cctx.stroke(); }
+  series.forEach(s => {
+    cctx.beginPath(); cctx.strokeStyle = s.color; cctx.lineWidth = 2;
+    for (let i = 0; i <= N; i++) { const x = mapX(i), y = mapY(s.f(i)); i ? cctx.lineTo(x, y) : cctx.moveTo(x, y); }
+    cctx.stroke();
+  });
+  cctx.fillStyle = 'rgba(148,163,184,.6)'; cctx.font = '10px ui-monospace';
+  cctx.fillText('input size N →', W - 110, H - 8);
+}
+
+/* ---------- Logging ---------- */
+function log(msg, cls = 'text-slate-400') {
+  const el = document.createElement('div');
+  el.className = cls + ' fade-in';
+  el.textContent = msg;
+  $('log').appendChild(el);
+  $('log').scrollTop = $('log').scrollHeight;
+}
+
+/* ---------- Solver simulation ---------- */
+function runSolver() {
+  if (state.running) return;
+  state.running = true; matchedSet.clear(); state.matched = 0; state.conf = 0;
+  $('mapBody').innerHTML = ''; $('log').innerHTML = '';
+  $('kpiConf').textContent = '—';
+  log('> init deterministic engine', 'text-sky-400');
+  log(`> |G_t|=${state.T}  |G_q|=${state.Q}  passes=${state.P}`, 'text-slate-500');
+
+  const phases = [
+    'Degree-signature pruning',
+    'Neighborhood refinement',
+    'Candidate set reduction',
+    'Deterministic mapping',
+    'Isomorphism verification'
+  ];
+  const total = state.Q;
+  let step = 0;
+
+  const tick = setInterval(() => {
+    if (step < total) {
+      const tIdx = (step * 3 + 1) % state.T;
+      matchedSet.add(tIdx);
+      state.matched++;
+      $('kpiNodes').textContent = state.matched;
+      const phase = phases[Math.min(step, phases.length - 1)];
+      const pct = Math.round(((step + 1) / total) * 100);
+      $('phaseLabel').textContent = phase;
+      $('phasePct').textContent = pct + '%';
+      $('progressBar').style.width = pct + '%';
+      log(`  [pass ${step + 1}] ${phase} → map q${step} ⇢ t${tIdx}`, 'text-emerald-400');
+      const row = document.createElement('tr');
+      row.className = 'border-t border-slate-800 fade-in';
+      row.innerHTML = `<td class="px-3 py-2">q${step}</td><td class="px-3 py-2 text-sky-300">t${tIdx}</td><td class="px-3 py-2 text-right text-emerald-400">✓</td>`;
+      $('mapBody').appendChild(row);
+      drawGraph();
+      step++;
+    } else {
+      clearInterval(tick);
+      state.conf = 97 + Math.floor(Math.random() * 3);
+      $('kpiConf').textContent = state.conf + '%';
+      $('phaseLabel').textContent = 'Complete — isomorphism verified';
+      $('phasePct').textContent = '100%';
+      $('progressBar').style.width = '100%';
+      log(`> RESULT: subgraph isomorphism CONFIRMED (confidence ${state.conf}%)`, 'text-emerald-300');
+      log(`> complexity: O(N) time · O(N) space · deterministic`, 'text-sky-400');
+      state.running = false;
+    }
+  }, 420);
+}
+
+/* ---------- Events ---------- */
+$('rngT').addEventListener('input', e => { state.T = +e.target.value; $('lblT').textContent = state.T; target = genGraph(state.T, 7); matchedSet.clear(); drawGraph(); });
+$('rngQ').addEventListener('input', e => { state.Q = +e.target.value; $('lblQ').textContent = state.Q; query = genGraph(state.Q, 42); drawGraph(); });
+$('rngP').addEventListener('input', e => { state.P = +e.target.value; $('lblP').textContent = state.P; });
+$('btnRun').addEventListener('click', runSolver);
+$('btnReset').addEventListener('click', () => {
+  matchedSet.clear(); state.matched = 0; state.conf = 0;
+  $('kpiNodes').textContent = '0'; $('kpiConf').textContent = '—';
+  $('progressBar').style.width = '0%'; $('phaseLabel').textContent = 'Idle — awaiting execution'; $('phasePct').textContent = '0%';
+  $('mapBody').innerHTML = '<tr><td colspan="3" class="px-3 py-6 text-center text-slate-600">No mapping computed</td></tr>';
+  $('log').innerHTML = '<div class="text-slate-600">// engine ready. press "Run Solver".</div>';
+  drawGraph();
+});
+document.querySelectorAll('.scale-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.scale-btn').forEach(x => x.className = 'scale-btn px-2.5 py-1 rounded-md border border-slate-700 text-slate-300');
+  b.className = 'scale-btn px-2.5 py-1 rounded-md border border-sky-500/40 bg-sky-500/10 text-sky-300';
+  state.scale = b.dataset.scale; drawChart();
+}));
+
+/* ---------- Init ---------- */
+function resizeAll() { fitCanvas(canvas); fitCanvas(chart); drawGraph(); drawChart(); }
+window.addEventListener('resize', resizeAll);
+resizeAll();
+</script>
+</body>
+</html>

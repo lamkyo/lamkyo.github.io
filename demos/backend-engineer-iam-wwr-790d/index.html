@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Identity Fabric · IAM Operations Console</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            mono: ['"JetBrains Mono"', 'ui-monospace']
+          },
+          colors: {
+            ink: '#080b12',
+            panel: '#10141e',
+            line: '#202838',
+            cyan: '#67e8f9',
+            violet: '#a78bfa',
+            lime: '#b8f36b'
+          },
+          boxShadow: {
+            glow: '0 0 32px rgba(103,232,249,.12)',
+            violet: '0 0 34px rgba(167,139,250,.14)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root { color-scheme: dark; }
+    * { scrollbar-width: thin; scrollbar-color: #293449 transparent; }
+    body {
+      background: #080b12;
+      color: #e7edf7;
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent 85%);
+      z-index: -1;
+    }
+    .glass { background: linear-gradient(135deg, rgba(18,24,36,.92), rgba(12,16,25,.92)); border: 1px solid #202838; backdrop-filter: blur(18px); }
+    .soft-grid { background-image: linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px); background-size: 28px 28px; }
+    .text-gradient { background: linear-gradient(90deg, #f8fafc 0%, #a5f3fc 48%, #c4b5fd 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .pulse-dot { animation: pulseDot 2s ease-in-out infinite; }
+    @keyframes pulseDot { 0%,100% { box-shadow: 0 0 0 0 rgba(184,243,107,.5); } 50% { box-shadow: 0 0 0 6px rgba(184,243,107,0); } }
+    .bar { transition: width .6s cubic-bezier(.22,1,.36,1); }
+    .chart-line { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 1.8s ease forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    .fade-in { animation: fadeIn .35s ease both; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .toast { animation: toastIn .3s ease both; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-backdrop { background: rgba(2,6,12,.76); backdrop-filter: blur(8px); }
+    input:focus, select:focus { outline: none; border-color: #67e8f9; box-shadow: 0 0 0 3px rgba(103,232,249,.1); }
+    .nav-item.active { background: linear-gradient(90deg, rgba(103,232,249,.12), transparent); color: #a5f3fc; border-left-color: #67e8f9; }
+    .nav-item.active svg { color: #67e8f9; }
+    .stat-value { font-variant-numeric: tabular-nums; }
+    .truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div class="sticky top-0 z-50 border-b border-cyan-300/15 bg-[#0b111c]/90 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
+      <div class="flex min-w-0 items-center gap-3">
+        <div class="hidden h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-cyan-300/10 text-cyan-200 sm:flex"><i data-lucide="shield-check" class="h-4 w-4"></i></div>
+        <p class="truncate text-[11px] font-medium tracking-wide text-slate-300 sm:text-xs">
+          <span class="mr-2 text-cyan-200">🚀 Live Interactive Prototype for: Backend Engineer, IAM</span>
+          <span class="text-slate-500">|</span>
+          <span class="ml-2 text-slate-400">Built autonomously by Antigravity OS</span>
+          <span class="ml-2 hidden text-slate-500 md:inline">|</span>
+          <span class="ml-2 hidden text-slate-400 md:inline">Ready for deployment</span>
+        </p>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-790d0d95" class="shrink-0 rounded-lg border border-amber-300/25 bg-amber-300/10 px-3 py-1.5 text-[11px] font-semibold text-amber-200 transition hover:bg-amber-300/20 sm:text-xs">Hire Team ($150 - $500)</a>
+    </div>
+  </div>
+
+  <div class="mx-auto flex max-w-[1600px]">
+    <aside class="sticky top-[45px] hidden h-[calc(100vh-45px)] w-[248px] shrink-0 flex-col border-r border-line bg-[#0a0e16]/80 px-4 py-6 lg:flex">
+      <div class="mb-8 flex items-center gap-3 px-2">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-300 to-violet-400 text-[#081019] shadow-glow"><i data-lucide="fingerprint" class="h-5 w-5"></i></div>
+        <div>
+          <div class="text-sm font-bold tracking-tight">identity<span class="text-cyan-300">fabric</span></div>
+          <div class="mt-0.5 text-[10px] uppercase tracking-[.18em] text-slate-500">IAM control plane</div>
+        </div>
+      </div>
+
+      <div class="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[.2em] text-slate-600">Workspace</div>
+      <nav class="space-y-1" id="sideNav">
+        <button data-page="overview" class="nav-item active flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-left text-sm text-slate-400 transition hover:bg-white/[.035] hover:text-slate-200"><i data-lucide="layout-dashboard" class="h-4 w-4"></i>Overview</button>
+        <button data-page="identities" class="nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-left text-sm text-slate-400 transition hover:bg-white/[.035] hover:text-slate-200"><i data-lucide="users" class="h-4 w-4"></i>Identities <span class="ml-auto rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-400">12.4k</span></button>
+        <button data-page="access" class="nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-left text-sm text-slate-400 transition hover:bg-white/[.035] hover:text-slate-200"><i data-lucide="key-round" class="h-4 w-4"></i>Access policies</button>
+        <button data-page="events" class="nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-left text-sm text-slate-400 transition hover:bg-white/[.035] hover:text-slate-200"><i data-lucide="activity" class="h-4 w-4"></i>Audit events</button>
+        <button data-page="services" class="nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-left text-sm text-slate-400 transition hover:bg-white/[.035] hover:text-slate-200"><i data-lucide="box" class="h-4 w-4"></i>Services</button>
+      </nav>
+
+      <div class="mb-3 mt-8 px-3 text-[10px] font-semibold uppercase tracking-[.2em] text-slate-600">Operations</div>
+      <nav class="space-y-1">
+        <button class="nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-left text-sm text-slate-400 transition hover:bg-white/[.035] hover:text-slate-200" data-action="alerts"><i data-lucide="bell-ring" class="h-4 w-4"></i>Alerts <span class="ml-auto h-2 w-2 rounded-full bg-amber-300"></span></button>
+        <button class="nav-item flex w-full items-center gap-3 rounded-r-lg border-l-2 border-transparent px-3 py-2.5 text-left text-sm text-slate-400 transition hover:bg-white/[.035] hover:text-slate-200" data-action="settings"><i data-lucide="settings-2" class="h-4 w-4"></i>Settings</button>
+      </nav>
+
+      <div class="mt-auto rounded-xl border border-cyan-300/10 bg-cyan-300/[.045] p-3.5">
+        <div class="mb-2 flex items-center justify-between"><span class="text-[11px] font-semibold text-slate-300">Platform health</span><span class="text-[11px] font-bold text-lime-300">99.99%</span></div>
+        <div class="h-1.5 overflow-hidden rounded-full bg-slate-800"><div class="bar h-full w-[99%] rounded-full bg-gradient-to-r from-cyan-300 to-lime-300"></div></div>
+        <p class="mt-2 text-[10px] leading-relaxed text-slate-500">All critical services operational across 3 regions.</p>
+      </div>
+      <div class="mt-5 flex items-center gap-3 border-t border-line px-2 pt-5">
+        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-violet-300 to-cyan-300 text-xs font-bold text-slate-900">AM</div>
+        <div class="min-w-0 flex-1"><div class="truncate text-xs font-semibold">Alex Morgan</div><div class="truncate text-[10px] text-slate-500">Platform administrator</div></div>
+        <i data-lucide="more-horizontal" class="h-4 w-4 text-slate-600"></i>
+      </div>
+    </aside>
+
+    <main class="min-w-0 flex-1 px-4 pb-10 pt-6 sm:px-6 lg:px-9">
+      <div class="mx-auto max-w-[1250px]">
+        <div class="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <div class="mb-2 flex items-center gap-2 text-[11px] font-medium text-slate-500"><span class="h-1.5 w-1.5 rounded-full bg-lime-300 pulse-dot"></span>PRODUCTION CLUSTER <span class="text-slate-700">/</span> GLOBAL</div>
+            <h1 id="pageTitle" class="text-2xl font-semibold tracking-tight text-slate-100 sm:text-3xl">Good morning, Alex <span class="text-slate-600">—</span></h1>
+            <p id="pageSubtitle" class="mt-1.5 text-sm text-slate-500">Here’s what’s happening across your identity plane.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="refreshBtn" class="flex items-center gap-2 rounded-lg border border-line bg-panel px-3.5 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-slate-500 hover:text-white"><i data-lucide="refresh-cw" class="h-3.5 w-3.5"></i><span class="hidden sm:inline">Refresh</span></button>
+            <button id="exportBtn" class="flex items-center gap-2 rounded-lg bg-cyan-300 px-3.5 py-2.5 text-xs font-bold text-slate-950 shadow-glow transition hover:bg-cyan-200"><i data-lucide="download" class="h-3.5 w-3.5"></i>Export report</button>
+          </div>
+        </div>
+
+        <section id="overviewPage" class="page-section">
+          <div class="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="glass rounded-xl p-4 shadow-xl">
+              <div class="mb-3 flex items-start justify-between"><span class="text-xs font-medium text-slate-500">Active identities</span><span class="rounded-lg bg-cyan-300/10 p-2 text-cyan-200"><i data-lucide="users" class="h-4 w-4"></i></span></div>
+              <div class="flex items-end justify-between"><div class="stat-value text-2xl font-semibold tracking-tight">12,482</div><span class="mb-1 flex items-center gap-1 text-[11px] font-semibold text-lime-300"><i data-lucide="arrow-up-right" class="h-3 w-3"></i>8.4%</span></div>
+              <div class="mt-3 text-[10px] text-slate-600">vs. previous 30 days</div>
+            </div>
+            <div class="glass rounded-xl p-4 shadow-xl">
+              <div class="mb-3 flex items-start justify-between"><span class="text-xs font-medium text-slate-500">Auth requests</span><span class="rounded-lg bg-violet-300/10 p-2 text-violet-200"><i data-lucide="scan-face" class="h-4 w-4"></i></span></div>
+              <div class="flex items-end justify-between"><div class="stat-value text-2xl font-semibold tracking-tight">8.9M</div><span class="mb-1 flex items-center gap-1 text-[11px] font-semibold text-lime-300"><i data-lucide="arrow-up-right" class="h-3 w-3"></i>12.7%</span></div>
+              <div class="mt-3 text-[10px] text-slate-600">last 24 hours · 99.97% success</div>
+            </div>
+            <div class="glass rounded-xl p-4 shadow-xl">
+              <div class="mb-3 flex items-start justify-between"><span class="text-xs font-medium text-slate-500">Policy evaluations</span><span class="rounded-lg bg-amber-300/10

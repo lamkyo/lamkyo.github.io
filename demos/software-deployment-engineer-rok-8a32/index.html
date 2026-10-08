@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Software Deployment Engineer Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#0ea5e9',
+          },
+        },
+      },
+    };
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen pt-14">
+  <!-- Sticky Notification Bar -->
+  <div class="fixed inset-x-0 top-0 z-50 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-4 py-2 text-sm">
+    <div class="flex items-center space-x-2">
+      <span class="inline-block">🚀 Live Interactive Prototype for: Software Deployment Engineer | Built autonomously by Antigravity OS | Ready for deployment</span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20rok-8a324f9b"
+       class="bg-primary hover:bg-primary/80 text-white font-medium py-1 px-3 rounded transition">
+      Hire Team ($150 - $500)
+    </a>
+  </div>
+
+  <main class="max-w-7xl mx-auto p-6 space-y-8">
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <h1 class="text-3xl font-bold text-primary">Deployment Dashboard</h1>
+      <div class="flex items-center gap-4">
+        <input type="text" id="searchInput" placeholder="Search deployments…" class="bg-slate-800 border border-slate-600 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-primary">
+        <button id="newDeployBtn" class="flex items-center gap-1 bg-primary hover:bg-primary/80 text-white font-medium py-1 px-3 rounded transition">
+          <i data-lucide="plus"></i> New Deployment
+        </button>
+      </div>
+    </header>
+
+    <!-- Filters -->
+    <section class="flex items-center gap-6">
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="filter-env" value="Production" checked>
+        <span>Production</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="filter-env" value="Staging" checked>
+        <span>Staging</span>
+      </label>
+      <label class="flex items-center gap-2">
+        <input type="checkbox" class="filter-env" value="Testing" checked>
+        <span>Testing</span>
+      </label>
+    </section>
+
+    <!-- Deployments Table -->
+    <section class="overflow-x-auto bg-slate-800 rounded-lg shadow">
+      <table class="w-full table-auto">
+        <thead class="bg-slate-700">
+          <tr>
+            <th class="px-4 py-2 text-left">ID</th>
+            <th class="px-4 py-2 text-left">Name</th>
+            <th class="px-4 py-2 text-left">Environment</th>
+            <th class="px-4 py-2 text-left">Status</th>
+            <th class="px-4 py-2 text-left">Progress</th>
+          </tr>
+        </thead>
+        <tbody id="deployTableBody" class="divide-y divide-slate-700"></tbody>
+      </table>
+    </section>
+
+    <!-- Deployments Chart -->
+    <section class="bg-slate-800 rounded-lg p-4 shadow">
+      <canvas id="deployChart" height="120"></canvas>
+    </section>
+  </main>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Mock deployment data
+    const deployments = [
+      { id: 101, name: "Kommand v1.2", env: "Production", status: "Running", progress: 0 },
+      { id: 102, name: "WCS Upgrade", env: "Staging", status: "Pending", progress: 0 },
+      { id: 103, name: "AutoStore Sync", env: "Testing", status: "Running", progress: 0 },
+      { id: 104, name: "T-sort Patch", env: "Production", status: "Running", progress: 0 },
+      { id: 105, name: "Pick-to-Light Rollout", env: "Staging", status: "Pending", progress: 0 },
+    ];
+
+    const tableBody = document.getElementById('deployTableBody');
+    const searchInput = document.getElementById('searchInput');
+    const envFilters = document.querySelectorAll('.filter-env');
+    const newDeployBtn = document.getElementById('newDeployBtn');
+    const chartCtx = document.getElementById('deployChart').getContext('2d');
+
+    // Render table rows
+    function renderTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const activeEnvs = Array.from(envFilters).filter(cb => cb.checked).map(cb => cb.value);
+      tableBody.innerHTML = '';
+      deployments
+        .filter(d => activeEnvs.includes(d.env))
+        .filter(d => d.name.toLowerCase().includes(searchTerm) || String(d.id).includes(searchTerm))
+        .forEach(d => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-4 py-2">${d.id}</td>
+            <td class="px-4 py-2">${d.name}</td>
+            <td class="px-4 py-2">${d.env}</td>
+            <td class="px-4 py-2">${d.status}</td>
+            <td class="px-4 py-2">
+              <div class="w-full bg-slate-700 rounded h-4 overflow-hidden">
+                <div class="bg-primary h-4 transition-all duration-500" style="width:${d.progress}%"></div>
+              </div>
+            </td>
+          `;
+          tableBody.appendChild(tr);
+        });
+    }
+
+    // Simulate progress updates
+    function updateProgress() {
+      deployments.forEach(d => {
+        if (d.status === "Running" && d.progress < 100) {
+          d.progress = Math.min(100, d.progress + Math.random() * 10);
+          if (d.progress >= 100) d.status = "Completed";
+        }
+      });
+      renderTable();
+      updateChart();
+    }
+
+    // Add new deployment
+    newDeployBtn.addEventListener('click', () => {
+      const newId = Math.max(...deployments.map(d => d.id)) + 1;
+      const envOptions = ["Production", "Staging", "Testing"];
+     

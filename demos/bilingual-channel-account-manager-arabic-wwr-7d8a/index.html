@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Channel Account Manager — Arabic (MEA) | Application Dossier</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: { colors: { ink: '#0a0a0f', panel: '#12121a', edge: '#1f1f2e' } } }
+}
+</script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 4px; }
+  .glow { box-shadow: 0 0 0 1px rgba(99,102,241,.25), 0 8px 40px -12px rgba(99,102,241,.5); }
+  .fade-in { animation: fade .4s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="bg-ink text-slate-200 antialiased">
+
+<!-- STICKY BANNER -->
+<div class="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 text-white text-sm">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <p class="flex items-center gap-2 font-medium">
+      <span>🚀</span>
+      <span class="hidden sm:inline">Live Interactive Prototype for:</span>
+      <span class="font-semibold">Bilingual Channel Account Manager, Arabic (MEA)</span>
+      <span class="hidden md:inline text-white/70">| Built autonomously by Antigravity OS | Ready for deployment</span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-7d8ab424"
+       class="shrink-0 bg-white text-indigo-700 hover:bg-indigo-50 transition font-semibold px-4 py-1.5 rounded-lg text-xs shadow">
+      Hire Team ($150 – $500)
+    </a>
+  </div>
+</div>
+
+<!-- NAV -->
+<header class="border-b border-edge bg-panel/60 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 grid place-items-center glow">
+        <i data-lucide="briefcase" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <p class="font-semibold leading-tight">Channel Account Manager</p>
+        <p class="text-xs text-slate-400 leading-tight">Arabic (MEA) · London, UK</p>
+      </div>
+    </div>
+    <nav class="hidden md:flex items-center gap-6 text-sm text-slate-400">
+      <a href="#match" class="hover:text-white transition">Match</a>
+      <a href="#pipeline" class="hover:text-white transition">Pipeline</a>
+      <a href="#partners" class="hover:text-white transition">Partners</a>
+      <a href="#interview" class="hover:text-white transition">Interview</a>
+    </nav>
+    <button onclick="document.getElementById('apply').scrollIntoView({behavior:'smooth'})"
+      class="text-sm font-medium bg-indigo-600 hover:bg-indigo-500 transition px-4 py-2 rounded-lg">
+      Apply Now
+    </button>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-12">
+
+  <!-- HERO -->
+  <section class="fade-in">
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">● Open to applicants</span>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Quota-carrying</span>
+      <span class="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">Up to 50% travel</span>
+    </div>
+    <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white">Bilingual Channel Account Manager</h1>
+    <p class="text-slate-400 mt-3 max-w-2xl">Own and grow the MEA channel — recruit, enable and co-sell with distributors and resellers across Turkey, the Middle East and Africa. Fluent Arabic &amp; English. Security SaaS.</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+      <div class="bg-panel border border-edge rounded-xl p-4">
+        <p class="text-xs text-slate-500">Experience</p>
+        <p class="text-lg font-semibold text-white">5+ yrs</p>
+      </div>
+      <div class="bg-panel border border-edge rounded-xl p-4">
+        <p class="text-xs text-slate-500">Languages</p>
+        <p class="text-lg font-semibold text-white">AR / EN</p>
+      </div>
+      <div class="bg-panel border border-edge rounded-xl p-4">
+        <p class="text-xs text-slate-500">Location</p>
+        <p class="text-lg font-semibold text-white">London</p>
+      </div>
+      <div class="bg-panel border border-edge rounded-xl p-4">
+        <p class="text-xs text-slate-500">Travel</p>
+        <p class="text-lg font-semibold text-white">≤ 50%</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATCH SCORE -->
+  <section id="match" class="fade-in">
+    <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-indigo-400"></i> Candidate Match Analysis</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-panel border border-edge rounded-2xl p-6 flex flex-col items-center justify-center">
+        <div class="relative w-40 h-40">
+          <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#1f1f2e" stroke-width="10"/>
+            <circle id="scoreRing" cx="60" cy="60" r="52" fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="327" stroke-dashoffset="327" style="transition: stroke-dashoffset 1.2s ease"/>
+            <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#d946ef"/>
+            </linearGradient></defs>
+          </svg>
+          <div class="absolute inset-0 grid place-items-center">
+            <div class="text-center">
+              <p id="scoreVal" class="text-4xl font-bold text-white">0%</p>
+              <p class="text-xs text-slate-500">match</p>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-slate-400 mt-4 text-center">Weighted against posting requirements</p>
+      </div>
+      <div class="md:col-span-2 bg-panel border border-edge rounded-2xl p-6 space-y-4" id="criteriaList"></div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="pipeline" class="fade-in">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-400"></i> MEA Channel Pipeline</h2>
+      <div class="flex gap-2 text-xs">
+        <button data-region="all" class="region-btn active px-3 py-1.5 rounded-lg border border-edge bg-indigo-600 text-white">All</button>
+        <button data-region="turkey" class="region-btn px-3 py-1.5 rounded-lg border border-edge text-slate-400 hover:text-white">Turkey</button>
+        <button data-region="me" class="region-btn px-3 py-1.5 rounded-lg border border-edge text-slate-400 hover:text-white">Middle East</button>
+        <button data-region="africa" class="region-btn px-3 py-1.5 rounded-lg border border-edge text-slate-400 hover:text-white">Africa</button>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-4 gap-4" id="pipelineGrid"></div>
+  </section>
+
+  <!-- PARTNERS TABLE -->
+  <section id="partners" class="fade-in">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="text-xl font-semibold text-white flex items-center gap-2"><i data-lucide="handshake" class="w-5 h-5 text-indigo-400"></i> Partner Portfolio</h2>
+      <div class="relative">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+        <input id="partnerSearch" placeholder="Search partners…" class="bg-panel border border-edge rounded-lg pl-9 pr-3 py-2 text-sm w-56 focus:outline-none focus:border-indigo-500 transition">
+      </div>
+    </div>
+    <div class="bg-panel border border-edge rounded-2xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-white/5 text-slate-400 text-xs uppercase tracking-wide">
+          <tr>
+            <th class="text-left px-5 py-3 font-medium">Partner</th>
+            <th class="text-left px-5 py-3 font-medium hidden sm:table-cell">Region</th>
+            <th class="text-left px-5 py-3 font-medium">Tier</th>
+            <th class="text-right px-5 py-3 font-medium">ARR</th>
+            <th class="text-right px-5 py-3 font-medium hidden md:table-cell">Quota</th>
+          </tr>
+        </thead>
+        <tbody id="partnerBody" class="divide-y divide-edge"></tbody>
+      </table>
+      <p id="noResults" class="hidden text-center text-slate-500 py-8 text-sm">No partners match your search.</p>
+    </div>
+  </section>
+
+  <!-- INTERVIEW PREP -->
+  <section id="interview" class="fade-in">
+    <h2 class="text-xl font-semibold text-white mb-4 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-5 h-5 text-indigo-400"></i> Interview Preparation</h2>
+    <div class="grid md:grid-cols-2 gap-4" id="interviewGrid"></div>
+  </section>
+
+  <!-- APPLY CTA -->
+  <section id="apply" class="fade-in">
+    <div class="bg-gradient-to-br from-indigo-600/20 to-fuchsia-600/10 border border-indigo-500/30 rounded-2xl p-8 text-center glow">
+      <h2 class="text-2xl font-bold text-white">Ready to move forward?</h2>
+      <p class="text-slate-400 mt-2 max-w-xl mx-auto">This prototype demonstrates the full application dossier — cover letter, CV restructuring and interview prep — tailored to this exact posting.</p>
+      <div class="flex flex-wrap justify-center gap-3 mt-6">
+        <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-7d8ab424"
+           class="bg-indigo-600 hover:bg-indigo-500 transition px-6 py-3 rounded-xl font-semibold text-white flex items-center gap-2">
+          <i data-lucide="send" class="w-4 h-4"></i> Hire Team ($150 – $500)
+        </a>
+        <button onclick="window.print()" class="border border-edge hover:border-indigo-500 transition px-6 py-3 rounded-xl font-semibold text-slate-300 flex items-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Export Dossier
+        </button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-edge mt-12">
+  <div class="max-w-7xl mx-auto px-4 py-6 text-xs text-slate-500 flex flex-wrap justify-between gap-2">
+    <p>Prototype built autonomously by Antigravity OS · wwr-7d8ab424</p>
+    <p>Not affiliated with the hiring company. Demonstration only.</p>
+  </div>
+</footer>
+
+<script>
+/* ---------- DATA ---------- */
+const criteria = [
+  { label: 'Security SaaS channel sales (5+ yrs)', weight: 30, score: 96 },
+  { label: 'Fluent Arabic & English', weight: 25, score: 100 },
+  { label: 'UK (London) residency', weight: 15, score: 100 },
+  { label: 'MEA market knowledge', weight: 20, score: 92 },
+  { label: 'Salesforce / PRM fluency', weight: 10, score: 88 },
+];
+
+const pipeline = {
+  turkey:  { label: 'Turkey',       deals: 14, value: 420, stage: 'Negotiation' },
+  me:      { label: 'Middle East',  deals: 22, value: 780, stage: 'Proposal' },
+  africa:  { label: 'Africa',       deals: 9,  value: 260, stage: 'Discovery' },
+};
+
+const partners = [
+  { name: 'Ingram Micro',        region: 'me',     tier: 'Distributor', arr: 1240000, quota: 112 },
+  { name: 'Arena Bilgisayar',    region: 'turkey', tier: 'Distributor', arr: 640000,  quota: 98 },
+  { name: 'Mindware',            region: 'me',     tier: 'VAD',         arr: 520000,  quota: 105 },
+  { name: 'Westcon-Comstor',     region: 'africa', tier: 'Distributor', arr: 310000,  quota: 87 },
+  { name: 'Bulut Teknoloji',     region: 'turkey', tier: 'Reseller',    arr: 180000,  quota: 121 },
+  { name: 'Gulf IT Solutions',   region: 'me',     tier: 'Reseller',    arr: 145000,  quota: 94 },
+  { name: 'Nairobi Cyber Hub',   region: 'africa', tier: 'Reseller',    arr: 92000,   quota: 76 },
+];
+
+const interview = [
+  { q: 'How do you manage partner conflict & deal registration?', a: 'Enforce a single registration system, publish clear rules of engagement, and arbitrate with data — not relationships. Escalate only when margin or territory is genuinely breached.' },
+  { q: 'Walk us through a GTM co-sell motion in MEA.', a: 'Joint territory mapping → enablement workshops → co-branded pipeline in PRM → quarterly business reviews. Anchor on partner-sourced revenue, not activity.' },
+  { q: 'How would you position zero-trust / PAM to a distributor?', a: 'Frame it as a margin-rich, compliance-driven attach. Lead with regional regulation (data residency, NCA/SAMA), then quantify the upsell path across their existing security stack.' },
+  { q: 'How do you recruit a new reseller in a low-maturity market?', a: 'Identify adjacent security resellers with enterprise reach, run a 90-day pilot with co-funded enablement, and convert on demonstrated pipeline velocity.' },
+];
+
+/* ---------- RENDER: MATCH ---------- */
+const critEl = document.getElementById('criteriaList');
+critEl.innerHTML = criteria.map(c => `
+  <div>
+    <div class="flex justify-between text-sm mb-1.5">
+      <span class="text-slate-300">${c.label}</span>
+      <span class="text-slate-400">${c.score}%</span>
+    </div>
+    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+      <div class="h-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 rounded-full" style="width:0;transition:width 1s ease" data-w="${c.score}"></div>
+    </div>
+  </div>`).join('');
+
+const total = Math.round(criteria.reduce((s,c)=>s + c.score*c.weight, 0) / criteria.reduce((s,c)=>s+c.weight,0));
+
+/* ---------- RENDER: PIPELINE ---------- */
+function renderPipeline(region='all'){
+  const keys = region === 'all' ? Object.keys(pipeline) : [region];
+  document.getElementById('pipelineGrid').innerHTML = keys.map(k => {
+    const p = pipeline[k];
+    return `<div class="bg-panel border border-edge rounded-2xl p-5 hover:border-indigo-500/50 transition">
+      <p class="text-sm text-slate-400">${p.label}</p>
+      <p class="text-3xl font-bold text-white mt-1">$${p.value}k</p>
+      <p class="text-xs text-slate-500 mt-1">${p.deals} active deals</p>
+      <div class="mt-3 flex items-center gap-2 text-xs">
+        <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+        <span class="text-slate-400">${p.stage}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- RENDER: PARTNERS ---------- */
+const tierColor = { Distributor:'text-indigo-300 bg-indigo-500/10 border-indigo-500/20', VAD:'text-fuchsia-300 bg-fuchsia-500/10 border-fuchsia-500/20', Reseller:'text-emerald-300 bg-emerald-500/10 border-emerald-500/20' };
+const regionName = { turkey:'Turkey', me:'Middle East', africa:'Africa' };
+
+function renderPartners(filter=''){
+  const f = filter.toLowerCase();
+  const rows = partners.filter(p => p.name.toLowerCase().includes(f) || regionName[p.region].toLowerCase().includes(f));
+  document.getElementById('noResults').classList.toggle('hidden', rows.length > 0);
+  document.getElementById('partnerBody').innerHTML = rows.map(p => `
+    <tr class="hover:bg-white/5 transition">
+      <td class="px-5 py-3.5 font-medium text-white">${p.name}</td>
+      <td class="px-5 py-3.5 text-slate-400 hidden sm:table-cell">${regionName[p.region]}</td>
+      <td class="px-5 py-3.5"><span class="text-xs px-2 py-1 rounded-md border ${tierColor[p.tier]}">${p.tier}</span></td>
+      <td class="px-5 py-3.5 text-right text-slate-200">$${(p.arr/1000).toFixed(0)}k</td>
+      <td class="px-5 py-3.5 text-right hidden md:table-cell">
+        <span class="${p.quota>=100?'text-emerald-400':'text-amber-400'} font-medium">${p.quota}%</span>
+      </td>
+    </tr>`).join('');
+}
+
+/* ---------- RENDER: INTERVIEW ---------- */
+document.getElementById('interviewGrid').innerHTML = interview.map(i => `
+  <div class="bg-panel border border-edge rounded-2xl p-5 hover:border-indigo-500/40 transition">
+    <p class="font-medium text-white flex items-start gap-2"><i data-lucide="help-circle" class="w-4 h-4 text-indigo-400 mt-0.5 shrink-0"></i>${i.q}</p>
+    <p class="text-sm text-slate-400 mt-3 leading-relaxed">${i.a}</p>
+  </div>`).join('');
+
+/* ---------- EVENTS ---------- */
+document.querySelectorAll('.region-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.region-btn').forEach(b => {
+      b.classList.remove('active','bg-indigo-600','text-white');
+      b.classList.add('text-slate-400');
+    });
+    btn.classList.add('active','bg-indigo-600','text-white');
+    btn.classList.remove('text-slate-400');
+    renderPipeline(btn.dataset.region);
+  });
+});
+
+document.getElementById('partnerSearch').addEventListener('input', e => renderPartners(e.target.value));
+
+/* ---------- INIT ---------- */
+renderPipeline();
+renderPartners();
+lucide.createIcons();
+
+setTimeout(() => {
+  document.getElementById('scoreRing').style.strokeDashoffset = 327 - (327 * total / 100);
+  let n = 0;
+  const iv = setInterval(() => {
+    n += 2;
+    if (n >= total) { n = total; clearInterval(iv); }
+    document.getElementById('scoreVal').textContent = n + '%';
+  }, 18);
+  document.querySelectorAll('[data-w]').forEach(el => el.style.width = el.dataset.w + '%');
+}, 200);
+</script>
+</body>
+</html>

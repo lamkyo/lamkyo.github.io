@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Live interactive Kubernetes control plane prototype for a multimodel distributed data platform.">
+  <title>Arango Control Plane — Live Operations Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular']
+          },
+          colors: {
+            ink: '#07090d',
+            panel: '#0d1118',
+            line: '#202631',
+            cyan: '#22d3ee',
+            violet: '#8b5cf6'
+          },
+          boxShadow: {
+            glow: '0 0 30px rgba(34, 211, 238, 0.12)',
+            violet: '0 0 35px rgba(139, 92, 246, 0.16)'
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { scrollbar-width: thin; scrollbar-color: #2b3440 transparent; }
+    html { background: #07090d; color-scheme: dark; }
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 72% -15%, rgba(34,211,238,.09), transparent 30%),
+        radial-gradient(circle at 15% 10%, rgba(139,92,246,.08), transparent 25%),
+        #07090d;
+    }
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 42px 42px;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(17,22,30,.92), rgba(11,15,21,.96));
+      border: 1px solid #202631;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 18px 45px rgba(0,0,0,.18);
+    }
+    .soft-border { border-color: rgba(148,163,184,.14); }
+    .glow-line { box-shadow: 0 0 12px rgba(34,211,238,.35); }
+    .metric-spark path { vector-effect: non-scaling-stroke; }
+    .topology-node {
+      transition: all .2s ease;
+      cursor: pointer;
+    }
+    .topology-node:hover {
+      transform: translateY(-2px);
+      border-color: rgba(34,211,238,.65);
+      box-shadow: 0 0 24px rgba(34,211,238,.12);
+    }
+    .topology-node.selected {
+      border-color: #22d3ee;
+      box-shadow: 0 0 0 1px rgba(34,211,238,.2), 0 0 28px rgba(34,211,238,.15);
+    }
+    .pulse-dot { animation: pulseDot 2s infinite; }
+    @keyframes pulseDot {
+      0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.35); }
+      50% { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+    .progress-stripes {
+      background-image: linear-gradient(45deg, rgba(255,255,255,.08) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.08) 75%, transparent 75%, transparent);
+      background-size: 18px 18px;
+      animation: stripe 1s linear infinite;
+    }
+    @keyframes stripe { to { background-position: 18px 0; } }
+    .fade-in { animation: fadeIn .22s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    .modal-backdrop { backdrop-filter: blur(9px); }
+    input[type="range"] { accent-color: #22d3ee; }
+    .status-dot { box-shadow: 0 0 8px currentColor; }
+  </style>
+</head>
+<body class="font-sans text-slate-200 antialiased">
+  <div class="fixed inset-0 grid-bg pointer-events-none"></div>
+
+  <!-- Required notification banner -->
+  <header class="sticky top-0 z-50 border-b border-cyan-400/20 bg-[#081016]/95 backdrop-blur-xl">
+    <div class="mx-auto flex min-h-11 max-w-[1800px] items-center justify-between gap-4 px-4 py-2 sm:px-6">
+      <div class="flex min-w-0 items-center gap-3">
+        <span class="relative flex h-2 w-2 shrink-0">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-60"></span>
+          <span class="relative inline-flex h-2 w-2 rounded-full bg-cyan-400"></span>
+        </span>
+        <p class="truncate text-[11px] font-medium text-slate-200 sm:text-xs">
+          🚀 Live Interactive Prototype for: <span class="text-cyan-300">Golang Kubernetes Engineer</span> | Built autonomously by Antigravity OS | Ready for deployment
+        </p>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20rok-9b0012b5" class="shrink-0 rounded-lg border border-cyan-300/20 bg-cyan-400/10 px-3 py-1.5 text-[11px] font-semibold text-cyan-200 transition hover:border-cyan-300/50 hover:bg-cyan-400/20 sm:text-xs">
+        Hire Team ($150 - $500)
+      </a>
+    </div>
+  </header>
+
+  <div class="relative mx-auto flex max-w-[1800px]">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-11 left-0 z-40 w-64 -translate-x-full border-r border-slate-800/80 bg-[#090d13]/95 p-4 backdrop-blur-xl transition-transform lg:sticky lg:top-11 lg:h-[calc(100vh-2.75rem)] lg:translate-x-0">
+      <div class="mb-7 flex items-center gap-3 px-2 pt-2">
+        <div class="grid h-9 w-9 place-items-center rounded-xl border border-cyan-300/20 bg-gradient-to-br from-cyan-400/20 to-violet-500/20 shadow-glow">
+          <i data-lucide="network" class="h-5 w-5 text-cyan-300"></i>
+        </div>
+        <div>
+          <div class="text-sm font-semibold tracking-wide text-white">ARANGO</div>
+          <div class="font-mono text-[10px] uppercase tracking-[.18em] text-slate-500">Control Plane</div>
+        </div>
+      </div>
+
+      <div class="mb-6 rounded-xl border border-slate-700/60 bg-slate-900/50 p-2">
+        <label class="mb-1.5 block px-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Environment</label>
+        <button id="envButton" class="flex w-full items-center justify-between rounded-lg px-1 py-1 text-left hover:bg-white/[.03]">
+          <div class="flex items-center gap-2">
+            <span class="h-2 w-2 rounded-full bg-emerald-400 status-dot text-emerald-400"></span>
+            <div>
+              <div id="envName" class="text-xs font-medium text-slate-200">production-us-east</div>
+              <div id="envVersion" class="font-mono text-[9px] text-slate-500">v3.11.4 · 12 nodes</div>
+            </div>
+          </div>
+          <i data-lucide="chevrons-up-down" class="h-3.5 w-3.5 text-slate-500"></i>
+        </button>
+        <div id="envMenu" class="mt-1 hidden space-y-1 border-t border-slate-800 pt-1">
+          <button data-env="production-us-east" data-version="v3.11.4 · 12 nodes" class="env-option w-full rounded-md px-2 py-2 text-left text-xs text-slate-300 hover:bg-slate-800">production-us-east</button>
+          <button data-env="staging-us-west" data-version="v3.12.0-rc · 6 nodes" class="env-option w-full rounded-md px-2 py-2 text-left text-xs text-slate-300 hover:bg-slate-800">staging-us-west</button>
+          <button data-env="edge-eu-central" data-version="v3.10.9 · 9 nodes" class="env-option w-full rounded-md px-2 py-2 text-left text-xs text-slate-300 hover:bg-slate-800">edge-eu-central</button>
+        </div>
+      </div>
+
+      <nav class="space-y-1">
+        <p class="mb-2 px-2 text-[10px] font-semibold uppercase tracking-[.16em] text-slate-600">Operate</p>
+        <button data-view="overview" class="nav-item flex w-full items-center gap-3 rounded-lg bg-cyan-400/10 px-3 py-2.5 text-sm font-medium text-cyan-300">
+          <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Overview
+        </button>
+        <button data-view="cluster" class="nav-item flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition hover:bg-white/[.04] hover:text-white">
+          <i data-lucide="boxes" class="h-4 w-4"></i> Cluster topology
+        </button>
+        <button data-view="workloads" class="nav-item flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition hover:bg-white/[.04] hover:text-white">
+          <i data-lucide="layers-3" class="h-4 w-4"></i> Workloads
+          <span class="ml-auto rounded-full bg-slate-800 px-2 py-0.5 font-mono text-[9px] text-slate-400">24</span>
+        </button>
+        <button data-view="releases" class="nav-item flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition hover:bg-white/[.04] hover:text-white">
+          <i data-lucide="git-compare-arrows" class="h-4 w-4"></i> Releases
+        </button>
+
+        <p class="mb-2 mt-7 px-2 text-[10px] font-semibold uppercase tracking-[.16em] text-slate-600">Observe</p>
+        <button data-view="events" class="nav-item flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition hover:bg-white/[.04] hover:text-white">
+          <i data-lucide="activity" class="h-4 w-4"></i> Event stream
+          <span class="ml-auto h-2 w-2 rounded-full bg-amber-400 status-dot text-amber-400"></span>
+        </button>
+        <button data-view="metrics" class="nav-item flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition hover:bg-white/[.04] hover:text-white">
+          <i data-lucide="chart-no-axes-combined" class="h-4 w-4"></i> Metrics
+        </button>
+        <button data-view="policies" class="nav-item flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-400 transition hover:bg-white/[.04] hover:text-white">
+          <i data-lucide="shield-check" class="h-4 w-4"></i> Policies
+          <span class="ml-auto rounded-full bg-emerald-400/10 px-2 py-0.5 font-mono text-[9px] text-emerald-400">PASS</span>
+        </button>
+      </nav>
+
+      <div class="absolute bottom-5 left-4 right-4 rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+        <div class="mb-2 flex items-center justify-between">
+          <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Control plane</span>
+          <span class="text-[10px] text-emerald-400">Healthy</span>
+        </div>
+        <div class="h-1.5 overflow-hidden rounded-full bg-slate-800">
+          <div id="healthBar" class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all" style="width:99.98%"></div>
+        </div>
+        <div class="mt-2 flex justify-between font-mono text-[9px] text-slate-600">
+          <span>SLO 99.95%</span><span id="uptime">43d 18h</span>
+        </div>
+      </div>
+    </aside>
+
+    <div id="overlay" class="fixed inset-0 z-30 hidden bg-black/60 lg:hidden"></div>
+
+    <!-- Main -->
+    <main class="min-w-0 flex-1 px-4 py-5 sm:px-6 lg:px-8">
+      <div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div class="flex items-center gap-3">
+          <button id="menuButton" class="grid h-9 w-9 place-items-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 lg:hidden">
+            <i data-lucide="menu" class="h-4 w-4"></i>
+          </button>
+          <div>
+            <div class="mb-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.2em] text-slate-600">
+              Operations <span class="text-slate-800">/</span> <span id="breadcrumb" class="text-cyan-500">Overview</span>
+            </div>
+            <h1 id="pageTitle" class="text-xl font-semibold tracking-tight text-white sm:text-2xl">Platform overview</h1>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"></i>
+            <input id="globalSearch" type="search" placeholder="Search resources…" class="w-48 rounded-lg border border-slate-800 bg-slate-900/80 py-2 pl-9 pr-3 text-xs text-slate-200 outline-none transition placeholder:text-slate-600 focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/10 sm:w-64">
+          </div>
+          <button id="pauseButton" class="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-slate-700 hover:text-white">
+            <i data-lucide="pause" class="h-3.5 w-3.5"></i><span>Pause live</span>
+          </button>
+          <button id="upgradeButton" class="flex items-center gap-2 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-semibold text-slate-950 shadow-glow transition hover:bg-cyan-200">
+            <i data-lucide="rocket" class="h-3.5 w-3.5"></i> Plan upgrade

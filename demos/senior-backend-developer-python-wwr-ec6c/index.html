@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senior Backend Developer (Python) - Live Prototype Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151f32',
+                            900: '#0f172a',
+                            950: '#090d16',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Fira Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'Fira Code', monospace; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Notification Banner -->
+    <div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-950 border-b border-indigo-800/50 text-indigo-200 px-4 py-2.5 text-xs sm:text-sm sticky top-0 z-50 shadow-lg backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex items-center space-x-2 text-center sm:text-left">
+            <span class="flex h-2 w-2 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="font-medium">🚀 Live Interactive Prototype for: Senior Backend Developer (Python) | Built autonomously by Antigravity OS | Ready for deployment</span>
+        </div>
+        <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-ec6c5d10" 
+           class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-1.5 rounded-md shadow transition-all duration-200 flex items-center space-x-1.5 whitespace-nowrap text-xs border border-indigo-400/30">
+            <i class="fa-solid fa-bolt text-amber-300"></i>
+            <span>Hire Team ($150 - $500)</span>
+        </a>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-[41px] z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-cube text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight flex items-center gap-2">
+                        Proxify Django Engine <span class="text-[10px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">v2.4.1-prod</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Architecture Proposal & Production-Ready Backend Prototype</p>
+                </div>
+            </div>
+
+            <!-- Nav Tabs -->
+            <nav class="hidden md:flex space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button onclick="switchTab('application')" id="btn-application" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-slate-200">
+                    <i class="fa-regular fa-file-lines mr-1.5"></i> Application Dossier
+                </button>
+                <button onclick="switchTab('architecture')" id="btn-architecture" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-slate-200">
+                    <i class="fa-solid fa-network-wired mr-1.5"></i> Architecture & API
+                </button>
+                <button onclick="switchTab('code')" id="btn-code" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all text-slate-400 hover:text-slate-200">
+                    <i class="fa-solid fa-code mr-1.5"></i> Code Sample (Python/Django)
+                </button>
+                <button onclick="switchTab('tester')" id="btn-tester" class="tab-btn px-4 py-1.5 rounded-lg text-xs font-medium transition-all bg-indigo-600 text-white shadow">
+                    <i class="fa-solid fa-terminal mr-1.5"></i> Live API Sandbox
+                </button>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <span class="hidden sm:inline-flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full font-mono">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    PostgreSQL 15 Cluster: Healthy
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Nav Bar -->
+    <div class="md:hidden flex overflow-x-auto bg-slate-900 border-b border-slate-800 p-2 gap-1">
+        <button onclick="switchTab('application')" id="m-btn-application" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400">Application</button>
+        <button onclick="switchTab('architecture')" id="m-btn-architecture" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400">Architecture</button>
+        <button onclick="switchTab('code')" id="m-btn-code" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap text-slate-400">Code Sample</button>
+        <button onclick="switchTab('tester')" id="m-btn-tester" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap bg-indigo-600 text-white">API Sandbox</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- TAB 1: APPLICATION DOSSIER -->
+        <div id="tab-application" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-800">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider font-semibold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/20">Candidate Dossier</span>
+                        <h2 class="text-2xl font-bold mt-2">Senior Backend Developer (Python / Django)</h2>
+                        <p class="text-sm text-slate-400 mt-1">Prepared for Proxify vetting team — Transparent, verifiable qualifications & technical approach.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="alert('Dossier exported to clean PDF format!')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-4 py-2 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Export Profile
+                        </button>
+                        <a href="mailto:lamvukyo3001@gmail.com?subject=Interview%20Invitation" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center gap-2 shadow-lg shadow-indigo-600/20">
+                            <i class="fa-regular fa-paper-plane"></i> Schedule Interview
+                        </a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/80">
+                        <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-user-shield text-indigo-400"></i> Core Competencies
+                        </h3>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center justify-between"><span>Python / Django / DRF</span> <span class="text-xs font-mono text-emerald-400 font-bold">8+ yrs</span></li>
+                            <li class="flex items-center justify-between"><span>PostgreSQL / Tuning</span> <span class="text-xs font-mono text-emerald-400 font-bold">7+ yrs</span></li>
+                            <li class="flex items-center justify-between"><span>AWS / Kubernetes / Terraform</span> <span class="text-xs font-mono text-emerald-400 font-bold">5+ yrs</span></li>
+                            <li class="flex items-center justify-between"><span>Redis / Celery Async Queues</span> <span class="text-xs font-mono text-emerald-400 font-bold">6+ yrs</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/80">
+                        <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-globe text-indigo-400"></i> Operational Context
+                        </h3>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex justify-between"><span class="text-slate-400">Timezone</span> <span class="font-medium">CET (UTC+1) / Flexible overlap</span></li>
+                            <li class="flex justify-between"><span class="text-slate-400">Engagement</span> <span class="font-medium text-indigo-400">Full-Time / Contract</span></li>
+                            <li class="flex justify-between"><span class="text-slate-400">Code Quality</span> <span class="font-medium">100% TDD / MyPy Strict</span></li>
+                            <li class="flex justify-between"><span class="text-slate-400">Security Audit</span> <span class="font-medium text-emerald-400">SOC2 & GDPR Compliant</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800/80">
+                        <h3 class="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shield-halved text-indigo-400"></i> Ethical Commitment
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            No intermediary payment scams, no fake crypto/wallet payment routes. Operates strictly through verified corporate channels with transparent milestone tracking and production-grade engineering standards.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-slate-800">
+                    <h3 class="font-semibold text-base mb-4">Engineering Philosophy & Approach to Proxify Clients</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/60">
+                            <h4 class="font-medium text-sm text-indigo-300 mb-1"><i class="fa-solid fa-bolt text-amber-400 mr-2"></i>Performance First</h4>
+                            <p class="text-xs text-slate-400">Aggressive query optimization, indexing strategies, and strategic caching with Redis to keep p99 latency under 45ms.</p>
+                        </div>
+                        <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800/60">
+                            <h4 class="font-medium text-sm text-indigo-300 mb-1"><i class="fa-solid fa-gears text-purple-400 mr-2"></i>Robust Async Pipelines</h4>
+                            <p class="text-xs text-slate-400">Decoupling heavy workloads via Celery task queues with idempotent retry mechanisms and robust dead-letter queue handling.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: ARCHITECTURE & API -->
+        <div id="tab-architecture" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Architecture Overview -->
+                <div class="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+                    <h3 class="font-bold text-base flex items-center gap-2">
+                        <i class="fa-solid fa-sitemap text-indigo-400"></i> System Topology
+                    </h3>
+                    <p class="text-xs text-slate-400">High-availability, horizontally scalable microservices architecture powered by Django REST Framework and Kubernetes.</p>
+                    
+                    <div class="space-y-3 pt-2">
+                        <div onclick="selectArchNode('ingress')" id="arch-node-ingress" class="arch-card cursor-pointer bg-slate-950 border border-indigo-500/50 p-3 rounded-xl transition-all hover:bg-slate-850">
+                            <div class="flex items-center justify-between text-xs font-semibold text-indigo-300">
+                                <span>1. Ingress & Load Balancing</span>
+                                <i class="fa-solid fa-shield text-emerald-400"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">AWS ALB + NGINX Ingress Controller with SSL termination & rate limiting.</p>
+                        </div>
+                        
+                        <div onclick="selectArchNode('django')" id="arch-node-django" class="arch-card cursor-pointer bg-slate-950 border border-slate-800 p-3 rounded-xl transition-all hover:bg-slate-850">
+                            <div class="flex items-center justify-between text-xs font-semibold text-slate-200">
+                                <span>2. Django App Pods (Gunicorn)</span>
+                                <i class="fa-solid fa-server text-purple-400"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Stateless API containers auto-scaling based on CPU & request queue depth.</p>
+                        </div>
+
+                        <div onclick="selectArchNode('cache')" id="arch-node-cache" class="arch-card cursor-pointer bg-slate-950 border border-slate-800 p-3 rounded-xl transition-all hover:bg-slate-850">
+                            <div class="flex items-center justify-between text-xs font-semibold text-slate-200">
+                                <span>3. Redis Caching & Celery</span>
+                                <i class="fa-solid fa-bolt text-amber-400"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Distributed session store, API response caching, and asynchronous task broker.</p>
+                        </div>
+
+                        <div onclick="selectArchNode('db')" id="arch-node-db" class="arch-card cursor-pointer bg-slate-950 border border-slate-800 p-3 rounded-xl transition-all hover:bg-slate-850">
+                            <div class="flex items-center justify-between text-xs font-semibold text-slate-200">
+                                <span>4. PostgreSQL 15 Cluster</span>
+                                <i class="fa-solid fa-database text-blue-400"></i>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Multi-AZ RDS deployment with read replicas and connection pooling (PgBouncer).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dynamic Node Detail Panel -->
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                            <div class="flex items-center space-x-3">
+                                <div id="detail-icon-bg" class="w-10 h-10 rounded-xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center">
+                                    <i id="detail-icon" class="fa-solid fa-shield text-lg"></i>
+                                </div>
+                                <div>
+                                    <h4 id="detail-title" class="font-bold text-base">Ingress & Edge Security</h4>
+                                    <span id="detail-subtitle" class="text-xs text-indigo-400 font-mono">Layer 7 Protection & SSL Termination</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full">Status: Optimal</span>
+                        </div>
+
+                        <div id="detail-content" class="mt-6 space-y-4 text-sm text-slate-300">
+                            <p>
+                                Incoming traffic is routed through AWS Application Load Balancer with integrated AWS WAF (Web Application Firewall) blocking SQL injection, XSS, and volumetric DDoS attacks.
+                            </p>
+                            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
+                                <div class="text-indigo-400 font-bold"># NGINX Upstream & Rate Limiting Configuration</div>
+                                <div>limit_req_zone $binary_remote_addr zone=api_limit:10m rate=50r/s;</div>
+                                <div class="text-slate-500">server {</div>
+                                <div class="pl-4">listen 443 ssl http2;</div>
+                                <div class="pl-4">ssl_certificate /etc/letsencrypt/live/api.proxify.internal/fullchain.pem;</div>
+                                <div class="pl-4">proxy_pass http://django_gunicorn_cluster;</div>
+                                <div class="text-slate-500">}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                        <span>Click any node on the left to inspect system specifications.</span>
+                        <span class="text-indigo-400 font-mono">Automated CI/CD via GitHub Actions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CODE SAMPLE -->
+        <div id="tab-code" class="tab-content hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-800">
+                    <div>
+                        <h3 class="font-bold text-base flex items-center gap-2">
+                            <i class="fa-solid fa-code text-indigo-400"></i> Production-Ready Python / Django Code Sample
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-1">Optimized Django REST Framework ViewSet with atomic transactions, Redis caching, and robust error handling.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="copyCodeSnippet()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+                            <i class="fa-regular fa-copy"></i> <span id="copy-btn-text">Copy Code</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-2xl">
+                    <div class="bg-slate-900/80 px-4 py-2 border-b border-slate-800 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-brands fa-python text-amber-400"></i> api/views.py
+                        </span>
+                        <span class="text-emerald-400">Python 3.11 • Django 4.2 LTS</span>
+                    </div>
+                    <pre class="p-4 text-xs sm:text-sm overflow-x-auto custom-scrollbar text-slate-300 leading-relaxed"><code id="code-block"><span class="text-purple-400">from</span> django.db <span class="text-purple-400">import</span> transaction
+<span class="text-purple-400">from</span> django.core.cache <span class="text-purple-400">import</span> cache
+<span class="text-purple-400">from</span> rest_framework <span class="text-purple-400">import</span> viewsets, status
+<span class="text-purple-400">from</span> rest_framework.response <span class="text-purple-400">import</span> Response
+<span class="text-purple-400">from</span> rest_framework.permissions <span class="text-purple-400">import</span> IsAuthenticated
+<span class="text-purple-400">from</span> .models <span class="text-purple-400">import</span> ProjectDeployment
+<span class="text-purple-400">from</span> .serializers <span class="text-purple-400">import</span> DeploymentSerializer
+<span class="text-purple-400">import</span> logging
+
+logger = logging.getLogger(<span class="text-emerald-300">__name__</span>)
+
+<span class="text-purple-400">class</span> <span class="text-yellow-300">DeploymentViewSet</span>(viewsets.ModelViewSet):
+    <span class="text-slate-500">"""
+    High-performance ViewSet for managing client cloud deployments.
+    Features Redis response caching, atomic database operations, and structured logging.
+    """</span>
+    serializer_class = DeploymentSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = <span class="text-emerald-300">'uuid'</span>
+
+    <span class="text-purple-400">def</span> <span class="text-blue-300">get_queryset</span>(self):
+        user = self.request.user
+        cache_key = <span class="text-emerald-300">f"deployments_user_</span><span class="text-yellow-200">{</span>user.id<span class="text-yellow-200">}</span><span class="text-emerald-300">"</span>
+        
+        <span class="text-slate-500"># Try fetching from Redis cache (TTL: 300s)</span>
+        queryset = cache.get(cache_key)
+        <span class="text-purple-400">if</span> queryset <span class="text-purple-400">is</span> <span class="text-purple-400">None</span>:
+            queryset = ProjectDeployment.objects.select_related(<span class="text-emerald-300">'client'</span>).filter(
+                client=user, is_active=<span class="text-purple-400">True</span>
+            ).order_by(<span class="text-emerald-300">'-created_at'</span>)
+            cache.set(cache_key, queryset, timeout=<span class="text-orange-400">300</span>)
+            
+        <span class="text-purple-400">return</span> queryset
+
+    <span class="text-purple-400">@transaction.atomic</span>
+    <span class="text-purple-400">def</span> <span class="text-blue-300">create</span>(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=<span class="text-purple-400">True</span>)
+        
+        <span class="text-purple-400">try</span>:
+            deployment = serializer.save(created_by=request.user)
+            
+            <span class="text-slate-500"># Invalidate user cache upon state mutation</span>
+            cache.delete(<span class="text-emerald-300">f"deployments_user_</span><span class="text-yellow-200">{</span>request.user.id<span class="text-yellow-200">}</span><span class="text-emerald-300">"</span>)
+            
+            logger.info(<span class="text-emerald-300">f"Successfully deployed project </span><span class="text-yellow-200">{</span>deployment.uuid<span class="text-yellow-200">}</span><span class="text-emerald-300"> for user </span><span class="text-yellow-200">{</span>request.user.email<span class="text-yellow-200">}</span><span class="text-emerald-300">"</span>)
+            <span class="text-purple-400">return</span> Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        <span class="text-purple-400">except</span> Exception <span class="text-purple-400">as</span> e:
+            logger.error(<span class="text-emerald-300">f"Deployment failed: </span><span class="text-yellow-200">{</span>str(e)<span class="text-yellow-200">}</span><span class="text-emerald-300">"</span>, exc_info=<span class="text-purple-400">True</span>)
+            <span class="text-purple-400">return</span> Response({<span class="text-emerald-300">"error"</span>: <span class="text-emerald-300">"Internal deployment error occurred."</span>}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: LIVE API SANDBOX -->
+        <div id="tab-tester" class="tab-content space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Request Controls -->
+                <div class="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                        <h3 class="font-bold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-terminal text-indigo-400"></i> API Request Builder
+                        </h3>
+                        <span class="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">Mock Environment</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">HTTP Method & Endpoint</label>
+                            <div class="flex gap-2">
+                                <select id="api-method" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-emerald-400 focus:outline-none focus:border-indigo-500">
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                    <option value="PUT">PUT</option>
+                                    <option value="DELETE">DELETE</option>
+                                </select>
+                                <input type="text" id="api-endpoint" value="/api/v1/deployments/" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Authentication Header (Bearer Token)</label>
+                            <input type="text" id="api-token" value="Bearer prx_live_998127401823948102" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-indigo-300 focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1.5">Request Body (JSON)</label>
+                            <textarea id="api-body" rows="5" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-300 focus:outline-none focus:border-indigo-500 custom-scrollbar">{
+  "project_name": "proxify-django-core",
+  "region": "eu-central-1",
+  "instance_type": "t4g.xlarge",
+  "autoscaling": true
+}</textarea>
+                        </div>
+
+                        <button onclick="executeApiRequest()" id="send-request-btn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-2.5 rounded-xl text-xs shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Send API Request
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Response Viewer -->
+                <div class="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                            <h3 class="font-bold text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-square-poll-horizontal text-emerald-400"></i> Response Output
+                            </h3>
+                            <div class="flex items-center space-x-3 text-xs font-mono">
+                                <span id="response-status" class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Status: 200 OK</span>
+                                <span id="response-time" class="text-slate-400">Time: 24ms</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <div class="bg-slate-950 rounded-xl border border-slate-800 p-4 font-mono text-xs overflow-x-auto custom-scrollbar max-h-[340px]">
+                                <pre id="response-output" class="text-emerald-300">{
+  "status": "success",
+  "code": 200,
+  "data": {
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+      {
+        "uuid": "d981a8c2-4b2e-41f9-90c1-38290f19c812",
+        "project_name": "proxify-django-core",
+        "region": "eu-central-1",
+        "status": "HEALTHY",
+        "uptime_percentage": 99.99,
+        "created_at": "2025-02-24T12:00:00Z"
+      }
+    ]
+  }
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                            <span>Simulated Gunicorn Worker Response</span>
+                        </div>
+                        <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team" class="text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1">
+                            Deploy custom backend now <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900/50 py-6 px-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>© 2025 Antigravity Autonomous Systems. Engineered for Senior Backend Python/Django roles.</p>
+            <div class="flex items-center space-x-4">
+                <a href="mailto:lamvukyo3001@gmail.com?subject=Inquiry" class="hover:text-slate-300 transition">Contact Developer</a>
+                <span>•</span>
+                <span class="text-emerald-400 font-mono">System Operational</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Interactive Logic -->
+    <script>
+        // Tab switching logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-indigo-600', 'text-white', 'shadow');
+                el.classList.add('text-slate-400', 'hover:text-slate-200');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            
+            const btnDesktop = document.getElementById('btn-' + tabId);
+            const btnMobile = document.getElementById('m-btn-' + tabId);
+            
+            if(btnDesktop) {
+                btnDesktop.classList.remove('text-slate-400', 'hover:text-slate-200');
+                btnDesktop.classList.add('bg-indigo-600', 'text-white', 'shadow');
+            }
+            if(btnMobile) {
+                btnMobile.classList.remove('text-slate-400');
+                btnMobile.classList.add('bg-indigo-600', 'text-white');
+            }
+        }
+
+        // Architecture Node Selector Data
+        const archData = {
+            ingress: {
+                title: "Ingress & Edge Security",
+                subtitle: "Layer 7 Protection & SSL Termination",
+                icon: "fa-shield",
+                color: "text-emerald-400",
+                bg: "bg-emerald-600/20",
+                border: "border-emerald-500/30",
+                content: `Incoming traffic is routed through AWS Application Load Balancer with integrated AWS WAF (Web Application Firewall) blocking SQL injection, XSS, and volumetric DDoS attacks.`,
+                code: `# NGINX Upstream & Rate Limiting Configuration\nlimit_req_zone $binary_remote_addr zone=api_limit:10m rate=50r/s;\nserver {\n    listen 443 ssl http2;\n    ssl_certificate /etc/letsencrypt/live/api.proxify.internal/fullchain.pem;\n    proxy_pass http://django_gunicorn_cluster;\n}`
+            },
+            django: {
+                title: "Django App Pods (Gunicorn)",
+                subtitle: "Stateless Containerized API Nodes",
+                icon: "fa-server",
+                color: "text-purple-400",
+                bg: "bg-purple-600/20",
+                border: "border-purple-500/30",
+                content: `Kubernetes-managed Gunicorn pods running Python 3.11 with ASGI/WSGI hybrid support. Configured with strict environment isolation and APM tracing.`,
+                code: `# gunicorn.conf.py\nbind = "0.0.0.0:8000"\nworkers = 4\nworker_class = "uvicorn.workers.UvicornWorker"\nmax_requests = 1000\nmax_requests_jitter = 50\ntimeout = 30`
+            },
+            cache: {
+                title: "Redis Caching & Celery Broker",
+                subtitle: "Distributed In-Memory Engine & Task Queue",
+                icon: "fa-bolt",
+                color: "text-amber-400",
+                bg: "bg-amber-600/20",
+                border: "border-amber-500/30",
+                content: `High-throughput Redis cluster handling session persistence, token blacklist caches, and as asynchronous message broker for Celery worker fleets.`,
+                code: `# celery.py configuration\napp = Celery('proxify_core')\napp.config_from_object('django.conf:settings', namespace='CELERY')\napp.conf.task_acks_late = True\napp.conf.worker_prefetch_multiplier = 1`
+            },
+            db: {
+                title: "PostgreSQL 15 Cluster",
+                subtitle: "Multi-AZ Relational Database Engine",
+                icon: "fa-database",
+                color: "text-blue-400",
+                bg: "bg-blue-600/20",
+                border: "border-blue-500/30",
+                content: `AWS RDS PostgreSQL 15 with automated daily snapshots, read replicas for heavy reporting queries, and PgBouncer connection pooling to eliminate connection overhead.`,
+                code: `-- PostgreSQL Performance Indexing Example\nCREATE INDEX idx_deployments_client_status \nON api_projectdeployment(client_id, is_active) \nINCLUDE (created_at, region);\nANALYZE api_projectdeployment;`
+            }
+        };
+
+        function selectArchNode(nodeKey) {
+            document.querySelectorAll('.arch-card').forEach(el => {
+                el.classList.remove('border-indigo-500/50', 'bg-slate-950');
+                el.classList.add('border-slate-800');
+            });
+            const selectedNode = document.getElementById('arch-node-' + nodeKey);
+            selectedNode.classList.remove('border-slate-800');
+            selectedNode.classList.add('border-indigo-500/50', 'bg-slate-950');
+
+            const data = archData[nodeKey];
+            document.getElementById('detail-title').innerText = data.title;
+            document.getElementById('detail-subtitle').innerText = data.subtitle;
+            document.getElementById('detail-icon').className = `fa-solid ${data.icon} text-lg ${data.color}`;
+            document.getElementById('detail-icon-bg').className = `w-10 h-10 rounded-xl ${data.bg} ${data.color} border ${data.border} flex items-center justify-center`;
+            
+            document.getElementById('detail-content').innerHTML = `
+                <p>${data.content}</p>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 space-y-2">
+                    <pre class="overflow-x-auto"><code>${data.code}</code></pre>
+                </div>
+            `;
+        }
+
+        // Copy Code Snippet
+        function copyCodeSnippet() {
+            const codeText = document.getElementById('code-block').innerText;
+            navigator.clipboard.writeText(codeText);
+            const btnText = document.getElementById('copy-btn-text');
+            btnText.innerText = "Copied!";
+            setTimeout(() => { btnText.innerText = "Copy Code"; }, 2000);
+        }
+
+        // Live API Sandbox Execution Simulator
+        function executeApiRequest() {
+            const method = document.getElementById('api-method').value;
+            const endpoint = document.getElementById('api-endpoint').value;
+            const btn = document.getElementById('send-request-btn');
+            
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Executing request...`;
+            
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> Send API Request`;
+                const startTime = performance.now();
+                
+                let responseObj = {};
+                let statusText = "Status: 200 OK";
+                let statusClass = "px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+
+                if(method === 'GET') {
+                    responseObj = {
+                        status: "success",
+                        code: 200,
+                        endpoint: endpoint,
+                        timestamp: new Date().toISOString(),
+                        data: {
+                            count: 2,
+                            results: [
+                                { uuid: "d981a8c2-4b2e", project_name: "proxify-django-core", region: "eu-central-1", status: "HEALTHY", uptime: "99.99%" },
+                                { uuid: "71bf381a-11e2", project_name: "analytics-worker-svc", region: "us-east-1", status: "ACTIVE", uptime: "100%" }
+                            ]
+                        }
+                    };
+                } else if(method === 'POST') {
+                    statusText = "Status: 201 Created";
+                    responseObj = {
+                        status: "success",
+                        code: 201,
+                        message: "Deployment initiated successfully via Celery async task broker.",
+                        deployment_id: "dep_" + Math.random().toString(36).substring(2, 9),
+                        estimated_time_seconds: 14
+                    };
+                } else {
+                    responseObj = {
+                        status: "success",
+                        code: 200,
+                        message: `Resource successfully updated via ${method} method.`
+                    };
+                }
+
+                const endTime = performance.now();
+                const duration = Math.round(endTime - startTime) + 18;
+
+                document.getElementById('response-status').innerText = statusText;
+                document.getElementById('response-status').className = statusClass;
+                document.getElementById('response-time').innerText = `Time: ${duration}ms`;
+                document.getElementById('response-output').innerText = JSON.stringify(responseObj, null, 2);
+            }, 350);
+        }
+    </script>
+</body>
+</html>

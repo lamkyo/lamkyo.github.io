@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Auditable NFT Revenue Split Calculator — Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          slate: { 950: '#020617' },
+          accent: { DEFAULT: '#6366f1', soft: '#818cf8' }
+        },
+        fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] }
+      }
+    }
+  }
+</script>
+<style>
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  .glow { box-shadow: 0 0 0 1px rgba(99,102,241,.25), 0 8px 30px -12px rgba(99,102,241,.5); }
+  .fade-in { animation: fade .35s ease both; }
+  @keyframes fade { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased min-h-screen">
+
+<!-- Sticky Banner -->
+<div class="sticky top-0 z-50 border-b border-indigo-500/30 bg-gradient-to-r from-indigo-950/90 via-slate-900/90 to-slate-950/90 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <p class="text-xs sm:text-sm text-slate-300 flex items-center gap-2">
+      <span class="text-base">🚀</span>
+      <span class="font-medium">Live Interactive Prototype for:</span>
+      <span class="text-indigo-300 font-semibold">[LIVE FRONTIER: $3000] Implement auditable NFT rev</span>
+      <span class="hidden md:inline text-slate-500">|</span>
+      <span class="hidden md:inline text-slate-400">Built autonomously by Antigravity OS</span>
+      <span class="hidden lg:inline text-slate-500">|</span>
+      <span class="hidden lg:inline text-emerald-400">Ready for deployment</span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20gh-live-5690358071"
+       class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-semibold px-3.5 py-1.5 transition glow">
+      <i data-lucide="briefcase" class="w-3.5 h-3.5"></i>
+      Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="max-w-7xl mx-auto px-4 pt-8 pb-4">
+  <div class="flex items-center gap-3">
+    <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center">
+      <i data-lucide="calculator" class="w-5 h-5 text-indigo-400"></i>
+    </div>
+    <div>
+      <h1 class="text-xl sm:text-2xl font-semibold text-white tracking-tight">Auditable Revenue Split Calculator</h1>
+      <p class="text-xs text-slate-400">Deterministic · Pure calculation layer · No settlement, no wallets, no transfers</p>
+    </div>
+  </div>
+  <div class="mt-4 flex flex-wrap gap-2 text-[11px]">
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-2.5 py-1"><i data-lucide="check" class="w-3 h-3"></i>Calculation ≠ Settlement</span>
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 px-2.5 py-1"><i data-lucide="shield-alert" class="w-3 h-3"></i>Treasury ≠ Available Balance</span>
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-500/10 border border-slate-500/30 text-slate-300 px-2.5 py-1"><i data-lucide="lock" class="w-3 h-3"></i>No bounty can become FUNDED here</span>
+    <span class="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 px-2.5 py-1"><i data-lucide="git-branch" class="w-3 h-3"></i>Ref #1462</span>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+  <!-- LEFT: Inputs -->
+  <section class="lg:col-span-5 space-y-5">
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2"><i data-lucide="sliders-horizontal" class="w-4 h-4 text-indigo-400"></i>Inputs</h2>
+        <button id="resetBtn" class="text-[11px] text-slate-400 hover:text-white inline-flex items-center gap-1"><i data-lucide="rotate-ccw" class="w-3 h-3"></i>Reset</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1.5">Gross settled amount</label>
+          <div class="flex gap-2">
+            <input id="gross" type="number" min="0" step="0.01" value="100"
+              class="flex-1 bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/40 rounded-lg px-3 py-2 text-sm font-mono text-white outline-none transition" />
+            <select id="asset" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-200 outline-none focus:border-indigo-500">
+              <option value="EUR">EUR</option>
+              <option value="USD">USD</option>
+              <option value="ETH">ETH</option>
+              <option value="USDC">USDC</option>
+              <option value="">— none —</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1.5">
+            <label class="text-slate-400">MyZubster platform fee</label>
+            <span id="feeVal" class="font-mono text-indigo-300">10.00%</span>
+          </div>
+          <input id="feePct" type="range" min="0" max="100" step="0.5" value="10" class="w-full accent-indigo-500" />
+        </div>
+
+        <div>
+          <div class="flex justify-between text-xs mb-1.5">
+            <label class="text-slate-400">Treasury allocation (of platform fee)</label>
+            <span id="treasuryVal" class="font-mono text-indigo-300">50.00%</span>
+          </div>
+          <input id="treasuryPct" type="range" min="0" max="100" step="0.5" value="50" class="w-full accent-indigo-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5">Terms / policy version</label>
+            <input id="policy" type="text" value="pilot-2024.1" class="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 rounded-lg px-3 py-2 text-sm font-mono text-white outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs text-slate-400 mb-1.5">Settlement status</label>
+            <select id="settleStatus" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-200 outline-none focus:border-indigo-500">
+              <option value="verified">verified</option>
+              <option value="unverified">unverified</option>
+              <option value="failed">failed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input id="consent" type="checkbox" class="accent-indigo-500 w-4 h-4" />
+          <label for="consent" class="text-xs text-slate-400">Creator consent recorded (required for real settlement — not for calculation)</label>
+        </div>
+      </div>
+
+      <button id="calcBtn" class="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-semibold py-2.5 transition glow">
+        <i data-lucide="play" class="w-4 h-4"></i>Run Calculation
+      </button>
+    </div>
+
+    <!-- Presets -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <h2 class="text-sm font-semibold text-white mb-3 flex items-center gap-2"><i data-lucide="flask-conical" class="w-4 h-4 text-indigo-400"></i>Test Scenarios</h2>
+      <div id="presets" class="grid grid-cols-2 gap-2 text-[11px]"></div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Output -->
+  <section class="lg:col-span-7 space-y-5">
+    <!-- Validation banner -->
+    <div id="validation" class="hidden rounded-xl border px-4 py-3 text-sm flex items-start gap-2"></div>
+
+    <!-- Result cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+        <p class="text-[11px] text-slate-400 mb-1">Creator amount</p>
+        <p id="outCreator" class="text-lg font-semibold text-emerald-400 font-mono">—</p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+        <p class="text-[11px] text-slate-400 mb-1">MyZubster gross fee</p>
+        <p id="outFee" class="text-lg font-semibold text-indigo-300 font-mono">—</p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+        <p class="text-[11px] text-slate-400 mb-1">Treasury allocation</p>
+        <p id="outTreasury" class="text-lg font-semibold text-amber-300 font-mono">—</p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+        <p class="text-[11px] text-slate-400 mb-1">Project revenue</p>
+        <p id="outProject" class="text-lg font-semibold text-sky-300 font-mono">—</p>
+      </div>
+    </div>
+
+    <!-- Reconciliation -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2"><i data-lucide="scale" class="w-4 h-4 text-indigo-400"></i>Reconciliation</h2>
+        <span id="reconBadge" class="text-[11px] px-2 py-0.5 rounded-full border border-slate-700 text-slate-400">idle</span>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Allocation sum vs gross</span><span id="reconSum" class="font-mono text-slate-300">—</span></div>
+          <div class="h-2 rounded-full bg-slate-800 overflow-hidden"><div id="reconBar" class="h-full bg-emerald-500 transition-all" style="width:0%"></div></div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-[11px] pt-1">
+          <div class="rounded-lg bg-slate-950/60 border border-slate-800 p-2.5"><p class="text-slate-500">Rounding rule</p><p class="text-slate-300 font-mono">half-up, 2dp</p></div>
+          <div class="rounded-lg bg-slate-950/60 border border-slate-800 p-2.5"><p class="text-slate-500">Residual absorbed by</p><p class="text-slate-300 font-mono">creator</p></div>
+          <div class="rounded-lg bg-slate-950/60 border border-slate-800 p-2.5"><p class="text-slate-500">Policy version</p><p id="outPolicy" class="text-slate-300 font-mono">—</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ledger -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2"><i data-lucide="list-checks" class="w-4 h-4 text-indigo-400"></i>Audit Ledger</h2>
+        <button id="clearLedger" class="text-[11px] text-slate-400 hover:text-white inline-flex items-center gap-1"><i data-lucide="trash-2" class="w-3 h-3"></i>Clear</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-[11px] font-mono">
+          <thead class="text-slate-500 border-b border-slate-800">
+            <tr>
+              <th class="text-left py-2 pr-3">#</th>
+              <th class="text-left py-2 pr-3">Gross</th>
+              <th class="text-left py-2 pr-3">Asset</th>
+              <th class="text-left py-2 pr-3">Creator</th>
+              <th class="text-left py-2 pr-3">Fee</th>
+              <th class="text-left py-2 pr-3">Treasury</th>
+              <th class="text-left py-2 pr-3">Project</th>
+              <th class="text-left py-2">Status</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody" class="text-slate-300"></tbody>
+        </table>
+        <p id="ledgerEmpty" class="text-center text-xs text-slate-600 py-6">No calculations yet. Run one to populate the audit ledger.</p>
+      </div>
+    </div>
+
+    <!-- Trust boundary note -->
+    <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 text-[11px] text-amber-200/90 leading-relaxed">
+      <p class="font-semibold mb-1 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i>Trust boundaries</p>
+      This component performs <b>calculation only</b>. It does not mint, transfer, sign, or settle. A calculated treasury allocation is <b>not</b> an available treasury balance, and no bounty becomes FUNDED or PAID from this calculator alone. Rights/consent remain separate prerequisites. Secondary-sale royalties are out of scope.
+    </div>
+  </section>
+</main>
+
+<script>
+// ---------- Pure calculation layer ----------
+const ROUND = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+function validate({ gross, feePct, treasuryPct, asset, policy }) {
+  const errors = [];
+  if (gross === '' || gross === null || isNaN(gross)) errors.push('Gross amount is required.');
+  else if (gross < 0) errors.push('Gross amount cannot be negative.');
+  if (isNaN(feePct) || feePct < 0 || feePct > 100) errors.push('Platform fee must be between 0 and 100%.');
+  if (isNaN(treasuryPct) || treasuryPct < 0 || treasuryPct > 100) errors.push('Treasury allocation must be between 0 and 100%.');
+  if (!asset) errors.push('Asset/currency identifier is required.');
+  if (!policy || !policy.trim()) errors.push('Terms/policy version is required.');
+  return errors;
+}
+
+function calculate(input) {
+  const { gross, feePct, treasuryPct, asset, policy, settlementStatus } = input;
+  const errors = validate(input);
+  if (errors.length) return { ok: false, errors };
+
+  const g = ROUND(gross);
+  const fee = ROUND(g * (feePct / 100));
+  const treasury = ROUND(fee * (treasuryPct / 100));
+  const project = ROUND(fee - treasury);
+  const creator = ROUND(g - fee); // residual absorbed by creator
+
+  const sum = ROUND(creator + fee);
+  const reconciles = sum === g;
+
+  // Trust boundary: unverified/failed settlement cannot be represented as available treasury funds
+  const treasuryAvailable = settlementStatus === 'verified';
+
+  return {
+    ok: true,
+    asset, policy,
+    gross: g,
+    creator, fee, treasury, project,
+    rounding: { rule: 'half-up', decimals: 2, residualTo: 'creator' },
+    reconciles,
+    settlementStatus,
+    treasuryAvailable,
+    treasuryLabel: treasuryAvailable ? 'allocated (verified)' : 'calculated only — not available'
+  };
+}
+
+// ---------- UI wiring ----------
+const $ = (id) => document.getElementById(id);
+const fmt = (n, asset) => `${n.toFixed(2)} ${asset || ''}`.trim();
+
+const presets = [
+  { name: 'Normal split', gross: 100, feePct: 10, treasuryPct: 50, asset: 'EUR', policy: 'pilot-2024.1', settleStatus: 'verified' },
+  { name: 'Zero platform fee', gross: 100, feePct: 0, treasuryPct: 50, asset: 'EUR', policy: 'pilot-2024.1', settleStatus: 'verified' },
+  { name: 'Zero treasury', gross: 100, feePct: 10, treasuryPct: 0, asset: 'EUR', policy: 'pilot-2024.1', settleStatus: 'verified' },
+  { name: 'Fractional/rounding', gross: 33.33, feePct: 7.5, treasuryPct: 33.3, asset: 'USD', policy: 'pilot-2024.1', settleStatus: 'verified' },
+  { name: 'Invalid percentages', gross: 100, feePct: 150, treasuryPct: 50, asset: 'EUR', policy: 'pilot-2024.1', settleStatus: 'verified' },
+  { name: 'Zero-value sale', gross: 0, feePct: 10, treasuryPct: 50, asset: 'EUR', policy: 'pilot-2024.1', settleStatus: 'verified' },
+  { name: 'Missing asset', gross: 100, feePct: 10, treasuryPct: 50, asset: '', policy: 'pilot-2024.1', settleStatus: 'verified' },
+  { name: 'Unverified settlement', gross: 100, feePct: 10, treasuryPct: 50, asset: 'EUR', policy: 'pilot-2024.1', settleStatus: 'unverified' },
+];
+
+let ledger = [];
+let counter = 0;
+
+function buildPresets() {
+  const wrap = $('presets');
+  wrap.innerHTML = '';
+  presets.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.className = 'text-left rounded-lg border border-slate-800 bg-slate-950/60 hover:border-indigo-500/50 hover:bg-slate-900 px-2.5 py-2 transition';
+    b.innerHTML = `<span class="block text-slate-200 font-medium">${p.name}</span><span class="block text-slate-500 mt-0.5">${p.gross} ${p.asset || '—'} · fee ${p.feePct}% · tre ${p.treasuryPct}%</span>`;
+    b.onclick = () => applyPreset(p);
+    wrap.appendChild(b);
+  });
+}
+
+function applyPreset(p) {
+  $('gross').value = p.gross;
+  $('feePct').value = p.feePct;
+  $('treasuryPct').value = p.treasuryPct;
+  $('asset').value = p.asset;
+  $('policy').value = p.policy;
+  $('settleStatus').value = p.settleStatus;
+  syncLabels();
+  run();
+}
+
+function syncLabels() {
+  $('feeVal').textContent = parseFloat($('feePct').value).toFixed(2) + '%';
+  $('treasuryVal').textContent = parseFloat($('treasuryPct').value).toFixed(2) + '%';
+}
+
+function readInput() {
+  return {
+    gross: parseFloat($('gross').value),
+    feePct: parseFloat($('feePct').value),
+    treasuryPct: parseFloat($('treasuryPct').value),
+    asset: $('asset').value,
+    policy: $('policy').value,
+    settlementStatus: $('settleStatus').value
+  };
+}
+
+function showValidation(errors) {
+  const el = $('validation');
+  if (!errors.length) { el.classList.add('hidden'); return; }
+  el.className = 'rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm flex items-start gap-2 text-rose-200 fade-in';
+  el.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 mt-0.5 shrink-0"></i><div><b>Validation failed</b><ul class="mt-1 list-disc list-inside text-rose-200/80">${errors.map(e=>`<li>${e}</li>`).join('')}</ul></div>`;
+  lucide.createIcons();
+}
+
+function run() {
+  const input = readInput();
+  const res = calculate(input);
+
+  if (!res.ok) {
+    showValidation(res.errors);
+    ['outCreator','outFee','outTreasury','outProject','outPolicy'].forEach(id => $(id).textContent = '—');
+    $('reconBadge').textContent = 'invalid';
+    $('reconBadge').className = 'text-[11px] px-2 py-0.5 rounded-full border border-rose-500/40 text-rose-300';
+    $('reconSum').textContent = '—';
+    $('reconBar').style.width = '0%';
+    return;
+  }
+
+  showValidation([]);
+  $('outCreator').textContent = fmt(res.creator, res.asset);
+  $('outFee').textContent = fmt(res.fee, res.asset);
+  $('outTreasury').textContent = fmt(res.treasury, res.asset);
+  $('outProject').textContent = fmt(res.project, res.asset);
+  $('outPolicy').textContent = res.policy;
+
+  const sum = ROUND(res.creator + res.fee);
+  $('reconSum').textContent = `${sum.toFixed(2)} / ${res.gross.toFixed(2)} ${res.asset}`;
+  $('reconBar').style.width = res.reconciles ? '100%' : '40%';
+  $('reconBar').className = 'h-full transition-all ' + (res.reconciles ? 'bg-emerald-500' : 'bg-rose-500');
+  $('reconBadge').textContent = res.reconciles ? 'reconciled ✓' : 'mismatch';
+  $('reconBadge').className = 'text-[11px] px-2 py-0.5 rounded-full border ' + (res.reconciles ? 'border-emerald-500/40 text-emerald-300' : 'border-rose-500/40 text-rose-300');
+
+  pushLedger(res);
+}
+
+function pushLedger(res) {
+  counter++;
+  ledger.unshift({ id: counter, ...res });
+  if (ledger.length > 12) ledger.pop();
+  renderLedger();
+}
+
+function renderLedger() {
+  const body = $('ledgerBody');
+  body.innerHTML = '';
+  $('ledgerEmpty').style.display = ledger.length ? 'none' : 'block';
+  ledger.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.className = 'border-b border-slate-800/60 fade-in';
+    const status = r.treasuryAvailable
+      ? '<span class="text-emerald-400">verified</span>'
+      : `<span class="text-amber-400">${r.settlementStatus}</span>`;
+    tr.innerHTML = `
+      <td class="py-2 pr-3 text-slate-500">${r.id}</td>
+      <td class="py-2 pr-3">${r.gross.toFixed(2)}</td>
+      <td class="py-2 pr-3">${r.asset}</td>
+      <td class="py-2 pr-3 text-emerald-400">${r.creator.toFixed(2)}</td>
+      <td class="py-2 pr-3 text-indigo-300">${r.fee.toFixed(2)}</td>
+      <td class="py-2 pr-3 text-amber-300">${r.treasury.toFixed(2)}</td>
+      <td class="py-2 pr-3 text-sky-300">${r.project.toFixed(2)}</td>
+      <td class="py-2">${status}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+// ---------- Events ----------
+['feePct','treasuryPct'].forEach(id => $(id).addEventListener('input', () => { syncLabels(); run(); }));
+['gross','asset','policy','settleStatus'].forEach(id => $(id).addEventListener('input', run));
+$('calcBtn').onclick = run;
+$('resetBtn').onclick = () => { applyPreset(presets[0]); };
+$('clearLedger').onclick = () => { ledger = []; counter = 0; renderLedger(); };
+
+// ---------- Init ----------
+buildPresets();
+syncLabels();
+run();
+lucide.createIcons();
+</script>
+</body>
+</html>

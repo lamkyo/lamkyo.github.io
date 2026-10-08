@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<title>AI Agent Engineer Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* Custom scrollbar for dark mode */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #1e293b; }
+  ::-webkit-scrollbar-thumb { background: #64748b; border-radius: 4px; }
+</style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen flex flex-col">
+
+<!-- Sticky Notification Banner -->
+<div class="fixed top-0 inset-x-0 bg-indigo-600 text-white text-sm py-2 z-50 flex items-center justify-between px-4">
+  <span>🚀 Live Interactive Prototype for: AI agent engineer | Built autonomously by Antigravity OS | Ready for deployment</span>
+  <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20ext-remoteok-remoteok-1137399" class="bg-white text-indigo-600 font-semibold px-3 py-1 rounded hover:bg-gray-200 transition">Hire Team ($150 - $500)</a>
+</div>
+
+<!-- Main Content -->
+<main class="flex-1 pt-16 px-4 sm:px-6 lg:px-8">
+  <h1 class="text-3xl font-semibold mb-6">AI Agent Dashboard</h1>
+
+  <!-- Filters -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div class="flex items-center space-x-2">
+      <lucide-search class="w-5 h-5 text-gray-400"></lucide-search>
+      <input id="searchInput" type="text" placeholder="Search agents..." class="bg-gray-800 text-gray-200 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    </div>
+    <div class="flex items-center space-x-2">
+      <lucide-filter class="w-5 h-5 text-gray-400"></lucide-filter>
+      <select id="statusFilter" class="bg-gray-800 text-gray-200 rounded px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="all">All Statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Agents Table -->
+  <div class="overflow-x-auto rounded-lg bg-gray-800 shadow">
+    <table id="agentsTable" class="min-w-full divide-y divide-gray-700">
+      <thead class="bg-gray-700">
+        <tr>
+          <th class="px-4 py-2 text-left text-sm font-medium">ID</th>
+          <th class="px-4 py-2 text-left text-sm font-medium">Name</th>
+          <th class="px-4 py-2 text-left text-sm font-medium">Status</th>
+          <th class="px-4 py-2 text-left text-sm font-medium">Progress</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-700">
+        <!-- Rows will be inserted by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Performance Chart -->
+  <div class="mt-8">
+    <h2 class="text-xl font-semibold mb-4">Agent Performance</h2>
+    <canvas id="performanceChart" class="bg-gray-800 rounded-lg p-4"></canvas>
+  </div>
+</main>
+
+<script>
+  // Initialize Lucide icons
+  lucide.createIcons();
+
+  // Sample data
+  const agents = [
+    { id: 1, name: 'Agent Alpha', status: 'active', progress: 0, performance: 85 },
+    { id: 2, name: 'Agent Bravo', status: 'inactive', progress: 0, performance: 60 },
+    { id: 3, name: 'Agent Charlie', status: 'active', progress: 0, performance: 92 },
+    { id: 4, name: 'Agent Delta', status: 'active', progress: 0, performance: 78 },
+    { id: 5, name: 'Agent Echo', status: 'inactive', progress: 0, performance: 55 },
+    { id: 6, name: 'Agent Foxtrot', status: 'active', progress: 0, performance: 88 },
+    { id: 7, name: 'Agent Golf', status: 'inactive', progress: 0, performance: 63 },
+    { id: 8, name: 'Agent Hotel', status: 'active', progress: 0, performance: 90 }
+  ];
+
+  const tableBody = document.querySelector('#agentsTable tbody');
+  const searchInput = document.getElementById('searchInput');
+  const statusFilter = document.getElementById('statusFilter');
+
+  // Render table rows
+  function renderTable() {
+    tableBody.innerHTML = '';
+    const filtered = agents.filter(agent => {
+      const matchesSearch = agent.name.toLowerCase().includes(searchInput.value.toLowerCase());
+      const matchesStatus = statusFilter.value === 'all' || agent.status === statusFilter.value;
+      return matchesSearch && matchesStatus;
+    });
+    filtered.forEach(agent => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="px-4 py-2">${agent.id}</td>
+        <td class="px-4 py-2">${agent.name}</td>
+        <td class="px-4 py-2">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${agent.status === 'active' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}">
+            ${agent.status}
+          </span>
+        </td>
+        <td class="px-4 py-2">
+          <div class="w-full bg-gray-600 rounded h-4">
+            <div id="progress-${agent.id}" class="h-4 bg-indigo-500 rounded" style="width: ${agent.progress}%"></div>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  // Simulate progress updates
+  function simulateProgress() {
+    agents.forEach(agent => {
+      if (agent.progress < 100) {
+        agent.progress = Math.min(100, agent.progress + Math.floor(Math.random() * 10));
+        const bar = document.getElementById(`progress-${agent.id}`);
+        if (bar) bar.style.width = `${agent.progress}%`;
+      }
+    });
+  }
+
+  // Chart setup
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  const performanceChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: agents.map(a => a.name),
+      datasets: [{
+        label: 'Performance Score',
+        data: agents.map(a => a.performance),
+        backgroundColor: 'rgba(99, 102, 241, 0.7)',
+        borderColor: 'rgba(99, 102, 241, 1)',
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true, max: 100 }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  // Event listeners
+  searchInput.addEventListener('input', renderTable);
+  statusFilter.addEventListener('change', renderTable);
+
+  // Initial render
+  renderTable();
+
+  // Update progress bars every 2 seconds
+  setInterval(() => {
+    simulateProgress();
+  }, 2000);
+</script>
+</body>
+</html>

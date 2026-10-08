@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAHOF | Collibra Public Sector Control Plane</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <style>
+        body { background-color: #020617; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="min-h-screen font-sans">
+
+    <!-- Sticky Header -->
+    <div class="sticky top-0 z-50 w-full glass p-3 flex justify-between items-center px-6 text-sm">
+        <span class="flex items-center gap-2 font-medium text-slate-300">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            🚀 Live Interactive Prototype for: CPS Account Program Manager | Built autonomously by Antigravity OS
+        </span>
+        <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-7b47b94d" 
+           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-xs font-bold transition-all">
+            Hire Team ($150 - $500)
+        </a>
+    </div>
+
+    <main class="max-w-7xl mx-auto p-6 space-y-6">
+        <!-- Header -->
+        <header class="flex justify-between items-end border-b border-slate-800 pb-6">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight">FAHOF Control Plane</h1>
+                <p class="text-slate-400">Federal Account Health & Observability Framework - GovCloud Instance: <span class="text-blue-400 font-mono">aws-us-gov-west-1</span></p>
+            </div>
+            <div class="flex gap-4">
+                <div class="text-right">
+                    <p class="text-xs text-slate-500 uppercase font-semibold">Compliance Drift</p>
+                    <p class="text-xl font-mono text-green-400">0.02%</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs text-slate-500 uppercase font-semibold">System Status</p>
+                    <p class="text-xl font-mono text-blue-400">OPERATIONAL</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="glass p-4 rounded-xl">
+                <p class="text-slate-400 text-sm">Avg API Latency</p>
+                <h3 class="text-2xl font-bold">42ms <span class="text-xs text-green-500 font-normal">+1.2ms</span></h3>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <p class="text-slate-400 text-sm">Active Nodes</p>
+                <h3 class="text-2xl font-bold">14/14</h3>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <p class="text-slate-400 text-sm">Metadata Volume</p>
+                <h3 class="text-2xl font-bold">8.2TB</h3>
+            </div>
+            <div class="glass p-4 rounded-xl">
+                <p class="text-slate-400 text-sm">Security Alerts</p>
+                <h3 class="text-2xl font-bold text-yellow-500">0</h3>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Table -->
+        <div class="glass rounded-xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center">
+                <h2 class="font-semibold">Recent Telemetry Ingestion</h2>
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Filter logs..." class="bg-slate-900 border border-slate-700 px-3 py-1 rounded text-sm focus:outline-none focus:border-blue-500">
+                    <button onclick="simulateActivity()" class="bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded text-sm border border-slate-600 transition">Refresh</button>
+                </div>
+            </div>
+            <table class="w-full text-sm text-left">
+                <thead class="bg-slate-900/50 text-slate-400">
+                    <tr>
+                        <th class="p-4">Timestamp</th>
+                        <th class="p-4">Event</th>
+                        <th class="p-4">Severity</th>
+                        <th class="p-4">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="telemetry-body" class="divide-y divide-slate-800">
+                    <tr class="hover:bg-slate-800/30 transition">
+                        <td class="p-4 font-mono text-slate-400">14:02:01</td>
+                        <td class="p-4">NIST 800-53 Drift Check: Passed</td>
+                        <td class="p-4"><span class="px-2 py-0.5 rounded-full bg-green-900 text-green-300 text-[10px]">LOW</span></td>
+                        <td class="p-4 text-green-400 font-bold">OK</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        function simulateActivity() {
+            const body = document.getElementById('telemetry-body');
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-800/30 transition animate-fade-in";
+            row.innerHTML = `
+                <td class="p-4 font-mono text-slate-400">${new Date().toLocaleTimeString()}</td>
+                <td class="p-4">Sync Metadata Pipeline: GovCloud-Cluster-A</td>
+                <td class="p-4"><span class="px-2 py-0.5 rounded-full bg-blue-900 text-blue-300 text-[10px]">INFO</span></td>
+                <td class="p-4 text-blue-400 font-bold italic">IN PROGRESS</td>
+            `;
+            body.prepend(row);
+            if(body.children.length > 5) body.lastElementChild.remove();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incident Response as Code — Datadog Service Management Demo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: { colors: {
+    slate: { 950: '#0a0e14' },
+    accent: { DEFAULT: '#7c3aed', soft: '#a78bfa' }
+  }, fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] } } }
+}
+</script>
+<style>
+  body { background:#0a0e14; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#1e293b; border-radius:4px; }
+  .glow { box-shadow: 0 0 0 1px rgba(124,58,237,.3), 0 0 24px -6px rgba(124,58,237,.5); }
+  .pulse-dot { animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .fade-in { animation: fade .35s ease both; }
+  @keyframes fade { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+</style>
+</head>
+<body class="text-slate-300 font-sans antialiased">
+
+<!-- Sticky Banner -->
+<div class="sticky top-0 z-50 bg-gradient-to-r from-violet-600/90 via-indigo-600/90 to-violet-600/90 backdrop-blur border-b border-violet-400/30">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <p class="text-[13px] text-white/95 font-medium flex items-center gap-2">
+      <span class="hidden sm:inline">🚀</span>
+      <span>Live Interactive Prototype for: <span class="font-semibold">Developer Advocate - Service Management EMEA</span> | Built autonomously by Antigravity OS | Ready for deployment</span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-55f9943b"
+       class="shrink-0 text-xs font-semibold bg-white text-violet-700 px-3.5 py-1.5 rounded-lg hover:bg-violet-50 transition shadow">
+      Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- Nav -->
+<header class="border-b border-slate-800/70 bg-slate-950/60 backdrop-blur sticky top-[46px] z-40">
+  <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-md bg-gradient-to-br from-violet-500 to-indigo-600 grid place-items-center glow">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-white"></i>
+      </div>
+      <span class="font-semibold text-slate-100 text-sm tracking-tight">IRaC</span>
+      <span class="text-[11px] text-slate-500 font-mono hidden sm:inline">incident-response-as-code</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-1 text-[13px]">
+      <button data-tab="dashboard" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800/60 transition">Dashboard</button>
+      <button data-tab="incidents" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800/60 transition">Incidents</button>
+      <button data-tab="workflows" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800/60 transition">Workflows</button>
+      <button data-tab="catalog" class="tab-btn px-3 py-1.5 rounded-md text-slate-300 hover:text-white hover:bg-slate-800/60 transition">Service Catalog</button>
+    </nav>
+    <div class="flex items-center gap-3">
+      <span class="flex items-center gap-1.5 text-[11px] text-emerald-400 font-mono">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span>API LIVE
+      </span>
+      <div class="w-7 h-7 rounded-full bg-slate-800 grid place-items-center text-[11px] font-semibold text-slate-300">SR</div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="view-dashboard" class="view">
+    <div class="flex items-end justify-between mb-5 flex-wrap gap-3">
+      <div>
+        <h1 class="text-xl font-semibold text-slate-100 tracking-tight">Service Management Overview</h1>
+        <p class="text-[13px] text-slate-500 mt-0.5">Live incident state machine · SLO burn · automation throughput</p>
+      </div>
+      <button id="simulateBtn" class="text-[13px] font-medium bg-violet-600 hover:bg-violet-500 text-white px-3.5 py-2 rounded-lg transition flex items-center gap-2">
+        <i data-lucide="zap" class="w-3.5 h-3.5"></i> Simulate Incident
+      </button>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] uppercase tracking-wider text-slate-500 font-medium">Active Incidents</span>
+          <i data-lucide="flame" class="w-4 h-4 text-orange-400"></i>
+        </div>
+        <div id="kpiActive" class="text-2xl font-semibold text-slate-100 font-mono">0</div>
+        <div class="text-[11px] text-slate-500 mt-1">across 6 services</div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] uppercase tracking-wider text-slate-500 font-medium">MTTA</span>
+          <i data-lucide="timer" class="w-4 h-4 text-sky-400"></i>
+        </div>
+        <div id="kpiMtta" class="text-2xl font-semibold text-slate-100 font-mono">2m 14s</div>
+        <div class="text-[11px] text-emerald-400 mt-1">▼ 18% vs last week</div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] uppercase tracking-wider text-slate-500 font-medium">Automation Runs</span>
+          <i data-lucide="workflow" class="w-4 h-4 text-violet-400"></i>
+        </div>
+        <div id="kpiRuns" class="text-2xl font-semibold text-slate-100 font-mono">1,284</div>
+        <div class="text-[11px] text-slate-500 mt-1">last 24h</div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] uppercase tracking-wider text-slate-500 font-medium">Error Budget</span>
+          <i data-lucide="gauge" class="w-4 h-4 text-emerald-400"></i>
+        </div>
+        <div id="kpiBudget" class="text-2xl font-semibold text-slate-100 font-mono">87%</div>
+        <div class="w-full h-1.5 bg-slate-800 rounded-full mt-2 overflow-hidden">
+          <div id="budgetBar" class="h-full bg-emerald-500 rounded-full transition-all duration-700" style="width:87%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-4">
+      <!-- Chart -->
+      <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold text-slate-200">Incident Volume &amp; Resolution</h2>
+          <div class="flex gap-1 text-[11px]">
+            <button data-range="24h" class="range-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-200">24h</button>
+            <button data-range="7d" class="range-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-300">7d</button>
+            <button data-range="30d" class="range-btn px-2.5 py-1 rounded-md text-slate-500 hover:text-slate-300">30d</button>
+          </div>
+        </div>
+        <div id="chart" class="flex items-end gap-1.5 h-44"></div>
+        <div class="flex items-center gap-4 mt-4 text-[11px] text-slate-500">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-violet-500"></span>Triggered</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span>Resolved</span>
+        </div>
+      </div>
+
+      <!-- Live feed -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 flex flex-col">
+        <h2 class="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4 text-violet-400"></i> Automation Feed
+        </h2>
+        <div id="feed" class="space-y-2.5 overflow-y-auto max-h-72 pr-1 text-[12px] font-mono"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ INCIDENTS ============ -->
+  <section id="view-incidents" class="view hidden">
+    <div class="flex items-end justify-between mb-5 flex-wrap gap-3">
+      <div>
+        <h1 class="text-xl font-semibold text-slate-100 tracking-tight">Incidents</h1>
+        <p class="text-[13px] text-slate-500 mt-0.5">State machine: triggered → acknowledged → resolving → resolved</p>
+      </div>
+      <div class="flex gap-2">
+        <div class="relative">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+          <input id="searchInput" placeholder="Search incidents…" class="bg-slate-900 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-[13px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500/60 w-56">
+        </div>
+        <select id="sevFilter" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-[13px] text-slate-300 focus:outline-none focus:border-violet-500/60">
+          <option value="">All severities</option>
+          <option value="SEV-1">SEV-1</option>
+          <option value="SEV-2">SEV-2</option>
+          <option value="SEV-3">SEV-3</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
+      <table class="w-full text-[13px]">
+        <thead class="bg-slate-900/80 text-[11px] uppercase tracking-wider text-slate-500">
+          <tr>
+            <th class="text-left font-medium px-4 py-3">ID</th>
+            <th class="text-left font-medium px-4 py-3">Title</th>
+            <th class="text-left font-medium px-4 py-3 hidden md:table-cell">Service</th>
+            <th class="text-left font-medium px-4 py-3">Severity</th>
+            <th class="text-left font-medium px-4 py-3">State</th>
+            <th class="text-right font-medium px-4 py-3">Action</th>
+          </tr>
+        </thead>
+        <tbody id="incidentBody" class="divide-y divide-slate-800/70"></tbody>
+      </table>
+      <div id="emptyState" class="hidden text-center py-12 text-slate-600 text-[13px]">No incidents match your filters.</div>
+    </div>
+  </section>
+
+  <!-- ============ WORKFLOWS ============ -->
+  <section id="view-workflows" class="view hidden">
+    <h1 class="text-xl font-semibold text-slate-100 tracking-tight mb-1">Workflow Automation</h1>
+    <p class="text-[13px] text-slate-500 mb-5">Event-driven enrichment pipelines triggered by Datadog monitors.</p>
+    <div id="workflowGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+  <!-- ============ CATALOG ============ -->
+  <section id="view-catalog" class="view hidden">
+    <h1 class="text-xl font-semibold text-slate-100 tracking-tight mb-1">Service Catalog</h1>
+    <p class="text-[13px] text-slate-500 mb-5">Ownership, tier, and SLO metadata used for incident enrichment.</p>
+    <div id="catalogGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </section>
+
+</main>
+
+<footer class="border-t border-slate-800/70 mt-8">
+  <div class="max-w-7xl mx-auto px-4 py-5 flex flex-wrap items-center justify-between gap-3 text-[12px] text-slate-600">
+    <span>Prototype · Incident Response as Code · Datadog Service Management API surface</span>
+    <span class="font-mono">built by Antigravity OS</span>
+  </div>
+</footer>
+
+<script>
+/* ---------- Data ---------- */
+const SERVICES = [
+  { name:'checkout-api', tier:'Tier 1', owner:'Payments', slo:'99.95%', lang:'Go' },
+  { name:'auth-gateway', tier:'Tier 1', owner:'Identity', slo:'99.99%', lang:'Rust' },
+  { name:'search-indexer', tier:'Tier 2', owner:'Discovery', slo:'99.9%', lang:'Java' },
+  { name:'notification-svc', tier:'Tier 2', owner:'Growth', slo:'99.5%', lang:'Node' },
+  { name:'billing-worker', tier:'Tier 1', owner:'Payments', slo:'99.95%', lang:'Python' },
+  { name:'analytics-pipe', tier:'Tier 3', owner:'Data', slo:'99.0%', lang:'Scala' },
+];
+
+const WORKFLOWS = [
+  { name:'Enrich Incident', trigger:'monitor.triggered', runs:412, ok:99.3, icon:'sparkles' },
+  { name:'Page On-Call', trigger:'incident.created', runs:188, ok:100, icon:'bell-ring' },
+  { name:'Attach Runbook', trigger:'service.catalog.match', runs:377, ok:98.7, icon:'book-open' },
+  { name:'Infer Severity', trigger:'monitor.tags', runs:412, ok:97.1, icon:'git-branch' },
+  { name:'Open Case', trigger:'incident.sev1', runs:23, ok:100, icon:'folder-open' },
+  { name:'Post-Mortem Draft', trigger:'incident.resolved', runs:64, ok:95.4, icon:'file-text' },
+];
+
+const STATES = ['triggered','acknowledged','resolving','resolved'];
+const SEV_COLORS = { 'SEV-1':'bg-red-500/15 text-red-400 border-red-500/30',
+                     'SEV-2':'bg-orange-500/15 text-orange-400 border-orange-500/30',
+                     'SEV-3':'bg-sky-500/15 text-sky-400 border-sky-500/30' };
+const STATE_COLORS = { triggered:'bg-red-500/15 text-red-400', acknowledged:'bg-amber-500/15 text-amber-400',
+                       resolving:'bg-violet-500/15 text-violet-300', resolved:'bg-emerald-500/15 text-emerald-400' };
+
+let incidents = [
+  { id:'INC-4821', title:'Checkout latency p99 > 2s', svc:'checkout-api', sev:'SEV-1', state:'triggered' },
+  { id:'INC-4820', title:'Auth token refresh failures', svc:'auth-gateway', sev:'SEV-1', state:'acknowledged' },
+  { id:'INC-4818', title:'Search index lag 12m', svc:'search-indexer', sev:'SEV-2', state:'resolving' },
+  { id:'INC-4815', title:'Notification queue backlog', svc:'notification-svc', sev:'SEV-3', state:'resolved' },
+  { id:'INC-4812', title:'Billing retry storm', svc:'billing-worker', sev:'SEV-2', state:'resolved' },
+  { id:'INC-4809', title:'Analytics partition skew', svc:'analytics-pipe', sev:'SEV-3', state:'resolved' },
+];
+
+/* ---------- Helpers ---------- */
+const $ = s => document.querySelector(s);
+const el = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; };
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+  $('#view-'+b.dataset.tab).classList.remove('hidden');
+  $('#view-'+b.dataset.tab).classList.add('fade-in');
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('bg-slate-800/60','text-white'));
+  b.classList.add('bg-slate-800/60','text-white');
+}));
+document.querySelector('.tab-btn').classList.add('bg-slate-800/60','text-white');
+
+/* ---------- Chart ---------- */
+const CHART_DATA = {
+  '24h': Array.from({length:12},(_,i)=>({t:((i*2)%24).toString().padStart(2,'0')+':00', a:Math.round(4+Math.random()*10), r:Math.round(3+Math.random()*9)})),
+  '7d':  Array.from({length:7},(_,i)=>({t:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i], a:Math.round(20+Math.random()*40), r:Math.round(18+Math.random()*38)})),
+  '30d': Array.from({length:15},(_,i)=>({t:'D'+(i*2+1), a:Math.round(40+Math.random()*80), r:Math.round(38+Math.random()*76)})),
+};
+function renderChart(range){
+  const data = CHART_DATA[range];
+  const max = Math.max(...data.map(d=>Math.max(d.a,d.r)));
+  const c = $('#chart'); c.innerHTML='';
+  data.forEach(d => {
+    const g = el('div','flex-1 flex flex-col items-center gap-1 group');
+    const bars = el('div','w-full flex items-end justify-center gap-0.5 h-40');
+    const a = el('div','w-1/2 bg-violet-500/80 rounded-t hover:bg-violet-400 transition-all duration-500');
+    a.style.height = (d.a/max*100)+'%';
+    const r = el('div','w-1/2 bg-emerald-500/80 rounded-t hover:bg-emerald-400 transition-all duration-500');
+    r.style.height = (d.r/max*100)+'%';
+    bars.append(a,r);
+    const lbl = el('span','text-[9px] text-slate-600 group-hover:text-slate-400 transition', d.t);
+    g.append(bars,lbl); c.append(g);
+  });
+}
+renderChart('24h');
+document.querySelectorAll('.range-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.range-btn').forEach(x => { x.classList.remove('bg-slate-800','text-slate-200'); x.classList.add('text-slate-500'); });
+  b.classList.add('bg-slate-800','text-slate-200'); b.classList.remove('text-slate-500');
+  renderChart(b.dataset.range);
+}));
+
+/* ---------- Feed ---------- */
+const FEED_MSGS = [
+  ['sparkles','Enriched INC-4821 with owner Payments','text-violet-400'],
+  ['bell-ring','Paged on-call: @sre-primary','text-amber-400'],
+  ['book-open','Attached runbook checkout-latency.md','text-sky-400'],
+  ['git-branch','Severity inferred SEV-1 from monitor tags','text-orange-400'],
+  ['check-circle-2','INC-4815 transitioned to resolved','text-emerald-400'],
+  ['folder-open','Case CASE-221 opened for INC-4820','text-violet-400'],
+];
+function pushFeed(msg){
+  const [icon,text,color] = msg;
+  const row = el('div','flex items-start gap-2 fade-in');
+  row.innerHTML = `<i data-lucide="${icon}" class="w-3.5 h-3.5 mt-0.5 shrink-0 ${color}"></i>
+    <div><span class="text-slate-500">${new Date().toLocaleTimeString('en-GB',{hour12:false})}</span> <span class="text-slate-300">${text}</span></div>`;
+  const f = $('#feed'); f.prepend(row);
+  while(f.children.length > 12) f.lastChild.remove();
+  lucide.createIcons();
+}
+FEED_MSGS.slice(0,4).forEach(pushFeed);
+setInterval(() => pushFeed(FEED_MSGS[Math.floor(Math.random()*FEED_MSGS.length)]), 4200);
+
+/* ---------- KPIs ---------- */
+function updateKPIs(){
+  const active = incidents.filter(i => i.state !== 'resolved').length;
+  $('#kpiActive').textContent = active;
+  $('#kpiRuns').textContent = (1284 + Math.floor(Math.random()*40)).toLocaleString();
+  const budget = Math.max(40, 87 - active*4);
+  $('#kpiBudget').textContent = budget + '%';
+  $('#budgetBar').style.width = budget + '%';
+  $('#budgetBar').className = 'h-full rounded-full transition-all duration-700 ' +
+    (budget > 60 ? 'bg-emerald-500' : budget > 35 ? 'bg-amber-500' : 'bg-red-500');
+}
+
+/* ---------- Incidents table ---------- */
+function renderIncidents(){
+  const q = $('#searchInput').value.toLowerCase();
+  const sev = $('#sevFilter').value;
+  const rows = incidents.filter(i =>
+    (!q || i.title.toLowerCase().includes(q) || i.id.toLowerCase().includes(q) || i.svc.includes(q)) &&
+    (!sev || i.sev === sev));
+  const body = $('#incidentBody'); body.innerHTML='';
+  $('#emptyState').classList.toggle('hidden', rows.length > 0);
+  rows.forEach(i => {
+    const tr = el('tr','hover:bg-slate-800/30 transition fade-in');
+    const nextState = STATES[Math.min(STATES.indexOf(i.state)+1, 3)];
+    tr.innerHTML = `
+      <td class="px-4 py-3 font-mono text-slate-400">${i.id}</td>
+      <td class="px-4 py-3 text-slate-200">${i.title}</td>
+      <td class="px-4 py-3 hidden md:table-cell font-mono text-slate-500">${i.svc}</td>
+      <td class="px-4 py-3"><span class="text-[11px] font-medium px-2 py-0.5 rounded border ${SEV_COLORS[i.sev]}">${i.sev}</span></td>
+      <td class="px-4 py-3"><span class="text-[11px] font-medium px-2 py-0.5 rounded ${STATE_COLORS[i.state]}">${i.state}</span></td>
+      <td class="px-4 py-3 text-right">${i.state!=='resolved'
+        ? `<button data-adv="${i.id}" class="text-[12px] text-violet-400 hover:text-violet-300 font-medium transition">Advance → ${nextState}</button>`
+        : `<span class="text-[12px] text-slate-600">closed</span>`}</td>`;
+    body.append(tr);
+  });
+  body.querySelectorAll('[data-adv]').forEach(b => b.addEventListener('click', () => {
+    const inc = incidents.find(x => x.id === b.dataset.adv);
+    inc.state = STATES[Math.min(STATES.indexOf(inc.state)+1, 3)];
+    pushFeed(['check-circle-2', `${inc.id} → ${inc.state}`, 'text-emerald-400']);
+    renderIncidents(); updateKPIs();
+  }));
+}
+$('#searchInput').addEventListener('input', renderIncidents);
+$('#sevFilter').addEventListener('change', renderIncidents);
+
+/* ---------- Simulate ---------- */
+const SIM_TITLES = ['DB connection pool exhausted','CDN cache hit ratio drop','Kafka consumer lag spike',
+  'Memory pressure on pod','TLS cert nearing expiry','Upstream 5xx surge'];
+$('#simulateBtn').addEventListener('click', () => {
+  const svc = SERVICES[Math.floor(Math.random()*SERVICES.length)];
+  const sev = ['SEV-1','SEV-2','SEV-3'][Math.floor(Math.random()*3)];
+  const id = 'INC-' + (4822 + incidents.length);
+  incidents.unshift({ id, title: SIM_TITLES[Math.floor(Math.random()*SIM_TITLES.length)], svc: svc.name, sev, state:'triggered' });
+  pushFeed(['flame', `New incident ${id} (${sev}) on ${svc.name}`, 'text-red-400']);
+  renderIncidents(); updateKPIs();
+});
+
+/* ---------- Workflows ---------- */
+function renderWorkflows(){
+  const g = $('#workflowGrid'); g.innerHTML='';
+  WORKFLOWS.forEach(w => {
+    const card = el('div','bg-slate-900/60 border border-slate-800 rounded-xl p-4 hover:border-violet-500/40 transition group');
+    card.innerHTML = `
+      <div class="flex items-start justify-between mb-3">
+        <div class="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 grid place-items-center">
+          <i data-lucide="${w.icon}" class="w-4 h-4 text-violet-400"></i>
+        </div>
+        <span class="text-[10px] font-mono text-slate-500 bg-slate-800/60 px-2 py-0.5 rounded">${w.trigger}</span>
+      </div>
+      <h3 class="text-sm font-semibold text-slate-200 mb-1">${w.name}</h3>
+      <div class="flex items-center justify-between text-[11px] text-slate-500 mb-2">
+        <span>${w.runs} runs / 24h</span><span class="${w.ok>98?'text-emerald-400':'text-amber-400'}">${w.ok}% ok</span>
+      </div>
+      <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+        <div class="h-full bg-violet-500 rounded-full transition-all duration-700" style="width:${w.ok}%"></div>
+      </div>`;
+    g.append(card);
+  });
+}
+
+/* ---------- Catalog ---------- */
+function renderCatalog(){
+  const g = $('#catalogGrid'); g.innerHTML='';
+  SERVICES.forEach(s => {
+    const card = el('div','bg-slate-900/60 border border-slate-800 rounded-xl p-4 hover:border-violet-500/40 transition');
+    card.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <span class="font-mono text-sm text-slate-200">${s.name}</span>
+        <span class="text-[10px] font-medium px-2 py-0.5 rounded ${s.tier==='Tier 1'?'bg-red-500/15 text-red-400':'bg-slate-700/40 text-slate-400'}">${s.tier}</span>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-[11px]">
+        <div><div class="text-slate-600 mb-0.5">Owner</div><div class="text-slate-300">${s.owner}</div></div>
+        <div><div class="text-slate-600 mb-0.5">SLO</div><div class="text-emerald-400 font-mono">${s.slo}</div></div>
+        <div><div class="text-slate-600 mb-0.5">Lang</div><div class="text-slate-300">${s.lang}</div></div>
+      </div>`;
+    g.append(card);
+  });
+}
+
+/* ---------- Init ---------- */
+renderIncidents(); renderWorkflows(); renderCatalog(); updateKPIs();
+lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIRA — AI Stockbroking Superapp · Technical Product Manager Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        ink: { 950:'#070a12', 900:'#0b0f1a', 850:'#0e1421', 800:'#111827', 700:'#1a2233' },
+        accent: { DEFAULT:'#6ee7f9', 400:'#6ee7f9', 500:'#22d3ee', 600:'#0ea5e9' },
+        pos: '#34d399', neg: '#f87171'
+      },
+      fontFamily: { sans:['Inter','ui-sans-serif','system-ui'], mono:['ui-monospace','SFMono-Regular','Menlo','monospace'] },
+      boxShadow: { glow:'0 0 40px -10px rgba(34,211,238,.35)' }
+    }
+  }
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  body{font-family:'Inter',system-ui,sans-serif;background:#070a12;}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:#0b0f1a}
+  ::-webkit-scrollbar-thumb{background:#1f2937;border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:#334155}
+  .grid-bg{
+    background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);
+    background-size:42px 42px;
+  }
+  .glass{background:rgba(17,24,39,.72);backdrop-filter:blur(14px);border:1px solid rgba(148,163,184,.12)}
+  .card{background:linear-gradient(160deg,rgba(17,24,39,.9),rgba(11,15,26,.9));border:1px solid rgba(148,163,184,.12);border-radius:16px}
+  .fade-in{animation:fade .45s cubic-bezier(.16,1,.3,1) both}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .pulse-dot{box-shadow:0 0 0 0 rgba(52,211,153,.7);animation:pd 2s infinite}
+  @keyframes pd{70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+  .bar{transition:height .7s cubic-bezier(.16,1,.3,1)}
+  .tab-active{background:rgba(34,211,238,.12);color:#6ee7f9;border-color:rgba(34,211,238,.45)}
+  input[type=range]{-webkit-appearance:none;height:6px;border-radius:999px;background:#1f2937;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#22d3ee;border:3px solid #0b0f1a;cursor:pointer;box-shadow:0 0 12px rgba(34,211,238,.6)}
+  .ticker-wrap{overflow:hidden;white-space:nowrap}
+  .ticker{display:inline-block;animation:tk 40s linear infinite}
+  @keyframes tk{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .scroll-enter{animation:se .3s ease both}
+  @keyframes se{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+  .seg{transition:all .2s}
+</style>
+</head>
+<body class="bg-ink-950 text-slate-200 antialiased">
+
+<!-- ══════════ TOP HEADER BANNER ══════════ -->
+<div class="sticky top-0 z-50 glass border-b border-slate-700/40">
+  <div class="max-w-[1500px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2 text-[13px] leading-snug">
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold shrink-0">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span> LIVE
+      </span>
+      <span class="text-slate-300">🚀 Live Interactive Prototype for: <span class="text-white font-semibold">Technical Product Manager AI Stockbroking App</span>
+      <span class="text-slate-500 hidden sm:inline"> | Built autonomously by <span class="text-cyan-300 font-medium">Antigravity OS</span> | <span class="text-emerald-300">Ready for deployment</span></span></span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20rok-7ecd11a2"
+       class="shrink-0 text-[13px] font-semibold px-4 py-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 text-slate-950 shadow-glow transition-all hover:scale-[1.03] active:scale-95">
+      Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- ══════════ NAV ══════════ -->
+<header class="max-w-[1500px] mx-auto px-4 pt-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-sky-600 grid place-items-center text-slate-950 text-lg font-black shadow-glow">K</div>
+      <div>
+        <h1 class="text-xl font-bold text-white tracking-tight leading-none">KIRA <span class="text-cyan-400">AI</span> Stockbroking Superapp</h1>
+        <p class="text-[12px] text-slate-500 mt-0.5">Technical Product Manager · Architecture &amp; Delivery Prototype · v1.0</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-[12px]">
+      <div class="hidden md:flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900/70 border border-slate-700/50 text-slate-400">
+        <i class="fa-solid fa-shield-halved text-emerald-400 mr-1.5"></i> Regime: <span class="text-emerald-300 font-semibold ml-1">MAS · SC · OJK · SEC-PH</span>
+      </div>
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900/70 border border-slate-700/50 text-slate-400">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span> Ledger sync <span id="syncAge" class="text-emerald-300 font-semibold ml-1 font-mono">0.3s</span>
+      </div>
+      <button onclick="openModal('hiring')" class="px-3.5 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/20 transition font-semibold">
+        <i class="fa-solid fa-users-gear mr-1.5"></i>Team
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ TABS ══════════ -->
+<nav class="max-w-[1500px] mx-auto px-4 mt-5">
+  <div class="flex gap-1.5 overflow-x-auto pb-1 border-b border-slate-800/70">
+    <button data-tab="dashboard" class="tabbtn tab-active scroll-enter whitespace-nowrap px-4 py-2.5 text-[13px] font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition"><i class="fa-solid fa-chart-pie mr-2"></i>Command Deck</button>
+    <button data-tab="ledger" class="tabbtn scroll-enter whitespace-nowrap px-4 py-2.5 text-[13px] font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition"><i class="fa-solid fa-scale-balanced mr-2"></i>Ledger &amp; Reconciliation</button>
+    <button data-tab="ai" class="tabbtn scroll-enter whitespace-nowrap px-4 py-2.5 text-[13px] font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition"><i class="fa-solid fa-brain mr-2"></i>AI Intent Layer</button>
+    <button data-tab="risk" class="tabbtn scroll-enter whitespace-nowrap px-4 py-2.5 text-[13px] font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition"><i class="fa-solid fa-gauge-high mr-2"></i>Risk, Limits &amp; Compliance</button>
+    <button data-tab="markets" class="tabbtn scroll-enter whitespace-nowrap px-4 py-2.5 text-[13px] font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition"><i class="fa-solid fa-globe mr-2"></i>ASEAN Markets</button>
+    <button data-tab="roadmap" class="tabbtn scroll-enter whitespace-nowrap px-4 py-2.5 text-[13px] font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition"><i class="fa-solid fa-diagram-project mr-2"></i>Launch Plan</button>
+  </div>
+</nav>
+
+<main class="max-w-[1500px] mx-auto px-4 py-6 pb-24">
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<section id="tab-dashboard" class="tabpane fade-in">
+
+  <!-- KPI ROW -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="card p-4 relative overflow-hidden">
+      <div class="flex justify-between items-start"><div>
+        <p class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Assets Under Custody</p>
+        <p class="text-2xl font-bold text-white mt-1.5 font-mono" id="kpiAuc">$4.82B</p>
+        <p class="text-[12px] text-emerald-400 mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i>+2.41% <span class="text-slate-500">WoW</span></p>
+      </div><div class="w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/25 grid place-items-center text-cyan-400"><i class="fa-solid fa-vault"></i></div></div>
+      <div class="mt-3 h-8 flex items-end gap-[3px]" id="spark1"></div>
+    </div>
+    <div class="card p-4">
+      <div class="flex justify-between items-start"><div>
+        <p class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Daily Notional Settled</p>
+        <p class="text-2xl font-bold text-white mt-1.5 font-mono" id="kpiSettle">$193.4M</p>
+        <p class="text-[12px] text-emerald-400 mt-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i>+8.7% <span class="text-slate-500">T+1 cycle</span></p>
+      </div><div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/25 grid place-items-center text-emerald-400"><i class="fa-solid fa-money-bill-transfer"></i></div></div>
+      <div class="mt-3 h-8 flex items-end gap-[3px]" id="spark2"></div>
+    </div>
+    <div class="card p-4">
+      <div class="flex justify-between items-start"><div>
+        <p class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">AI Intent → Order Success</p>
+        <p class="text-2xl font-bold text-white mt-1.5 font-mono" id="kpiAi">98.62%</p>
+        <p class="text-[12px] text-slate-500 mt-1"><i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i>Abstain rate 1.1% <span class="text-slate-600">·</span> Escalated 0.3%</p>
+      </div><div class="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/25 grid place-items-center text-violet-400"><i class="fa-solid fa-brain"></i></div></div>
+      <div class="mt-3 h-8 flex items-end gap-[3px]" id="spark3"></div>
+    </div>
+    <div class="card p-4">
+      <div class="flex justify-between items-start"><div>
+        <p class="text-[11px] uppercase tracking-wider text-slate-500 font-semibold">Ledger Integrity</p>
+        <p class="text-2xl font-bold text-white mt-1.5 font-mono" id="kpiLedger">100.000%</p>
+        <p class="text-[12px] text-emerald-400 mt-1"><i class="fa-solid fa-circle-check mr-1"></i>0 orphan · 0 drift <span class="text-slate-500">· 14.2M postings</span></p>
+      </div><div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/25 grid place-items-center text-amber-400"><i class="fa-solid fa-link"></i></div></div>
+      <div class="mt-3 h-8 flex items-end gap-[3px]" id="spark4"></div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid lg:grid-cols-3 gap-4 mt-4">
+    <!-- CHART -->
+    <div class="card p-5 lg:col-span-2">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="font-semibold text-white">Portfolio Flow &amp; Execution Quality</h3>
+          <p class="text-[12px] text-slate-500">Deterministic settlement volume vs. AI-routed order flow</p>
+       

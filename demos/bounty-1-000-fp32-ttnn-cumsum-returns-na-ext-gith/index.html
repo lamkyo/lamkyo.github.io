@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>FP32 ttnn.cumsum Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+  <!-- Header Banner -->
+  <header class="sticky top-0 z-10 bg-slate-800/80 backdrop-blur-sm border-b border-slate-700">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between text-sm">
+      <div class="flex items-center space-x-2">
+        <span class="inline-flex items-center"><i data-lucide="rocket" class="w-4 h-4"></i></span>
+        <span>Live Interactive Prototype for: <strong>[Bounty $1,000] FP32 ttnn.cumsum returns NaN after</strong></span>
+        <span class="mx-2">|</span>
+        <span>Built autonomously by Antigravity OS</span>
+        <span class="mx-2">|</span>
+        <span>Ready for deployment</span>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20ext-github-gh-tenstorrent-tt-metal-58986"
+         class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-md text-sm font-medium transition">
+        <i data-lucide="briefcase" class="w-4 h-4 mr-1"></i>Hire Team ($150 - $500)
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto scrollbar-hide">
+    <section class="max-w-5xl mx-auto py-8 px-4 space-y-8">
+      <h1 class="text-3xl font-bold text-center text-indigo-400">FP32 cumsum – Correct vs. ttnn Bug</h1>
+
+      <!-- Input Panel -->
+      <div class="bg-slate-800 rounded-lg p-6 shadow-lg">
+        <h2 class="text-xl font-semibold mb-4 flex items-center"><i data-lucide="list" class="w-5 h-5 mr-2"></i>Input Array</h2>
+        <textarea id="inputArray" rows="2"
+          class="w-full bg-slate-700 text-slate-100 p-3 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          placeholder="Enter numbers separated by commas, e.g. 1, 2, inf, 3, 1e38, 1e38"></textarea>
+        <div class="mt-4 flex items-center space-x-4">
+          <button id="computeBtn"
+            class="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-md transition">
+            <i data-lucide="play" class="w-4 h-4 mr-1"></i>Compute
+          </button>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="showNaNToggle" class="form-checkbox h-4 w-4 text-indigo-600 bg-slate-700 border-slate-600 rounded">
+            <span>Show NaN values</span>
+          </label>
+        </div>
+        <!-- Simulated Progress Bar -->
+        <div id="progressContainer" class="mt-4 hidden">
+          <div class="w-full bg-slate-700 rounded h-2 overflow-hidden">
+            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-300"></div>
+          </div>
+          <p class="text-sm text-slate-400 mt-1">Computing...</p>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div id="resultsSection" class="hidden space-y-8">
+        <!-- Toggle Buttons -->
+        <div class="flex space-x-4">
+          <button id="tabTorch" class="px-4 py-2 bg-slate-700 rounded-t-md text-indigo-300 hover:bg-slate-600">PyTorch (Correct)</button>
+          <button id="tabTTNN" class="px-4 py-2 bg-slate-700 rounded-t-md text-slate-400 hover:bg-slate-600">ttnn (Buggy)</button>
+        </div>
+
+        <!-- Table Output -->
+        <div class="bg-slate-800 rounded-b-lg p-4 shadow-lg overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-700">
+                <th class="px-3 py-2 text-left">Index</th>
+                <th class="px-3 py-2 text-left">Input</th>
+                <th class="px-3 py-2 text-left">Cumulative Sum</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody" class="font-mono"></tbody>
+          </table>
+        </div>
+
+        <!-- Chart -->
+        <div class="bg-slate-800 rounded-lg p-4 shadow-lg">
+          <canvas id="cumsumChart" height="120"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Utility: parse input string to float array (supports "inf", "-inf")
+    function parseInput(str) {
+      return str.split(',').map(s => {
+        const v = s.trim().toLowerCase();
+        if (v === 'inf' || v === '+inf') return Infinity;
+        if (v === '-inf') return -Infinity;
+        const num = Number(v);
+        return isNaN(num) ? NaN : num;
+      });
+    }
+
+    // Correct cumulative sum (like PyTorch)
+    function cumsumCorrect(arr) {
+      const out = [];
+      let total = 0;
+      for (let i = 0; i < arr.length; i++) {
+        const val = arr[i];
+        if (!Number.isFinite(val)) {
+          total = val; // Infinity propagates
+        } else if (Number.isFinite(total)) {
+          total += val;
+        }
+        out.push(total);
+      }
+      return out;
+    }
+
+    // Buggy cumulative sum (ttnn regression)
+    function cumsumBuggy(arr) {
+      const out = [];
+      let total = 0;
+      let comp = 0; // compensated summation (simplified)
+      for (let i = 0; i < arr.length; i++) {
+        const val = arr[i];
+        // Simulate compensated addition that fails after inf
+        const
