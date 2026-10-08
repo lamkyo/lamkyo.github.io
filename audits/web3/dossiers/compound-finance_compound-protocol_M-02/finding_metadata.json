@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "M-02",
+  "title": "Unchecked Return Value or Missing Error Handling in `SimplePriceOracle` Asset Type Detection",
+  "severity": "Medium",
+  "vuln_type": "Logic & State Machine Flaw",
+  "impact": "`SimplePriceOracle._getUnderlyingAddress` relies on string comparison of `cToken.symbol() == \"cETH\"` to determine if the asset is native Ether (`0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE`). If a malicious or misconfigured cToken registers with a symbol collision or bypasses standard naming conventions, the oracle returns incorrect asset mappings, resulting in severe pricing manipulation or failed liquidations.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.842307,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-02/poc_foundry_suite"
+}

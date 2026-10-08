@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "H-03",
+  "title": "`Flopper.dent` \u2014 External Call to Untrusted `bids[id].guy` Enables Reentrancy / Griefing",
+  "severity": "High",
+  "vuln_type": "Reentrancy (external call to attacker-controlled address)",
+  "impact": "On the first `dent`, the contract calls `VowLike(bids[id].guy).Ash()` and `.kiss(...)` where `guy` is set by `kick(gal, ...)` \u2014 `gal` is the `Vow`, but `Flopper.kick` is `auth`-gated and `Vow.flop()` passes `address(this)`. However, `Vow.file(\"flopper\", ...)` can point `flopper` at an arbitrary address, and more importantly `bids[id].guy` is later reassigned to `msg.sender` (any bidder). A malicious contract bidder can re-enter `dent`/`deal` mid-`kiss`. Because `bids[id].guy` is updated **after** the external `vat.move` + `kiss` calls, a reentrant `dent` observes stale `guy`, allowing double-payment or state desynchronization.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791114542.4023228,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-03/poc_foundry_suite"
+}

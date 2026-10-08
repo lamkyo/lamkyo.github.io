@@ -1,0 +1,12 @@
+{
+  "target_repo": "Uniswap/v4-core",
+  "finding_id": "H-02",
+  "title": "Precision Loss in `SwapMath.computeSwapStep` Fee Rounding Direction",
+  "severity": "High",
+  "vuln_type": "Precision & Rounding / Economic Drain",
+  "impact": "In exact-input swaps, round-down behavior on protocol fee deductions or LP fee splits can cause systemic leakage of dust amounts over millions of high-frequency trades, leading to protocol revenue shortfalls or arbitrage exploitation of rounding asymmetries between `feeAmount` and `amountIn`.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791115843.730386,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_H-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_H-02/poc_foundry_suite"
+}

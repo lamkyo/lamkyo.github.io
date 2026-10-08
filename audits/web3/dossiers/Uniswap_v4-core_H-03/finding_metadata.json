@@ -1,0 +1,12 @@
+{
+  "target_repo": "Uniswap/v4-core",
+  "finding_id": "H-03",
+  "title": "`Pool.donate` / `feeGrowthGlobal` Inflation Enables Fee-Theft via Position Sandwich (Documented but Material)",
+  "severity": "High",
+  "vuln_type": "Economic / Logic Flaw (Fee Growth Manipulation)",
+  "impact": "`Pool.State` explicitly documents that `feeGrowthGlobal` can be artificially inflated. An attacker can, within a single `unlock()`:\n  1. Open a solo position (or use existing one).\n  2. `donate` large amounts to inflate `feeGrowthGlobal`.\n  3. `modifyLiquidity` to collect the inflated fees as `feesOwed`.\n  4. Remove liquidity.\n  This is self-dealing and normally harmless \u2014 **but** combined with `getFeeGrowthInside`'s unchecked subtraction and tick `feeGrowthOutside` initialization, an attacker who initializes a tick *after* inflation can cause **other positions'** `feeGrowthInside` to wrap (unchecked `uint256` subtraction), zeroing or inflating their accrued fees. Specifically, `updateTick` initializes `feeGrowthOutside` to current global only `if (tick <= slot0.tick())`; ticks above current tick start at 0. If global is inflated *before* a victim's upper tick is initialized, then deflated relative expectations, the victim's `feeGrowthInside` computation `global - outside_lower - outside_upper` (unchecked) can underflow-wrap, granting unearned fees or destroying earned fees.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110036.6955001,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_H-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_H-03/poc_foundry_suite"
+}

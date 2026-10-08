@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "M-01",
+  "title": "`SafeTransferLib.safeApprove` Does Not Handle Non-Standard Tokens Requiring Allowance Reset",
+  "severity": "Medium",
+  "vuln_type": "Token Integration / ERC20 Standard Non-Compliance",
+  "impact": "Integrations using `SafeTransferLib.safeApprove` to interact with certain tokens (e.g., USDT, or tokens implementing OpenZeppelin's standard `approve` safety check which reverts if allowance is non-zero and being changed to a non-zero value) will cause transactions to revert unexpectedly.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.7505338,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-01/poc_foundry_suite"
+}

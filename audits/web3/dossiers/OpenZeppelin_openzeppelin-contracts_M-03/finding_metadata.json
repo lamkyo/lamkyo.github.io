@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "M-03",
+  "title": "InitializableHarness \u2014 Nested Initializer Revert-DoS Patterns Exposed",
+  "severity": "Medium (informational for FV, hazard if copied)",
+  "vuln_type": "State Machine",
+  "impact": "`nested_init_init()` etc. demonstrate that nested initializer calls revert \u2014 correct behavior, but the harness's public `disable()` lets anyone brick initialization of a shared instance. In a proxy deployment pattern copied from this file, front-running `initialize()`/`_disableInitializers()` is the classic uninitialized-proxy takeover.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120191.6810327,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-03/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "H-01",
+  "title": "`Owned.transferOwnership` Allows Permanent Ownership Lockout (Zero Address)",
+  "severity": "High",
+  "vuln_type": "Access Control / Logic Error",
+  "impact": "Calling `transferOwnership(address(0))` irreversibly sets `owner` to zero. Since `onlyOwner` checks `msg.sender == owner` and no address can be `address(0)`, **every owner-gated function becomes permanently uncallable**. If the contract controls funds, upgrades, or minting, those capabilities are destroyed. There is no recovery path.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791117840.8720028,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_H-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_H-01/poc_foundry_suite"
+}

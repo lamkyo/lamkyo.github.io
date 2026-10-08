@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-Protocol",
+  "finding_id": "M-01",
+  "title": "`DAIInterestRateModelV3.poke()` Publicly Callable + Division-Before-Multiplication Precision Loss",
+  "severity": "Medium",
+  "vuln_type": "Precision Loss / State Machine (stale parameters)",
+  "impact": "(a) `poke()` is `public` with no access control \u2014 anyone can call it, but more importantly it reads `jug.ilks(\"ETH-A\")` and `pot.dsr()` which may be stale until Maker's `drip()`/`fold()` is called, allowing a caller to checkpoint a momentarily manipulated DSR/stability-fee into `baseRatePerBlock`/`multiplierPerBlock`, mispricing the cDAI market until the next poke. (b) In `dsrPerBlock()` and `stabilityFeePerBlock`, division by `RAY_TO_BASE_SCALE` occurs **before** multiplication by `SECONDS_PER_BLOCK`, truncating up to `1e9`-scale precision per step and systematically understating rates.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110945.5322158,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-01/poc_foundry_suite"
+}

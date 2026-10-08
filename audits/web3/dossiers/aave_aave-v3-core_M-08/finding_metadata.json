@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "M-08",
+  "title": "`PoolHarness.getCurrScaledVariableDebt` reads from `reserve.cache()` without triggering a fresh index update",
+  "severity": "Medium",
+  "vuln_type": "Read-Only Reentrancy / Stale State",
+  "impact": "`reserve.cache()` snapshots `currScaledVariableDebt` from the last `updateState()` call. If `getCurrScaledVariableDebt` is called between a borrow/repay and the next index update (or during a flash-loan callback where the reserve state has not been refreshed), it returns a stale value. In Certora specs that use this getter as an invariant oracle, this can mask real accounting bugs. In production `Pool`, the analogous view functions have the same characteristic but are not",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103470.6904502,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-08/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-08/poc_foundry_suite"
+}

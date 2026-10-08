@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "H-04",
+  "title": "`liquidate` allows `seizedAssets == 0 && repaidShares == 0`-adjacent edge and missing `repaidAssets > 0` guard enabling zero-repay collateral seizure via rounding",
+  "severity": "High",
+  "vuln_type": "Logic Error / Rounding",
+  "impact": "`exactlyOneZero(seizedAssets, repaidShares)` permits `seizedAssets > 0, repaidShares = 0` as input, in which case `repaidShares` is recomputed \u2014 fine. But when `repaidShares > 0` is passed and `seizedAssets = 0`, the computed `seizedAssets` can round to **0** for dust positions (`repaidShares.toAssetsDown(...) == 0`), yet `repaidAssets = repaidShares.toAssetsUp(...)` can be \u2265 1. More importantly, there is **no `require(repaidAssets > 0)`** (reference impl has `require(seizedAssets != 0)` after computation). A liquidator can pass `repaidShares` such that `seizedAssets` computes to 0, burning borrower shares and reducing `totalBorrowShares` while seizing nothing \u2014 this is a griefing vector that corrupts the borrower's share accounting without granting collateral, and in the `collateral == 0` branch can trigger unintended bad-debt socialization.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791101138.3400261,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_H-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_H-04/poc_foundry_suite"
+}

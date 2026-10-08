@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "H-01",
+  "title": "Missing Oracle Validation Allows Stale, Negative, or Zero Prices to Break Protocol Solvency (`AaveOracle.sol`)",
+  "severity": "Critical",
+  "vuln_type": "Oracle Manipulation / Economic Attack",
+  "impact": "The `AaveOracle.getAssetPrice()` function relies on Chainlink's `latestAnswer()` interface without performing complete validity checks on the returned price response (such as checking `updatedAt` for staleness, checking round completeness via `latestRoundData()`, or validating bounds). If a Chainlink aggregator returns a zero or negative value, or stalls indefinitely on an outdated round, downstream health factor calculations inside Aave's core liquidation and borrowing engine will either revert or process corrupted asset valuations, leading to improper liquidations, unbacked bad debt accumulation, or protocol insolvency.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.4912093,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_H-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_H-01/poc_foundry_suite"
+}

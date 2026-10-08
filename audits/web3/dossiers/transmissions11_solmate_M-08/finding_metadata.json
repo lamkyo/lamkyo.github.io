@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "M-08",
+  "title": "`CREATE3.deploy` \u2014 Salt Collision / Front-Running of Deterministic Addresses",
+  "severity": "Medium",
+  "vuln_type": "Logic Error / Front-Running",
+  "impact": "`CREATE3.deploy(salt, ...)` computes the final address purely from `salt` and `address(this)`. If a protocol uses a predictable salt (e.g., `keccak256(user)`), an attacker can front-run the deployment by calling `deploy` with the same salt from the **same contract** (if the function is permissionless), causing the legitimate deployment to revert with `DEPLOYMENT_FAILED` (create2 returns 0 on collision). This is a griefing/Do",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791098360.3316777,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-08/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-08/poc_foundry_suite"
+}

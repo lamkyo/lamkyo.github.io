@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "H-02",
+  "title": "`Auth.setAuthority` Reverts for Owner When `authority` Is Zero \u2014 Permanently Freezes Authority Rotation",
+  "severity": "High",
+  "vuln_type": "Access Control / Denial of Service",
+  "impact": "The guard is `require(msg.sender == owner || authority.canCall(...))`. Solidity evaluates `||` left-to-right and short-circuits, so if `msg.sender == owner` the second clause is skipped \u2014 **but only if the owner check passes first**. The real hazard is the inverse: if `authority` is initialized to `address(0)` (a common deployment pattern) and the *owner* is not `msg.sender` at that moment (e.g., ownership was transferred to a multisig that later delegates, or an integrator constructs with `address(0)` authority expecting to set it later), the expression `authority.canCall(...)` performs an external call on `address(0)`. High-level calls to `address(0)` revert in Solidity \u22650.8, bricking `setAuthority` for any non-owner caller. More critically, **if `owner` is ever set to a contract that cannot call (e.g., a non-forwarding multisig or an EOA that lost keys) while `authority` is zero, authority can never be updated**, permanently freezing all `requiresAuth` functions that depend on authority-based authorization.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791117840.9491704,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_H-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_H-02/poc_foundry_suite"
+}

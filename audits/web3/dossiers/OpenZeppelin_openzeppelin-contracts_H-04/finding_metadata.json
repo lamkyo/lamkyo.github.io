@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "H-04",
+  "title": "Unrestricted Public `recover` in `ERC20WrapperHarness`",
+  "severity": "High",
+  "vuln_type": "Access Control (Missing `onlyOwner`)",
+  "impact": "Any address can recover underlying tokens that were mistakenly sent to the wrapper contract, potentially draining funds.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120969.4932063,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_H-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_H-04/poc_foundry_suite"
+}

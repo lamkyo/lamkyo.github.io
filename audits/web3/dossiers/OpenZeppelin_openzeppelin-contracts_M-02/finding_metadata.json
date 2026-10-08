@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "M-02",
+  "title": "Lack of Access Control on TimelockController Harness",
+  "severity": "Medium",
+  "vuln_type": "Access Control",
+  "impact": "`TimelockControllerHarness` does not restrict who can propose or execute transactions. While the base `TimelockController` has access control, the harness itself does not add any additional restrictions. If used in a production context without proper role assignment, it could be abused.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120775.9136467,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-02/poc_foundry_suite"
+}

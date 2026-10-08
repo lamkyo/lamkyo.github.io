@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "M-04",
+  "title": "`ZeroReserveInterestRateStrategy` returns zero rates, disabling all accrual for any reserve that uses it",
+  "severity": "Medium",
+  "vuln_type": "Logic Error / Economic",
+  "impact": "If governance mistakenly sets this strategy on a live reserve (it is a real, deployable contract with a valid `IPoolAddressesProvider` constructor), `calculateInterestRates` returns `(0,0,0)`. Borrowers pay no interest, suppliers earn nothing, and the reserve factor accrues nothing \u2014 an economic griefing / value-leak vector if activated on a productive asset. There is no on-chain guard preventing this.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103470.5752804,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-04/poc_foundry_suite"
+}

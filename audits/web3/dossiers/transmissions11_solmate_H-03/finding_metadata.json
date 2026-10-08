@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "H-03",
+  "title": "`ERC6909.transferFrom` Allowance Race Condition + Missing Zero-Address Checks Enable Stale-Allowance Double-Spend",
+  "severity": "High",
+  "vuln_type": "Logic Error / Stale Allowance",
+  "impact": "`approve` overwrites allowances without the ERC-20 `increaseAllowance`/`decreaseAllowance` pattern, enabling the classic **approve front-running race**: a spender can observe a pending `approve(spender, newAmount)` in the mempool and spend the *old* allowance before the new one lands, then spend the new allowance \u2014 net effect is spending up to `old + new`. Additionally, `transfer`/`transferFrom`/`_mint`/`_burn` perform **no `receiver != address(0)` check**, so tokens sent to `address(0)` are silently burned from circulation while `balanceOf[address(0)]` accrues \u2014 a permanent, unrecoverable loss of the `id`'s supply accounting.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791117841.0221627,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_H-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_H-03/poc_foundry_suite"
+}

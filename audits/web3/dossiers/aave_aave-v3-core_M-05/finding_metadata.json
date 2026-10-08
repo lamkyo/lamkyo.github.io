@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "M-05",
+  "title": "`AaveProtocolDataProvider.getAllReservesTokens` reverts if any reserve token lacks `symbol()`",
+  "severity": "Medium",
+  "vuln_type": "Logic Error / Denial of Service",
+  "impact": "The function special-cases `MKR` and `ETH` sentinel addresses, but any other non-standard token (e.g., a token with a fallback-only `symbol`, or a proxy whose `symbol()` reverts) will cause the entire `getAllReservesTokens()` call to revert, breaking frontends and monitoring that enumerate reserves. This is a read-path DoS, not a fund loss.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103470.611468,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-05/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-05/poc_foundry_suite"
+}

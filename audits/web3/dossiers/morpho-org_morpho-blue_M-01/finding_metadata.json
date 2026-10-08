@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "M-01",
+  "title": "Unchecked Return Value or Silent Failure Risk in `createMarket` IRM Initialization Call",
+  "severity": "Medium",
+  "vuln_type": "External Call Handling / Logic Flaw",
+  "impact": "In `createMarket`, the protocol calls `IIrm(marketParams.irm).borrowRate(marketParams, market[id])` to initialize stateful IRMs. If the external IRM contract reverts or consumes excessive gas without proper error propagation, market creation can be permanently bricked for specific IRMs.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120969.3516877,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-01/poc_foundry_suite"
+}

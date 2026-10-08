@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "M-01",
+  "title": "`ERC20WrapperHarness` Decimals Override May Mask Underlying Token Mismatch",
+  "severity": "Medium (Testing Integrity Risk)",
+  "vuln_type": "Logic Error / Test Coverage Gap",
+  "impact": "If the `ERC20Wrapper` is deployed with an underlying token that has different decimals than the wrapper, the `decimals()` function in the harness explicitly calls `super.decimals()`. In the standard `ERC20Wrapper`, `decimals()` is overridden to return the underlying token's decimals. However, if a developer mistakenly assumes the wrapper's decimals are fixed (e.g., 18) and the harness is used to verify logic that depends on decimal alignment, the test might pass incorrectly if the underlying token has non-standard decimals (e.g., USDT with 6). More critically, if the harness is used to test `recover` or `deposit` logic, the explicit override in the harness might hide a bug where the wrapper fails to correctly handle decimal conversion in edge cases.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791121321.808792,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-01/poc_foundry_suite"
+}

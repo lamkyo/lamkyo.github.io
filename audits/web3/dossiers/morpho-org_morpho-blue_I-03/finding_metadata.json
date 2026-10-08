@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "I-03",
+  "title": "Fee Shares Minted to `feeRecipient` Without a `Supply` Event",
+  "severity": "Medium",
+  "vuln_type": "Logic Error",
+  "impact": "Financial or state integrity risk.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791102756.2980318,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_I-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_I-03/poc_foundry_suite"
+}

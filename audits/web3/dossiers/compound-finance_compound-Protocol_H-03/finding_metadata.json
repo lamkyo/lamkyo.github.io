@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-Protocol",
+  "finding_id": "H-03",
+  "title": "Re-Initializable `CErc20.initialize` \u2014 State Reset / Privilege Escalation",
+  "severity": "High",
+  "vuln_type": "Access Control / Unprotected Initializer",
+  "impact": "`CErc20.initialize(...)` is `public` and has **no `initialized` guard**. Anyone can call it again on a live delegator (via `delegateToImplementation` or the fallback) to overwrite `comptroller`, `interestRateModel`, `initialExchangeRateMantissa`, `name`, `symbol`, `decimals`, and `underlying`. An attacker can point the market at a malicious comptroller (allowing uncollateralized borrows) or a malicious interest rate model (setting `borrowRateMaxMantissa`-exceeding rates via a hostile model), draining all supplied funds. `CToken.initialize` (inherited) is likewise re-callable.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110945.4992454,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_H-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_H-03/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "M-04",
+  "title": "`CErc20Delegator._setPendingAdmin` Missing Two-Step / Allows Single-Step Admin Takeover via Delegated Selector Confusion",
+  "severity": "Medium",
+  "vuln_type": "Access Control",
+  "impact": "`_setPendingAdmin` in the delegator forwards directly to the implementation. The underlying `CToken._setPendingAdmin` correctly requires only the current admin \u2014 but the pending admin acceptance path (`_acceptAdmin`) sets `admin = pendingAdmin`. If a compromised or mistaken admin sets `pendingAdmin` to an address that does not exist or is attacker-controlled, there is no cancel path for `pendingAdmin` other than the current admin calling `_setPendingAdmin` again. Combined with the fact that the admin of a freshly deployed delegator is temporarily `msg.sender` (the deployer) **before** being reassigned to `admin_` in the constructor, there is a front-runnable window: if a deployment script separates deployment and configuration, an attacker observing the mempool cannot act during the constructor (same-tx), but **off-chain deployers who deploy the implementation and delegator in separate transactions, or who pass `admin_` as a multi-sig they haven't yet controlled, create a stuck-admin scenario**. More concretely, `CErc20Delegate._become",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791106023.1762393,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-04/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "M-01",
+  "title": "Division Before Multiplication Precision Loss in `DAIInterestRateModelV3.dsrPerBlock()`",
+  "severity": "Medium",
+  "vuln_type": "Precision & Rounding",
+  "impact": "Substantial rounding precision degradation when calculating the Dai Savings Rate (DSR) per block due to performing integer division (`/ RAY_TO_BASE_SCALE`) prior to multiplication (`* SECONDS_PER_BLOCK`).",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.8218708,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-01/poc_foundry_suite"
+}

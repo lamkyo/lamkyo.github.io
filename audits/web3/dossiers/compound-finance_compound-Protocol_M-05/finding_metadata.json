@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-Protocol",
+  "finding_id": "M-05",
+  "title": "`CErc20Delegator` Constructor Sets `admin = msg.sender` Before `_setImplementation`, Temporary Trust Window",
+  "severity": "Medium",
+  "vuln_type": "Access Control / Initialization",
+  "impact": "In the constructor, `admin` is temporarily `msg.sender` (the deployer) while `delegateTo(initialize)` and `_setImplementation` run. If `becomeImplementationData` or the initialize call triggers any external callback (e",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110945.6134152,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-05/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-05/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "M-04",
+  "title": "`Flopper.dent` \u2014 external `Vow.kiss` call inside bid path couples auction liveness to Vow state",
+  "severity": "Medium",
+  "vuln_type": "Reentrancy / External-Call Coupling / Logic Error",
+  "impact": "On the first `dent`, `Flopper` makes two external calls to `bids[id].guy` (assumed to be the `Vow`): `VowLike(guy).Ash()` and `VowLike(guy).kiss(min(bid, Ash))`. If `guy` is not a `Vow` (mis-kicked `gal`), or `Vow.kiss` reverts (e.g. `rad > vat.dai(vow)` surplus constraint, or `Ash` accounting mismatch), the entire `dent` reverts \u2014 the debt auction cannot receive its first bid and the system cannot clear `Ash`. This is a state-dependent DoS on debt auctions. Additionally, `kiss` mutates `Ash` and calls `vat.heal` mid-`dent`, before `bids[id].guy = msg.sender` is written \u2014 a re-entrancy surface into `Flopper` state.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103696.0866308,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-04/poc_foundry_suite"
+}

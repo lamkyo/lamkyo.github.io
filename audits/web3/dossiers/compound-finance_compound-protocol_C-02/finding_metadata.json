@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "C-02",
+  "title": "SimplePriceOracle Manipulation via Unrestricted Price Setting",
+  "severity": "Critical",
+  "vuln_type": "Access Control / Oracle Manipulation",
+  "impact": "Anyone can set arbitrary prices for any asset, enabling instant liquidation of all positions or draining protocol funds.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791099472.6023653,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_C-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_C-02/poc_foundry_suite"
+}

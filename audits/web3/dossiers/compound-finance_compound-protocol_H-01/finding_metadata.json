@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "H-01",
+  "title": "Initialization Front-Running Vulnerability in `CErc20Delegator` Constructor",
+  "severity": "High",
+  "vuln_type": "Access Control / Initialization",
+  "impact": "An attacker can front-run the deployment and initialization of a newly deployed `CErc20Delegator` proxy contract by directly calling `initialize(...)` on the implementation contract or exploiting the constructor timing window, allowing them to seize administrative control of the market delegate or corrupt initial exchange rates.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.7865634,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_H-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_H-01/poc_foundry_suite"
+}

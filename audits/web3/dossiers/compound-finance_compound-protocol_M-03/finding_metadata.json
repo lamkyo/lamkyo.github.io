@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "M-03",
+  "title": "`CEther.doTransferOut` Uses 2300-Gas `transfer`, Bricking Interactions with Contract Wallets",
+  "severity": "Medium",
+  "vuln_type": "Denial of Service / Integration Hazard",
+  "impact": "`CEther.doTransferOut` uses `to.transfer(amount)` with a hard 2300 gas stipend. Any recipient whose `receive()`/`fallback()` consumes more than 2300 gas (smart-contract wallets like Gnosis Safe, account-abstraction wallets, multi-sigs with logging) will cause the transfer to revert. This blocks `redeem`, `borrow`, `repayBorrow` (overpayment refund), `_reduceReserves`, and liquidation payouts to such recipients. An attacker who controls a borrower address that is a contract can make their position **unliquidatable** if the liquidator's `seize`/transfer-out path must send Ether to them, and users with contract wallets cannot exit their positions \u2014 funds are effectively frozen.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791106023.1441298,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_M-03/poc_foundry_suite"
+}

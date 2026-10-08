@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "C-01",
+  "title": "Production Risk: Deployment of Unrestricted Test Harnesses",
+  "severity": "Critical (if deployed to Mainnet)",
+  "vuln_type": "Access Control / Privilege Escalation / Unbounded Minting",
+  "impact": "Total loss of funds, token inflation, or arbitrary state corruption. Test harnesses like `ERC721Harness`, `ERC20FlashMintHarness`, and `ERC20PermitHarness` expose public/external `mint()` and `burn()` functions without access control modifiers (`onlyOwner`, `onlyRole`).",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791100629.846058,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_C-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_C-01/poc_foundry_suite"
+}

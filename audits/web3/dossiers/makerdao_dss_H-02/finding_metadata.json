@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "H-02",
+  "title": "Unchecked Return Value or Missing Balance Verification in `Flopper.deal` Minting Logic",
+  "severity": "High",
+  "vuln_type": "Logic Flaw / Token Minting",
+  "impact": "`Flopper.deal` calls `gem.mint(bids[id].guy, bids[id].lot)` to distribute minted debt-auction tokens to the winning bidder. If the underlying `GemLike` token implementation does not revert on failure (e.g., non-standard ERC-20s or custom minters returning `false` instead of reverting), auctions can be finalized without the winner receiving tokens while their initial bid collateral remains locked or unaccounted for.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791117168.348213,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-02/poc_foundry_suite"
+}

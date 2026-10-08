@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "C-03",
+  "title": "Delegatecall Return Data Parsing Vulnerability in View Functions",
+  "severity": "Critical",
+  "vuln_type": "Logic Error / Data Handling",
+  "impact": "View functions may return incorrect data due to improper delegatecall wrapper handling, causing incorrect liquidation calculations, collateral assessments, and user balance reporting.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791099472.6238766,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_C-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_C-03/poc_foundry_suite"
+}

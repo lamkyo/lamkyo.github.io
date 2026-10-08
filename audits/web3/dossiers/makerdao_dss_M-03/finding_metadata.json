@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "M-03",
+  "title": "`End.cage(ilk)` Reads `pip.read()` Without `has` Flag \u2014 Zero/Invalid Price Silently Produces Wrong `tag`",
+  "severity": "Medium",
+  "vuln_type": "Oracle Manipulation / Precision",
+  "impact": "`End.cage(ilk)` uses `PipLike.read()` (which returns only `bytes32`) instead of `peek()` (which returns `(val, has)`). If the feed is unset or returns `0`, `wdiv(spot.par(), 0)` **reverts** (DoS on that ilk's settlement) \u2014 or if it returns a stale/manipulated value, `tag[ilk]` is set incorrectly, mispricing all redemptions in `flow`/`skim`/`cash`.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791114542.4576259,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-03/poc_foundry_suite"
+}

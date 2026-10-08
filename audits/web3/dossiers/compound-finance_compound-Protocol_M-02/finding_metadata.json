@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-Protocol",
+  "finding_id": "M-02",
+  "title": "`CEther.doTransferOut` Uses `transfer` \u2014 2300 Gas Stipend Breaks Smart-Contract Recipients",
+  "severity": "Medium",
+  "vuln_type": "Logic Error / Denial of Service",
+  "impact": "`to.transfer(amount)` forwards only 2300 gas. If `to` is a contract with a non-trivial `receive()` (multisig, vault, liquidation bot contract), the transfer reverts, permanently blocking `redeem`, `repayBorrow`, `borrow`, and liquidation payouts to that address. Funds become unrecoverable for contract wallets.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110945.550684,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-02/poc_foundry_suite"
+}

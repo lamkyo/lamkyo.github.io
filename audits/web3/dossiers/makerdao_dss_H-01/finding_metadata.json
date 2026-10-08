@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "H-01",
+  "title": "Global Settlement `flow` Calculation Vulnerability via Precision Truncation and Zero-Debt Edge Cases",
+  "severity": "High",
+  "vuln_type": "Precision Loss & Economic Manipulation",
+  "impact": "During Global Settlement (`End` contract), if `debt` is exceptionally large or if collateral debt baskets (`Art[ilk] * rate`) are small relative to system debt scaling, the calculation of `fix[ilk]` can result in integer division truncation to zero or allow disproportionate collateral extraction, leading to permanent loss of user funds or insolvency of the `End` cash-out mechanism.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.7135193,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-01/poc_foundry_suite"
+}

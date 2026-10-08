@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "M-02",
+  "title": "Potential Reentrancy Vector via External Token Transfers in `GemJoin.join` and `GemJoin.exit`",
+  "severity": "Medium",
+  "vuln_type": "Reentrancy / Check-Effects-Interactions",
+  "impact": "In `GemJoin.join`, state updates (`vat.slip`) occur *before* the external ERC-20 `transferFrom` execution. While MakerDAO relies on trusted collateral tokens, supporting ERC-777, ERC-1155, or tokens with transfer hooks opens up potential read-only reentrancy or state inconsistency across dependent CDP modules (`Vat`).",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791117168.3940485,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-02/poc_foundry_suite"
+}

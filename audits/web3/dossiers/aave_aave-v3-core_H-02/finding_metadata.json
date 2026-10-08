@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "H-02",
+  "title": "Unchecked Ownership Transfer Risks in `ReservesSetupHelper`",
+  "severity": "High",
+  "vuln_type": "Access Control / Privilege Escalation",
+  "impact": "`ReservesSetupHelper` inherits OpenZeppelin's standard `Ownable` contract and exposes the `configureReserves` function restricted by the `onlyOwner` modifier. The deployment comment specifies: *\"The Pool or Risk admin must transfer the ownership to ReservesSetupHelper before calling this function\"*. If the contract owner fails to renounce or properly secure ownership after configuration, or if frontrun during setup, unauthorized actors can execute arbitrary reserve parameter configurations (e.g., setting LTVs or liquidation thresholds to invalid values) prior to initialization.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.5793936,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_H-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_H-02/poc_foundry_suite"
+}

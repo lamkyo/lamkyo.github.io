@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "M-05",
+  "title": "Harness Constructors Accept Unvalidated Parameters",
+  "severity": "Medium (if deployed)",
+  "vuln_type": "Input Validation",
+  "impact": "`OwnableHarness`/`Ownable2StepHarness` accept `address(0)` as `initialOwner` (OZ's `Ownable` constructor does not zero-check in these versions), and `TimelockControllerHarness` forwards arbitrary `minDelay`/role lists. A zero owner permanently bricks `restricted()`-style admin functions; a zero default admin in `AccessControlDefaultAdminRulesHarness` bricks admin transfers.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791116574.2553582,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-05/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-05/poc_foundry_suite"
+}

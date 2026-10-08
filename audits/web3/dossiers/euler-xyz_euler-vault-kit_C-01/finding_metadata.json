@@ -1,0 +1,12 @@
+{
+  "target_repo": "**euler-xyz/euler-vault-kit**",
+  "finding_id": "C-01",
+  "title": "**BeaconProxy Allows Unchecked Implementation & Unrestricted Calldata Tail Injection**",
+  "severity": "Medium",
+  "vuln_type": "Logic Error",
+  "impact": "Financial or state integrity risk.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.3801186,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/**euler-xyz_euler-vault-kit**_C-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/**euler-xyz_euler-vault-kit**_C-01/poc_foundry_suite"
+}

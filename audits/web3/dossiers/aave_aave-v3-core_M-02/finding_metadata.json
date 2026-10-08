@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "M-02",
+  "title": "Hardcoded Protocol Token Addresses in `AaveProtocolDataProvider` Break Multi-Chain Deployments",
+  "severity": "Medium",
+  "vuln_type": "Logic & State Machine Flaw / Hardcoding Risk",
+  "impact": "The `AaveProtocolDataProvider` contract hardcodes specific mainnet addresses for Maker (`MKR`) and Native Ether (`ETH`):\n  ```solidity\n  address constant MKR = 0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2;\n  address constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;\n  ```\n  When deploying the core protocol onto alternative Layer 2 networks or sidechains (e.g., Polygon, Arbitrum, Optimism, Avalanche) where token registry addresses differ or MKR/ETH mock proxies are initialized differently, `getAllReservesTokens()` will return incorrect symbol strings or mismatch token lookup mappings, breaking external frontend integrations and off-chain indexers.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.690888,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-02/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "M-02",
+  "title": "Signature Replay Vulnerability via Unprotected Nonce Verification Bounds in `setAuthorizationWithSig`",
+  "severity": "Medium",
+  "vuln_type": "Access Control / Cryptographic Signature Verification",
+  "impact": "While nonces are strictly incremented per authorizer (`authorization.nonce == nonce[authorization.authorizer]++`), a signature can be captured and broadcasted anytime before `authorization.deadline`. If an authorizer signs a transaction granting broad permissions (`isAuthorized = true`), malicious actors observing the mempool could front-run or delay execution within the validity window, causing unexpected authorization state updates at inconvenient timestamps.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120969.3808095,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-02/poc_foundry_suite"
+}

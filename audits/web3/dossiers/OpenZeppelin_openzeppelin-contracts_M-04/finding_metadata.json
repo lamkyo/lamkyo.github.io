@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "M-04",
+  "title": "Harnesses Expose Internal Storage Layout (`_inner._values`, `_positions`)",
+  "severity": "Medium (informational)",
+  "vuln_type": "Information Disclosure / Coupling",
+  "impact": "`AccountHarness._validatorAtFull`, `EnumerableSetHarness._positionOf`, `DoubleEndedQueueHarness.begin/end` expose raw storage slots. Harmless in FV, but copying these accessors into production creates upgrade-layout coupling and griefing surface (e.g., `at_` on out-of-range index reverts \u2014 usable as a cheap DoS oracle in loops).",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120191.7051823,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_M-04/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "Uniswap/v4-core",
+  "finding_id": "M-04",
+  "title": "`ERC6909` missing zero-address / zero-amount validation and non-standard events",
+  "severity": "Medium",
+  "vuln_type": "Logic Error",
+  "impact": "Financial or state integrity risk.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.9150884,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-04/poc_foundry_suite"
+}

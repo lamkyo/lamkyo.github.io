@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "M-03",
+  "title": "Unchecked Return Value in Test Harness `SimpleERC20` Transfer / TransferFrom Implementations",
+  "severity": "Medium (Test / Harness Vulnerability)",
+  "vuln_type": "Non-Standard ERC20 Compliance",
+  "impact": "The `SimpleERC20` contract used in Certora verification harnesses implements `transfer` and `transferFrom` returning hardcoded `true` without checking standard ERC20 edge cases (such as zero-address transfers or interacting with tokens that return false instead of reverting). While this is restricted to test harnesses, incorrect mock behavior can lead to false confidence in formal verification models.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791118601.1335442,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-03/poc_foundry_suite"
+}

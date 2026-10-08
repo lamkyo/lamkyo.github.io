@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "M-06",
+  "title": "`ReentrancyGuard` uses a fixed storage slot (`locked = 1` initializer) \u2014 not proxy-safe and read-only reentrancy remains integrator's responsibility",
+  "severity": "Medium",
+  "vuln_type": "Reentrancy / Deployment Footgun",
+  "impact": "`uint256 private locked = 1;` is a declaration initializer. Under `delegatecall`-based proxies (UUPS/transparent), the initializer runs in the *implementation's* constructor context, not the proxy's \u2014 the proxy's storage slot for `locked` starts at `0`. The modifier `require(locked == 1)` then **always reverts**, permanently bricking all `nonReentrant` functions in the proxy. Additionally, the guard only protects state-changing functions; view functions (e.g., a vault's `convertToShares`) remain vulnerable to read-only reentrancy during an external callback, which this guard cannot prevent.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791105528.9795532,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-06/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-06/poc_foundry_suite"
+}

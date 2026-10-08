@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "M-05",
+  "title": "`Pot.join` / `Jug.file` \u2014 `rho` freshness requirement enables griefing via forced `drip` ordering",
+  "severity": "Medium",
+  "vuln_type": "Logic Error / State Machine (timestamp coupling)",
+  "impact": "`Pot.join` requires `now == rho` exactly. Since `drip()` sets `rho = now`, any `join` in a later block reverts until someone calls `drip()`. An attacker can front-run `join` by calling `drip()` in the same block *after* `rho` was set in a prior block \u2014 no, `drip` sets `rho = now` so `join` in the *same block* succeeds. The real risk: if `drip()` is not called, `join` is blocked for users in every subsequent block, and `Pot.file(\"dsr\", ...)` also requires `now == rho`, so governance cannot change the DSR until a `drip` lands. This is a liveness/griefing surface (anyone can `drip`, so severity is bounded), but combined with a `Vat`/RPC outage it blocks user deposits.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103696.1270912,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-05/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-05/poc_foundry_suite"
+}

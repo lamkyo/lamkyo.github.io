@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "M-04",
+  "title": "`supplyCollateral` Does Not Accrue Interest \u2014 Combined with `borrow`/`withdraw` Ordering Can Allow Fresh Collateral to Mask Stale Debt Health Check Timing",
+  "severity": "Medium (low practical exploitability, design note)",
+  "vuln_type": "Logic / State Machine",
+  "impact": "`supplyCollateral` deliberately skips `_accrueInterest` to save gas. This is safe in isolation because no debt-impacting value is read there. However, it means `position[id][onBehalf].collateral` can be topped up while `market[id].totalBorrowAssets` is stale; the subsequent `borrow` or `withdrawCollateral` call does accrue before `_isHealthy`, so the ordering is correct. The residual risk is a **read-only reentrancy / view inconsistency**: any external `view` reading `position` + `market` via `extSloads` or public getters between transactions observes an inconsistent debt/collateral snapshot if a callback (e.g., in a `supply` callback flow) queries health. Integrators reading `isHealthy` mid-callback may get stale debt figures.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791111174.8584044,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-04/poc_foundry_suite"
+}

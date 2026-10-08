@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "M-07",
+  "title": "`SSTORE2.read(pointer, start)` \u2014 Unchecked `start` Can Underflow `DATA_OFFSET` Addition",
+  "severity": "Medium",
+  "vuln_type": "Logic Error / Input Validation",
+  "impact": "`read(address pointer, uint256 start)` does `start += DATA_OFFSET` (i.e., `+1`). If a caller passes `type(uint256).max`, this overflows. Since the pragma is `>=0.8.0`, the checked arithmetic **reverts** \u2014 so no silent corruption, but the function reverts with a panic instead of a descriptive error, and the two-argument `read(pointer, start, end)` similarly computes `end - start` after both are incremented, which can revert on `end < start` post-increment in unexpected ways.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791098360.306815,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-07/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-07/poc_foundry_suite"
+}

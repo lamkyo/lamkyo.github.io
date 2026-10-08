@@ -1,0 +1,12 @@
+{
+  "target_repo": "Uniswap/v4-core",
+  "finding_id": "M-06",
+  "title": "`clear` Allows Zero-Amount No-Op That Silently Skips Delta Accounting",
+  "severity": "Medium",
+  "vuln_type": "Logic / State Machine Flaw",
+  "impact": "`PoolManager.clear` converts `amount` (uint256) to `int128` and requires `amountDelta == current`. If `current == 0` and `amount == 0`, the check passes and `_accountDelta(currency, 0, msg.sender)` is a no-op (early return on `delta == 0`), so `NonzeroDeltaCount` is untouched. This is benign in isolation, but it means `clear` can be used to \"confirm\" a zero delta without any effect \u2014 more importantly, the `MustClearExactPositiveDelta` check compares against `currency.getDelta(msg.sender)`, which is a *per-currency* transient delta. An attacker with a nonzero delta in currency A can call `clear(A, 0)` only if their delta is already 0; the real risk is that `clear` does not verify the caller has a *positive* delta before allowing the negation, so a caller with a **negative** delta (they owe tokens) cannot clear it \u2014 but a caller with a positive delta can clear it to zero and then re-acquire it via `settle`, potentially bypassing settlement ordering. This is a subtle accounting edge case rather than a direct exploit.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791107468.9252698,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-06/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-06/poc_foundry_suite"
+}

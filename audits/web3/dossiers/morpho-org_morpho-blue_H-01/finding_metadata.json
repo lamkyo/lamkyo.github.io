@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "H-01",
+  "title": "Missing Check on `loanToken` Safe Transfer Return / Non-Standard ERC20 Behavior in Callbacks",
+  "severity": "High",
+  "vuln_type": "Token Integration / Accounting Mismatch",
+  "impact": "Tokens that return `false` on failure instead of reverting (e.g., USDT, ZRX) can cause silent failures or fund extraction if interactively sequenced through callback hooks. While `SafeTransferLib` handles standard transfers, interactions within external callbacks (`onMorphoSupply`, `onMorphoRepay`) assume token transfers will correctly revert. Furthermore, `repay` updates internal states *before* executing the external callback and transfer, risking read-only or state synchronization anomalies if re-entered.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120968.613467,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_H-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_H-01/poc_foundry_suite"
+}

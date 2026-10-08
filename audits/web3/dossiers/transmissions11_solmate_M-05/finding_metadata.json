@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "M-05",
+  "title": "`FixedPointMathLib.mulDivDown`/`mulDivUp` round-trip asymmetry enables share inflation in ERC4626-style accounting",
+  "severity": "Medium",
+  "vuln_type": "Precision Loss / Rounding Direction",
+  "impact": "When integrators use `mulDivDown` for deposit\u2192shares and `mulDivUp` for shares\u2192assets inconsistently (or vice versa), an attacker can round-trip tiny amounts to extract value. Specifically, `mulWadDown(mulWadUp(x))` style round trips can lose/gain 1 wei per operation; in a vault, repeated 1-wei extractions across many operations or a manipulated first-depositor donation (share inflation attack) compounded with downward rounding on `convertToShares` lets an attacker mint shares cheaply and withdraw more than deposited.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791105528.9557657,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-05/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-05/poc_foundry_suite"
+}

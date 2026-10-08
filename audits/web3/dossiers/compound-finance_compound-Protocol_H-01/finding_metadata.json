@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-Protocol",
+  "finding_id": "H-01",
+  "title": "Unprotected Oracle Price Setter \u2014 Anyone Can Manipulate Any Market Price",
+  "severity": "Critical",
+  "vuln_type": "Access Control / Oracle Manipulation",
+  "impact": "An attacker sets any collateral price to `0` (or an arbitrary value). With price = 0, every borrower's collateral value computes to 0 \u2192 `getHypotheticalAccountLiquidity` reports infinite shortfall \u2192 **all positions become instantly liquidatable**, or alternatively the market is frozen (no borrows/mints pass liquidity checks). Conversely, an attacker can set a price to an inflated value to borrow against worthless collateral, draining all underlying liquidity from every market sharing that oracle. Direct, permissionless, irreversible-in-practice fund loss.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110945.4355333,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_H-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_H-01/poc_foundry_suite"
+}

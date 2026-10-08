@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "H-02",
+  "title": "Precision Loss and Dust Vulnerability in `liquidate` Bad Debt Realization",
+  "severity": "High",
+  "vuln_type": "Precision & Rounding / Economic Exploit",
+  "impact": "When a liquidated position's collateral reaches zero (`position[id][borrower].collateral == 0`), bad debt is calculated and written off against `totalSupplyAssets`. Due to rounding direction discrepancies between `.toAssetsUp()` and internal share conversions, a malicious liquidator can structure partial liquidations to leave behind microscopic dust positions or exploit discrepancies between asset scaling and share rounding, causing bad debt socializations to misalign with real token balances in the contract.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120969.3247094,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_H-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_H-02/poc_foundry_suite"
+}

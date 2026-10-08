@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "M-02",
+  "title": "Potential Precision Loss / Division Direction Inconsistency in `FixedPointMathLib` Division Wrappers",
+  "severity": "Medium",
+  "vuln_type": "Precision & Rounding / Economic Logic",
+  "impact": "Vaults, AMMs, or lending protocols using `divWadDown` or `divWadUp` inconsistently may suffer from rounding vulnerabilities, allowing users to extract dust or drain protocol yields over repeated rounding direction discrepancies.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.7693472,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-02/poc_foundry_suite"
+}

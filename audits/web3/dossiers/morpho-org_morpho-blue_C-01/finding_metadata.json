@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "C-01",
+  "title": "Reentrancy Risk in Callback Functions via State-After-External-Call Pattern",
+  "severity": "Critical",
+  "vuln_type": "Reentrancy / State Consistency",
+  "impact": "Malicious contracts invoking callbacks (`onMorphoSupply`, `onMorphoRepay`, `onMorphoLiquidate`) can re-enter Morpho functions while internal accounting updates (or token transfers) occur after or around the callback execution, potentially violating accounting invariants or manipulating utilization states across cross-market read-only calls.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791107219.6192968,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_C-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_C-01/poc_foundry_suite"
+}

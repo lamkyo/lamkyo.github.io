@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "C-01",
+  "title": "`Pot.drip` and `Jug.drip` Block-Timestamp Update Vulnerability Allows DSR / Stability Fee Manipulation and Accounting Desynchronization",
+  "severity": "Critical",
+  "vuln_type": "State Machine / Logic Flaw / Economic Attack",
+  "impact": "Malicious actors or miners can exploit the strict `now == rho` dependency combined with asynchronous `drip` execution to manipulate debt accumulation, lock savings rate accrual, or force out-of-bounds state transitions, leading to protocol insolvency or unjust inflation of the `chi` rate accumulator.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791117168.298501,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_C-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_C-01/poc_foundry_suite"
+}

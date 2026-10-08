@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "M-01",
+  "title": "Unsafe Downcasting in `L2Encoder` Causes Silent Truncation of Amounts and Timestamps",
+  "severity": "Medium",
+  "vuln_type": "Precision Loss / Type Conversion Error",
+  "impact": "`L2Encoder` encodes high-precision 256-bit parameters (`amount`, `deadline`) into truncated 128-bit and 32-bit fields using OpenZeppelin's `SafeCast`. While `SafeCast` throws an error on overflow during downcasting, edge cases involving large token amounts near `type(uint128).max` or future timestamps past year 2106 (`type(uint32).max`) will cause catastrophic transaction reverts for users attempting to interact with L2 pools via encoded calldata.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.6706808,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-01/poc_foundry_suite"
+}

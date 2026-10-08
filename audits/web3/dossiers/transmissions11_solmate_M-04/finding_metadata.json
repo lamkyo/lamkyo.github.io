@@ -1,0 +1,12 @@
+{
+  "target_repo": "transmissions11/solmate",
+  "finding_id": "M-04",
+  "title": "`SafeTransferLib` return-data check accepts tokens that return garbage in the first word when `returndatasize > 31` but value \u2260 1 \u2014 actually rejects valid tokens returning >32 bytes, and accepts tokens returning exactly `1` in 32 bytes only; more importantly, **fee-on-transfer and false-returning tokens are not detectable**",
+  "severity": "Medium",
+  "vuln_type": "Precision / Economic \u2014 integration assumption",
+  "impact": "`safeTransfer`/`safeTransferFrom` only verify the call didn't revert and the return convention is plausible. They do **not** verify the received amount. Integrations (vaults, routers) that assume `amount` arrived in full will accrue accounting drift with fee-on-transfer/rebasing tokens (USDT-like deflationary tokens, stETH-style rebasers), enabling share-price manipulation in downstream ERC4626-style vaults (donation/inflation via understated deposits).",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791105528.930326,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/transmissions11_solmate_M-04/poc_foundry_suite"
+}

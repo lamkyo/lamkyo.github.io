@@ -1,0 +1,12 @@
+{
+  "target_repo": "Uniswap/v4-core",
+  "finding_id": "M-01",
+  "title": "`feeGrowthGlobal` inflation via self-donation enables fee theft from passive LPs",
+  "severity": "Medium",
+  "vuln_type": "Logic Error",
+  "impact": "Financial or state integrity risk.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.8607862,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-01/poc_foundry_suite"
+}

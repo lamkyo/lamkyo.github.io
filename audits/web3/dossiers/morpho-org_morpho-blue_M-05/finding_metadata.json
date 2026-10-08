@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "M-05",
+  "title": "Test Mock `OracleMock.setPrice` and `ERC20Mock.setBalance` Are Unprotected \u2014 Unsafe if Ever Deployed Beyond Test Context",
+  "severity": "Medium (test-only; zero risk if confined to test fixtures)",
+  "vuln_type": "Access Control",
+  "impact": "`OracleMock.setPrice(uint256)` and `ERC20Mock.setBalance(address,uint256)` have no access control and can be called by anyone. If any deployment pipeline ever deploys these mocks to a live network (e.g., for a testnet demo or by mistake), anyone can arbitrarily reprice collateral or mint/drain token balances, trivially liquidating any position or breaking any integration using these tokens/oracles.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791111174.8777373,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-05/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-05/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "M-07",
+  "title": "`Vat.fold` / `Vat.suck` / `Pot.drip` \u2014 single-key governance can unilaterally mint unbacked Dai",
+  "severity": "Medium (trust-assumption / centralization)",
+  "vuln_type": "Access Control / Privilege Escalation",
+  "impact": "`Vat.suck(u, v, rad)` mints `dai[v]` and `sin[u]` with no cap; `Vat.fold` increases `ilk.rate` and mints `dai[vow]` proportionally to `Art`. A single compromised `ward` (e.g. the `Pot`, `Jug`, or `End`) can inflate `debt`/`vice` arbitrarily or drive stability fees to extreme values (`Jug.file(\"duty\")` has no upper bound). This is by design in Maker, but the absence of rate caps, mint caps, or timelocks on these paths is a material centralization risk.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103696.1882832,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-07/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-07/poc_foundry_suite"
+}

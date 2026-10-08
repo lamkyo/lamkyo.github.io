@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-protocol",
+  "finding_id": "H-03",
+  "title": "Public `poke()` Allows Permissionless Interest-Rate Parameter Manipulation",
+  "severity": "High",
+  "vuln_type": "Logic / State Machine Flaw \u2192 Economic Manipulation",
+  "impact": "`DAIInterestRateModelV3.poke()` is `public` with no access control. It recomputes `baseRatePerBlock` and `multiplierPerBlock` from live Maker `pot.dsr()` and `jug` values. While it reads on-chain state (so values are \"real\"), the function is a **state-changing write** callable by anyone at any time, and the derived values feed directly into `getBorrowRate` \u2192 `accrueInterest`. An attacker who can influence Maker governance-adjacent parameters (or simply time calls around DSR/stability-fee changes) can force rate recomputation at inopportune blocks. More importantly, `updateJumpRateModel` writes `gapPerBlock` **before** calling `updateJumpRateModelInternal` and `poke()` \u2014 if `poke()` reverts or if `kink` is set to 0 by a malicious owner, `multiplierPerBlock = gapPerBlock * BASE / kink` divides by zero and permanently bricks interest accrual for the cDAI market (all mints/borrows/redeems that call `accrueInterest` revert).",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791101847.632604,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_H-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-protocol_H-03/poc_foundry_suite"
+}

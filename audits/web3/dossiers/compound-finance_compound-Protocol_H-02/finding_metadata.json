@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-Protocol",
+  "finding_id": "H-02",
+  "title": "Public `delegateToImplementation` Allows Unpermissioned State-Changing Delegatecalls",
+  "severity": "High",
+  "vuln_type": "Access Control / Proxy Misconfiguration",
+  "impact": "`delegateToImplementation(bytes)` is `public` (not `internal`/`onlyAdmin`). Any external account can invoke **any** state-changing function on the implementation via delegatecall in the delegator's storage context \u2014 e.g. force `accrueInterest()`, call `sweepToken()` (which checks `msg.sender == admin`, so protected), or more importantly invoke `_setImplementation` indirectly is blocked by its own `msg.sender == admin` check, but arbitrary calls still allow griefing (forced accruals, gas griefing, manipulating `accrualBlockNumber` timing) and any future implementation function lacking an explicit `msg.sender` guard becomes instantly exposed. This violates the proxy security invariant that only the delegator (or admin) should drive delegatecalls.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110945.476567,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_H-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_H-02/poc_foundry_suite"
+}

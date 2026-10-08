@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "M-06",
+  "title": "`Dai.permit` \u2014 `ecrecover` malleability / zero-address not fully guarded before use",
+  "severity": "Medium",
+  "vuln_type": "Signature Validation / Access Control",
+  "impact": "`holder == ecrecover(...)` is checked, and `holder != address(0)` is checked \u2014 but the checks are ordered such that `ecrecover` returning `address(0)` is compared against `holder` first. Since `holder != 0` is required, a `0` recovery cannot match a non-zero holder, so this is safe *as written*. However, `v` is not constrained to `{27,28}`; a `v \u2208 {0,1}` yields `ecrecover == address(0)`, which fails the `holder != 0` check only if `holder` is non-zero \u2014 it is. **Residual risk:** the `nonce == nonces[holder]++` post-increment inside a `require` is correct but relies on evaluation order; combined with no `v` range check, off-chain signers producing non-canonical signatures can cause silent permit failures. Severity is Medium due to the missing `v` bound being a known ecrecover footgun in older Maker code.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103696.1564622,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-06/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_M-06/poc_foundry_suite"
+}

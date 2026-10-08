@@ -1,0 +1,12 @@
+{
+  "target_repo": "makerdao/dss",
+  "finding_id": "H-04",
+  "title": "`Vat.frob` allows debt increase when `dink >= 0 && dart > 0` bypasses ceiling check via `either` short-circuit \u2014 actually safe, but `fork` lacks `live` check enabling post-shutdown CDP migration",
+  "severity": "High",
+  "vuln_type": "Access Control / State Machine Flaw",
+  "impact": "`Vat.frob` correctly requires `live == 1`, and `grab` is `auth`-gated. However **`Vat.fork` has no `live` check**. After `End.cage()` freezes the system, `fork` still allows moving collateral and debt between urns (with consent). This lets sophisticated actors **rearrange CDP positions after prices are frozen but before `skim`**, potentially moving collateral out of an urn that would be `skim`med into one that has already been `skim`med (or into `free`-eligible state), distorting the `gap` shortfall calculation and the final `fix` prices. Specifically: `skim` is callable by anyone per-urn; an attacker can `fork` collateral from an un-skimmed unsafe urn into a fresh urn, then `free` it after `art == 0` \u2014 but `free` requires `art == 0`, so the debt must move too. The exploit requires both parties' consent (`wish`), so this is primarily a **griefing/settlement-integrity** vector between cooperating parties, but it breaks the assumption in `thaw()` that \"all under-collateralised CDPs are processed.\"",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791112145.6896424,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/makerdao_dss_H-04/poc_foundry_suite"
+}

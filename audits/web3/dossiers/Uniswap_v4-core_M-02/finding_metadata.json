@@ -1,0 +1,12 @@
+{
+  "target_repo": "Uniswap/v4-core",
+  "finding_id": "M-02",
+  "title": "`sync()` is permissionless and can force native-currency settlement misaccounting / DoS on naive integrators",
+  "severity": "Medium",
+  "vuln_type": "Logic Error",
+  "impact": "Financial or state integrity risk.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791443256.8791697,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-02/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_M-02/poc_foundry_suite"
+}

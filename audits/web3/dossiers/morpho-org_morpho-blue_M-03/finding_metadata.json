@@ -1,0 +1,12 @@
+{
+  "target_repo": "morpho-org/morpho-blue",
+  "finding_id": "M-03",
+  "title": "Permissionless `createMarket` + External `borrowRate` Call Can Be Abused for Griefing / Gas-Grief via Stateful IRM Initialization",
+  "severity": "Medium",
+  "vuln_type": "Logic / Denial-of-Service (Griefing)",
+  "impact": "`createMarket` calls into `IIrm(marketParams.irm).borrowRate(...)`. A stateful IRM (per the comment \"Call to initialize the IRM in case it is stateful\") may run arbitrary logic. Because `createMarket` is permissionless, anyone can front-run a legitimate market creator and create the market first (capturing no privilege, but emitting `CreateMarket` with identical params \u2014 actually the id is deterministic, so front-running just means the attacker creates the same market). The real risk: a buggy/stateful IRM could revert or consume unbounded gas on init, permanently blocking market creation for that IRM+LLTV combination if the IRM reverts deterministically for uninitialized state \u2014 but since any caller can retry, this is self-healing unless the IRM permanently bricks.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791111174.8415163,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/morpho-org_morpho-blue_M-03/poc_foundry_suite"
+}

@@ -1,0 +1,12 @@
+{
+  "target_repo": "Uniswap/v4-core",
+  "finding_id": "H-01",
+  "title": "Unprotected `updateDynamicLPFee` Allows Arbitrary LP Fee Manipulation by Malicious Hooks or Impostors",
+  "severity": "High",
+  "vuln_type": "Access Control / Economic Manipulation",
+  "impact": "A pool configured with a dynamic fee mechanism relies on its hook contract to call `updateDynamicLPFee`. Because `updateDynamicLPFee` does not verify whether the caller is actively executing a hook transaction or whether the pool is locked/unlocked, any contract (or if a hook is upgradable/compromised) can arbitrarily set the pool's LP fee up to `MAX_SWAP_FEE` (`1e6` / 100%), allowing malicious actors to sandwich users, trap funds, or drain pools through exorbitant fees.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791116799.5654793,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_H-01/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/Uniswap_v4-core_H-01/poc_foundry_suite"
+}

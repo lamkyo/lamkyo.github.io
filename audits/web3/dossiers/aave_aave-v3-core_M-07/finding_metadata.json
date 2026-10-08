@@ -1,0 +1,12 @@
+{
+  "target_repo": "aave/aave-v3-core",
+  "finding_id": "M-07",
+  "title": "`SymbolicPriceOracle` allows arbitrary price assignment with no access control",
+  "severity": "Medium (verification-only, but flagged for completeness)",
+  "vuln_type": "Access Control / Oracle Manipulation",
+  "impact": "`price[asset]` is a public mapping with no setter gating visible in the harness \u2014 any caller (in the Certora symbolic execution environment) can set any asset price to any value. This is intentional for symbolic exploration but means any property proven under this oracle does not constrain oracle trust assumptions. If this contract were ever deployed, it would be a trivially exploitable price oracle.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791103470.656231,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-07/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/aave_aave-v3-core_M-07/poc_foundry_suite"
+}

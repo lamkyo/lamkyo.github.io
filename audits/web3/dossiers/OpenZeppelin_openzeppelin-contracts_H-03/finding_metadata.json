@@ -1,0 +1,12 @@
+{
+  "target_repo": "OpenZeppelin/openzeppelin-contracts",
+  "finding_id": "H-03",
+  "title": "Unrestricted Public Minting in `ERC20PermitHarness`",
+  "severity": "Critical",
+  "vuln_type": "Access Control (Missing `onlyOwner`)",
+  "impact": "Arbitrary inflation of ERC\u201120 supply.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791120969.4697618,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_H-03/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/OpenZeppelin_openzeppelin-contracts_H-03/poc_foundry_suite"
+}

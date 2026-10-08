@@ -1,0 +1,12 @@
+{
+  "target_repo": "compound-finance/compound-Protocol",
+  "finding_id": "M-04",
+  "title": "`SimplePriceOracle._getUnderlyingAddress` String Comparison Fragility & cETH Sentinel",
+  "severity": "Medium",
+  "vuln_type": "Logic Error / Oracle",
+  "impact": "`_getUnderlyingAddress` hardcodes the `\"cETH\"` symbol check and a fixed sentinel `0xEeee...`. Any market whose symbol differs (e.g. `cWETH`, `cETH-v2`) falls through to `CErc20(address(cToken)).underlying()`, which reverts for a native-ETH market or returns the wrong asset. Combined with H-01, mis-keyed prices silently return `0` for the intended asset while a different asset's price is set \u2014 a price set for one market may not apply to the intended one.",
+  "payout_address": "0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA",
+  "packaged_at": 1791110945.595335,
+  "dossier_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-04/VULNERABILITY_DOSSIER.md",
+  "suite_path": "/opt/antigravity/web3_bounties/dossiers/compound-finance_compound-Protocol_M-04/poc_foundry_suite"
+}
