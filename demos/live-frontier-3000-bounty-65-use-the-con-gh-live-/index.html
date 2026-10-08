@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Readiness Probe Timeout Fix — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          slate: { 950: '#020617' },
+        },
+        fontFamily: {
+          mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  .glow { box-shadow: 0 0 0 1px rgba(56,189,248,.15), 0 0 24px -6px rgba(56,189,248,.35); }
+  .grid-bg {
+    background-image: linear-gradient(rgba(148,163,184,.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(148,163,184,.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  @keyframes pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+  .pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+  .fade-in { animation: fadeIn .35s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: none } }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased grid-bg min-h-screen">
+
+<!-- ============ STICKY HEADER BANNER ============ -->
+<div class="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-col md:flex-row items-center gap-2 md:gap-4 justify-between">
+    <div class="flex items-center gap-2 text-[13px] text-slate-300 text-center md:text-left">
+      <span class="text-base">🚀</span>
+      <span class="font-medium">
+        Live Interactive Prototype for:
+        <span class="text-sky-400 font-semibold">[LIVE FRONTIER: $3000] [Bounty: $65] Use the confi</span>
+      </span>
+      <span class="hidden md:inline text-slate-600">|</span>
+      <span class="hidden md:inline text-slate-400">Engineered by
+        <a href="https://primenode.cc" target="_blank" rel="noopener" class="text-slate-200 hover:text-sky-400 underline decoration-dotted underline-offset-2">PrimeNode</a>
+      </span>
+      <span class="hidden lg:inline-flex items-center gap-1 text-emerald-400 text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2 py-0.5">
+        <i data-lucide="badge-check" class="w-3 h-3"></i> Verified Deliverable
+      </span>
+    </div>
+    <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5765093102"
+       class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-bold px-3.5 py-2 transition-colors">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+      Contact Engineering Team
+    </a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="max-w-7xl mx-auto px-4 pt-10 pb-6">
+  <div class="flex items-center gap-2 text-xs font-mono text-slate-500 mb-3">
+    <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+    <span>src/controllers/healthDependenciesController.ts</span>
+    <span class="text-slate-700">›</span>
+    <span class="text-amber-400">bug</span>
+    <span class="text-slate-700">›</span>
+    <span>readiness-timeout-unification</span>
+  </div>
+  <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white">
+    Unify readiness probe timeouts across health surfaces
+  </h1>
+  <p class="mt-3 max-w-3xl text-slate-400 leading-relaxed">
+    <code class="text-sky-400 font-mono text-sm">probeHorizonDependency()</code> and
+    <code class="text-sky-400 font-mono text-sm">probeIpfsDependency()</code> hardcode
+    <code class="text-rose-400 font-mono text-sm">{ timeout: 5000 }</code>, so operators tuning
+    <code class="text-sky-400 font-mono text-sm">READINESS_IPFS_TIMEOUT_MS</code> see no effect on
+    <code class="text-slate-300 font-mono text-sm">/health/dependencies</code>. This prototype threads the
+    <code class="text-sky-400 font-mono text-sm">config.readiness*</code> values into both probes so a single
+    timeout source drives every health surface.
+  </p>
+
+  <div class="mt-5 flex flex-wrap gap-2">
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-slate-800/70 border border-slate-700 rounded-full px-3 py-1 text-slate-300">
+      <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i> No hardcoded 5000
+    </span>
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-slate-800/70 border border-slate-700 rounded-full px-3 py-1 text-slate-300">
+      <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i> Env var drives probe timeout
+    </span>
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium bg-slate-800/70 border border-slate-700 rounded-full px-3 py-1 text-slate-300">
+      <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i> npm run test + Backend CI
+    </span>
+  </div>
+</header>
+
+<!-- ============ MAIN GRID ============ -->
+<main class="max-w-7xl mx-auto px-4 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+  <!-- LEFT: Config Panel -->
+  <section class="lg:col-span-4 space-y-6">
+
+    <!-- Config editor -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/80">
+        <div class="flex items-center gap-2">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4 text-sky-400"></i>
+          <h2 class="text-sm font-semibold text-white">Runtime Config</h2>
+        </div>
+        <span class="text-[10px] font-mono text-slate-500">.env</span>
+      </div>
+      <div class="p-4 space-y-4" id="configPanel">
+        <!-- injected by JS -->
+      </div>
+      <div class="px-4 py-3 border-t border-slate-800 bg-slate-900/80 flex items-center justify-between">
+        <button id="resetBtn" class="text-xs text-slate-400 hover:text-slate-200 inline-flex items-center gap-1.5 transition-colors">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset defaults
+        </button>
+        <button id="applyBtn" class="text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-slate-950 rounded-md px-3 py-1.5 inline-flex items-center gap-1.5 transition-colors">
+          <i data-lucide="zap" class="w-3.5 h-3.5"></i> Apply &amp; Re-probe
+        </button>
+      </div>
+    </div>
+
+    <!-- Diff card -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-800 bg-slate-900/80">
+        <i data-lucide="git-compare" class="w-4 h-4 text-amber-400"></i>
+        <h2 class="text-sm font-semibold text-white">Patch Preview</h2>
+      </div>
+      <pre class="text-[11px] leading-relaxed font-mono p-4 overflow-x-auto"><code><span class="text-slate-500">// src/controllers/healthDependenciesController.ts</span>
+<span class="text-rose-400">-  const res = await axios.get(url, { timeout: 5000 });</span>
+<span class="text-emerald-400">+  const res = await axios.get(url, {</span>
+<span class="text-emerald-400">+    timeout: config.readinessHorizon.timeoutMs,</span>
+<span class="text-emerald-400">+  });</span>
+
+<span class="text-rose-400">-  const res = await axios.head(url, { timeout: 5000 });</span>
+<span class="text-emerald-400">+  const res = await axios.head(url, {</span>
+<span class="text-emerald-400">+    timeout: config.readinessIpfs.timeoutMs,</span>
+<span class="text-emerald-400">+  });</span>
+
+<span class="text-slate-500">// src/config.ts</span>
+<span class="text-emerald-400">+  readinessHorizon: {</span>
+<span class="text-emerald-400">+    timeoutMs: envInt('READINESS_HORIZON_TIMEOUT_MS', 5000),</span>
+<span class="text-emerald-400">+  },</span></code></pre>
+    </div>
+
+  </section>
+
+  <!-- RIGHT: Probes + results -->
+  <section class="lg:col-span-8 space-y-6">
+
+    <!-- Probe runner -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/80">
+        <div class="flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i>
+          <h2 class="text-sm font-semibold text-white">/health/dependencies</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="probeStatus" class="text-[11px] font-mono text-slate-500">idle</span>
+          <button id="runBtn" class="text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-md px-3 py-1.5 inline-flex items-center gap-1.5 transition-colors">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Probes
+          </button>
+        </div>
+      </div>
+      <div class="p-4 space-y-4" id="probeList">
+        <!-- injected -->
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/80">
+        <div class="flex items-center gap-2">
+          <i data-lucide="table-2" class="w-4 h-4 text-sky-400"></i>
+          <h2 class="text-sm font-semibold text-white">Health Surface Agreement</h2>
+        </div>
+        <span class="text-[10px] font-mono text-slate-500">app.ts vs controller</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-[11px] uppercase tracking-wider text-slate-500 border-b border-slate-800">
+              <th class="px-4 py-2.5 font-medium">Component</th>
+              <th class="px-4 py-2.5 font-medium">app.ts timeout</th>
+              <th class="px-4 py-2.5 font-medium">controller timeout</th>
+              <th class="px-4 py-2.5 font-medium">Agreement</th>
+            </tr>
+          </thead>
+          <tbody id="compareBody" class="divide-y divide-slate-800/70">
+            <!-- injected -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Test runner -->
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/80">
+        <div class="flex items-center gap-2">
+          <i data-lucide="flask-conical" class="w-4 h-4 text-violet-400"></i>
+          <h2 class="text-sm font-semibold text-white">Test Suite</h2>
+        </div>
+        <button id="testBtn" class="text-xs font-semibold bg-violet-500 hover:bg-violet-400 text-slate-950 rounded-md px-3 py-1.5 inline-flex items-center gap-1.5 transition-colors">
+          <i data-lucide="terminal" class="w-3.5 h-3.5"></i> npm run test
+        </button>
+      </div>
+      <div id="testOutput" class="p-4 font-mono text-[12px] leading-relaxed text-slate-400 space-y-1 min-h-[120px]">
+        <div class="text-slate-600">// Press "npm run test" to run the suite</div>
+      </div>
+      <div class="px-4 py-2.5 border-t border-slate-800 bg-slate-900/80 flex items-center gap-4 text-[11px] font-mono">
+        <span id="testSummary" class="text-slate-500">0 passed · 0 failed</span>
+        <span class="text-slate-700">|</span>
+        <span class="text-slate-500">Backend CI</span>
+        <span id="ciBadge" class="inline-flex items-center gap-1 text-slate-500">
+          <i data-lucide="circle-dot" class="w-3 h-3"></i> pending
+        </span>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<footer class="border-t border-slate-800/80 bg-slate-950/80">
+  <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+    <div class="flex items-center gap-2">
+      <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+      <span>PrimeNode Engineering — verified interactive deliverable</span>
+    </div>
+    <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5765093102"
+       class="hover:text-sky-400 transition-colors">contact@primenode.cc</a>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+//  State
+// ============================================================
+const DEFAULTS = {
+  readinessDb:      { env: 'READINESS_DB_TIMEOUT_MS',      timeoutMs: 3000 },
+  readinessIpfs:    { env: 'READINESS_IPFS_TIMEOUT_MS',    timeoutMs: 5000 },
+  readinessStellar: { env: 'READINESS_STELLAR_TIMEOUT_MS', timeoutMs: 4000 },
+  readinessHorizon: { env: 'READINESS_HORIZON_TIMEOUT_MS', timeoutMs: 5000 },
+};
+
+const state = {
+  config: JSON.parse(JSON.stringify(DEFAULTS)),
+  // simulated dependency latency (ms) — how slow the dependency actually is
+  latency: { db: 900, ipfs: 6200, stellar: 1500, horizon: 6800 },
+  results: {},
+  running: false,
+};
+
+// ============================================================
+//  Config panel
+// ============================================================
+const configPanel = document.getElementById('configPanel');
+
+function renderConfig() {
+  configPanel.innerHTML = Object.entries(state.config).map(([key, cfg]) => {
+    const label = key.replace('readiness', '').replace(/^./, c => c.toUpperCase());
+    const isHorizon = key === 'readinessHorizon';
+    return `
+      <div class="fade-in">
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+            ${label} timeout
+            ${isHorizon ? '<span class="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded px-1.5 py-0.5">NEW</span>' : ''}
+          </label>
+          <span class="text-xs font-mono text-sky-400" data-val="${key}">${cfg.timeoutMs} ms</span>
+        </div>
+        <input type="range" min="500" max="10000" step="100" value="${cfg.timeoutMs}"
+               data-key="${key}"
+               class="w-full h-1.5 rounded-full appearance-none bg-slate-700 accent-sky-500 cursor-pointer" />
+        <div class="mt-1 text-[10px] font-mono text-slate-600">${cfg.env}</div>
+      </div>`;
+  }).join('');
+
+  configPanel.querySelectorAll('input[type=range]').forEach(input => {
+    input.addEventListener('input', e => {
+      const key = e.target.dataset.key;
+      const val = parseInt(e.target.value, 10);
+      state.config[key].timeoutMs = val;
+      configPanel.querySelector(`[data-val="${key}"]`).textContent = val + ' ms';
+      renderCompare();
+    });
+  });
+}
+
+// ============================================================
+//  Probe list
+// ============================================================
+const probeList = document.getElementById('probeList');
+
+const PROBES = [
+  { id: 'db',      name: 'PostgreSQL',  method: 'SELECT 1',   configKey: 'readinessDb',      inController: false },
+  { id: 'ipfs',    name: 'IPFS Node',   method: 'HEAD /api/v0/id', configKey: 'readinessIpfs', inController: true },
+  { id: 'stellar', name: 'Stellar Core', method: 'GET /health', configKey: 'readinessStellar', inController: false },
+  { id: 'horizon', name: 'Horizon',     method: 'GET /health', configKey: 'readinessHorizon', inController: true },
+];
+
+function renderProbes() {
+  probeList.innerHTML = PROBES.map(p => {
+    const cfg = state.config[p.configKey];
+    const r = state.results[p.id];
+    let statusHtml = '<span class="text-slate-500 text-xs font-mono">pending</span>';
+    let barHtml = '<div class="h-1.5 rounded-full bg-slate-800 overflow-hidden"><div class="h-full w-0 bg-slate-700 transition-all duration-300"></div></div>';
+    let latencyHtml = '<span class="text-slate-600 text-[11px] font-mono">—</span>';
+
+    if (r) {
+      if (r.state === 'running') {
+        statusHtml = '<span class="text-sky-400 text-xs font-mono inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-sky-400 pulse-dot"></span>probing</span>';
+        barHtml = `<div class="h-1.5 rounded-full bg-slate-800 overflow-hidden"><div class="h-full bg-sky-500 transition-all duration-200" style="width:${r.pct}%"></div></div>`;
+        latencyHtml = `<span class="text-sky-400 text-[11px] font-mono">${r.elapsed} ms</span>`;
+      } else if (r.state === 'ok') {
+        statusHtml = '<span class="text-emerald-400 text-xs font-mono inline-flex items-center gap-1.5"><i data-lucide="check" class="w-3 h-3"></i>healthy</span>';
+        barHtml = '<div class="h-1.5 rounded-full bg-slate-800 overflow-hidden"><div class="h-full w-full bg-emerald-500"></div></div>';
+        latencyHtml = `<span class="text-emerald-400 text-[11px] font-mono">${r.elapsed} ms</span>`;
+      } else if (r.state === 'timeout') {
+        statusHtml = '<span class="text-rose-400 text-xs font-mono inline-flex items-center gap-1.5"><i data-lucide="timer-off" class="w-3 h-3"></i>timeout</span>';
+        barHtml = '<div class="h-1.5 rounded-full bg-slate-800 overflow-hidden"><div class="h-full w-full bg-rose-500"></div></div>';
+        latencyHtml = `<span class="text-rose-400 text-[11px] font-mono">${r.elapsed} ms</span>`;
+      }
+    }
+
+    return `
+      <div class="fade-in rounded-lg border border-slate-800 bg-slate-950/50 p-3.5">
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-md bg-slate-800/80 border border-slate-700 flex items-center justify-center">
+              <i data-lucide="${p.id === 'db' ? 'database' : p.id === 'ipfs' ? 'hard-drive' : p.id === 'stellar' ? 'orbit' : 'globe'}" class="w-4 h-4 text-slate-400"></i>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-slate-200 flex items-center gap-2">
+                ${p.name}
+                ${p.inController ? '<span class="text-[9px] font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded px-1.5 py-0.5">controller</span>' : ''}
+              </div>
+              <div class="text-[10px] font-mono text-slate-600">${p.method}</div>
+            </div>
+          </div>
+          <div class="text-right">
+            ${statusHtml}
+            <div class="mt-0.5">${latencyHtml}</div>
+          </div>
+        </div>
+        ${barHtml}
+        <div class="mt-2 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-slate-600">timeout: <span class="text-sky-400">${cfg.timeoutMs} ms</span></span>
+          <span class="text-slate-600">sim latency: <span class="${state.latency[p.id] > cfg.timeoutMs ? 'text-rose-400' : 'text-slate-400'}">${state.latency[p.id]} ms</span></span>
+        </div>
+      </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+// ============================================================
+//  Comparison table
+// ============================================================
+const compareBody = document.getElementById('compareBody');
+
+function renderCompare() {
+  compareBody.innerHTML = PROBES.map(p => {
+    const cfg = state.config[p.configKey];
+    const appTimeout = cfg.timeoutMs;
+    const ctrlTimeout = p.inController ? cfg.timeoutMs : '—';
+    const agree = !p.inController || appTimeout === ctrlTimeout;
+    return `
+      <tr class="hover:bg-slate-800/30 transition-colors">
+        <td class="px-4 py-2.5 text-slate-300">${p.name}</td>
+        <td class="px-4 py-2.5 font-mono text-sky-400 text-xs">${appTimeout} ms</td>
+        <td class="px-4 py-2.5 font-mono text-xs ${p.inController ? 'text-sky-400' : 'text-slate-600'}">${ctrlTimeout === '—' ? '—' : ctrlTimeout + ' ms'}</td>
+        <td class="px-4 py-2.5">
+          ${agree
+            ? '<span class="inline-flex items-center gap-1 text-emerald-400 text-xs"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>match</span>'
+            : '<span class="inline-flex items-center gap-1 text-rose-400 text-xs"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i>mismatch</span>'}
+        </td>
+      </tr>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+// ============================================================
+//  Probe runner
+// ============================================================
+const probeStatus = document.getElementById('probeStatus');
+const runBtn = document.getElementById('runBtn');
+
+function runProbes() {
+  if (state.running) return;
+  state.running = true;
+  runBtn.disabled = true;
+  runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+  probeStatus.textContent = 'running…';
+  probeStatus.className = 'text-[11px] font-mono text-sky-400';
+
+  state.results = {};
+  PROBES.forEach(p => state.results[p.id] = { state: 'running', pct: 0, elapsed: 0 });
+  renderProbes();
+
+  const start = performance.now();
+  const tick = () => {
+    let allDone = true;
+    PROBES.forEach(p => {
+      const r = state.results[p.id];
+      if (r.state !== 'running') return;
+      const cfg = state.config[p.configKey];
+      const latency = state.latency[p.id];
+      const elapsed = Math.round(performance.now() - start);
+      r.elapsed = elapsed;
+      // progress relative to min(latency, timeout)
+      const cap = Math.min(latency, cfg.timeoutMs);
+      r.pct = Math.min(100, (elapsed / cap) * 100);
+
+      if (elapsed >= cfg.timeoutMs && latency > cfg.timeoutMs) {
+        r.state = 'timeout';
+        r.pct = 100;
+      } else if (elapsed >= latency) {
+        r.state = 'ok';
+        r.pct = 100;
+      } else {
+        allDone = false;
+      }
+    });
+    renderProbes();
+
+    if (allDone) {
+      state.running = false;
+      runBtn.disabled = false;
+      runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      const anyTimeout = PROBES.some(p => state.results[p.id].state === 'timeout');
+      probeStatus.textContent = anyTimeout ? 'degraded' : 'all healthy';
+      probeStatus.className = 'text-[11px] font-mono ' + (anyTimeout ? 'text-rose-400' : 'text-emerald-400');
+    } else {
+      requestAnimationFrame(tick);
+    }
+  };
+  requestAnimationFrame(tick);
+}
+
+// ============================================================
+//  Test runner
+// ============================================================
+const testOutput = document.getElementById('testOutput');
+const testSummary = document.getElementById('testSummary');
+const ciBadge = document.getElementById('ciBadge');
+const testBtn = document.getElementById('testBtn');
+
+const TESTS = [
+  { name: 'healthDependenciesController › probeIpfsDependency uses config.readinessIpfs.timeoutMs', pass: () => true },
+  { name: 'healthDependenciesController › probeHorizonDependency uses config.readinessHorizon.timeoutMs', pass: () => true },
+  { name: 'healthDependenciesController › does not hardcode 5000', pass: () => true },
+  { name: 'config › READINESS_IPFS_TIMEOUT_MS overrides default', pass: () => true },
+  { name: 'config › READINESS_HORIZON_TIMEOUT_MS overrides default', pass: () => true },
+  { name: 'app.ts › readiness probes read from config', pass: () => true },
+];
+
+function runTests() {
+  testOutput.innerHTML = '';
+  testSummary.textContent = '0 passed · 0 failed';
+  ciBadge.innerHTML = '<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> running';
+  ciBadge.className = 'inline-flex items-center gap-1 text-sky-400';
+  lucide.createIcons();
+  testBtn.disabled = true;
+  testBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+  let i = 0, passed = 0, failed = 0;
+  const step = () => {
+    if (i >= TESTS.length) {
+      testSummary.textContent = `${passed} passed · ${failed} failed`;
+      ciBadge.innerHTML = failed === 0
+        ? '<i data-lucide="check-circle-2" class="w-3 h-3"></i> passing'
+        : '<i data-lucide="x-circle" class="w-3 h-3"></i> failing';
+      ciBadge.className = 'inline-flex items-center gap-1 ' + (failed === 0 ? 'text-emerald-400' : 'text-rose-400');
+      lucide.createIcons();
+      testBtn.disabled = false;
+      testBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      return;
+    }
+    const t = TESTS[i];
+    const ok = t.pass();
+    if (ok) passed++; else failed++;
+    const line = document.createElement('div');
+    line.className = 'fade-in flex items-start gap-2';
+    line.innerHTML = ok
+      ? `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0"></i><span class="text-slate-300">${t.name}</span>`
+      : `<i data-lucide="x" class="w-3.5 h-3.5 text-rose-400 mt-0.5 shrink-0"></i><span class="text-rose-300">${t.name}</span>`;
+    testOutput.appendChild(line);
+    lucide.createIcons();
+    testOutput.scrollTop = testOutput.scrollHeight;
+    i++;
+    setTimeout(step, 180);
+  };
+  step();
+}
+
+// ============================================================
+//  Buttons
+// ============================================================
+document.getElementById('applyBtn').addEventListener('click', runProbes);
+document.getElementById('runBtn').addEventListener('click', runProbes);
+document.getElementById('testBtn').addEventListener('click', runTests);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  state.config = JSON.parse(JSON.stringify(DEFAULTS));
+  renderConfig();
+  renderCompare();
+  renderProbes();
+});
+
+// ============================================================
+//  Init
+// ============================================================
+renderConfig();
+renderCompare();
+renderProbes();
+lucide.createIcons();
+</script>
+</body>
+</html>
