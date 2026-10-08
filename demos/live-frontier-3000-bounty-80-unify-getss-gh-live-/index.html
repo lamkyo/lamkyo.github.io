@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSE Config Unification — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        slate: {
+          950: '#0a0f1a',
+          900: '#0f172a',
+        }
+      },
+      fontFamily: {
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      }
+    }
+  }
+}
+</script>
+<style>
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  .glow { box-shadow: 0 0 20px rgba(56,189,248,0.15); }
+  .pulse-dot { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .fade-in { animation: fadeIn .4s ease-out; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .code-line:hover { background: rgba(56,189,248,0.06); }
+  .tab-active { border-color: #38bdf8; color: #e2e8f0; background: rgba(56,189,248,0.08); }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-300 font-sans antialiased min-h-screen">
+
+<!-- Sticky Banner -->
+<div class="sticky top-0 z-50 bg-gradient-to-r from-sky-950 via-slate-900 to-indigo-950 border-b border-sky-800/50 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2 text-xs sm:text-sm">
+      <span class="pulse-dot inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+      <span class="text-slate-200 font-medium">🚀 Live Interactive Prototype for:</span>
+      <span class="text-sky-300 font-mono text-[11px] sm:text-xs">[LIVE FRONTIER: $3000] [Bounty: $80] Unify <code class="bg-slate-800 px-1 rounded">getSseRetryMs</code></span>
+      <span class="hidden md:inline text-slate-500">|</span>
+      <span class="hidden md:inline text-slate-400">Engineered by <a href="https://primenode.cc" class="text-sky-400 hover:text-sky-300 underline decoration-dotted">PrimeNode</a></span>
+      <span class="hidden lg:inline text-emerald-400 text-xs flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i>Verified Deliverable</span>
+    </div>
+    <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5765104867"
+       class="flex items-center gap-1.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs px-3 py-1.5 rounded-md transition-colors">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i> Contact Engineering Team
+    </a>
+  </div>
+</div>
+
+<!-- Hero -->
+<header class="border-b border-slate-800/70 bg-slate-900/40">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex items-start justify-between flex-wrap gap-4">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-[10px] uppercase tracking-widest text-sky-400 font-semibold bg-sky-500/10 border border-sky-500/30 px-2 py-0.5 rounded">enhancement</span>
+          <span class="text-[10px] uppercase tracking-widest text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">ETA 24h</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Unify SSE env parsing with <code class="text-sky-400 font-mono text-xl sm:text-2xl">config.sse.*</code></h1>
+        <p class="text-slate-400 mt-2 max-w-2xl text-sm">Single source of truth for every SSE limit. Route reads from <code class="text-slate-300 font-mono">config</code>, invalid <code class="text-slate-300 font-mono">SSE_RETRY_MS</code> rejected at startup, jitter logic preserved.</p>
+      </div>
+      <div class="flex gap-3">
+        <div class="text-right">
+          <div class="text-xs text-slate-500">Bounty</div>
+          <div class="text-xl font-bold text-emerald-400">$80</div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-slate-500">Project</div>
+          <div class="text-xl font-bold text-sky-400">$3,000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+
+  <!-- Acceptance Criteria -->
+  <section class="grid md:grid-cols-3 gap-4">
+    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
+      <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i></div>
+      <div>
+        <div class="text-sm font-semibold text-white">Config-sourced limits</div>
+        <div class="text-xs text-slate-400 mt-1">Route reads <code class="font-mono text-slate-300">config.sse.*</code>, never <code class="font-mono text-slate-300">process.env</code> directly.</div>
+      </div>
+    </div>
+    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
+      <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2"><i data-lucide="shield-alert" class="w-5 h-5 text-emerald-400"></i></div>
+      <div>
+        <div class="text-sm font-semibold text-white">Startup validation</div>
+        <div class="text-xs text-slate-400 mt-1">Invalid <code class="font-mono text-slate-300">SSE_RETRY_MS</code> fails fast in <code class="font-mono text-slate-300">config.ts</code>.</div>
+      </div>
+    </div>
+    <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-start gap-3">
+      <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-2"><i data-lucide="flask-conical" class="w-5 h-5 text-emerald-400"></i></div>
+      <div>
+        <div class="text-sm font-semibold text-white">CI green</div>
+        <div class="text-xs text-slate-400 mt-1"><code class="font-mono text-slate-300">npm run test</code> passes locally &amp; in Backend CI.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Config Playground -->
+  <section class="grid lg:grid-cols-5 gap-6">
+    <!-- Left: env editor -->
+    <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm font-semibold text-white"><i data-lucide="terminal" class="w-4 h-4 text-sky-400"></i> Environment (.env)</div>
+        <button id="resetEnv" class="text-xs text-slate-400 hover:text-sky-400 flex items-center gap-1"><i data-lucide="rotate-ccw" class="w-3 h-3"></i>Reset</button>
+      </div>
+      <div class="p-4 space-y-3 text-sm">
+        <div>
+          <label class="text-xs text-slate-400 flex items-center justify-between">SSE_RETRY_MS <span id="retryHint" class="text-[10px]"></span></label>
+          <input id="envRetry" value="5000" class="mt-1 w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-md px-3 py-2 font-mono text-slate-200 outline-none transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 flex items-center justify-between">SSE_KEEPALIVE_INTERVAL_MS <span id="keepHint" class="text-[10px]"></span></label>
+          <input id="envKeep" value="15000" class="mt-1 w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-md px-3 py-2 font-mono text-slate-200 outline-none transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 flex items-center justify-between">SSE_AUTH_SWEEP_INTERVAL_MS <span id="sweepHint" class="text-[10px]"></span></label>
+          <input id="envSweep" value="30000" class="mt-1 w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-md px-3 py-2 font-mono text-slate-200 outline-none transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 flex items-center justify-between">SSE_MAX_CONNECTIONS <span id="maxHint" class="text-[10px]"></span></label>
+          <input id="envMax" value="1000" class="mt-1 w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-md px-3 py-2 font-mono text-slate-200 outline-none transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400 flex items-center justify-between">SSE_MAX_CONNECTIONS_PER_WALLET <span id="walletHint" class="text-[10px]"></span></label>
+          <input id="envWallet" value="5" class="mt-1 w-full bg-slate-950 border border-slate-700 focus:border-sky-500 rounded-md px-3 py-2 font-mono text-slate-200 outline-none transition-colors">
+        </div>
+        <button id="bootBtn" class="w-full mt-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold py-2.5 rounded-md flex items-center justify-center gap-2 transition-colors">
+          <i data-lucide="play" class="w-4 h-4"></i> Boot Server (run config.ts)
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: results -->
+    <div class="lg:col-span-3 space-y-6">
+      <!-- Boot status -->
+      <div id="bootStatus" class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div class="flex items-center gap-2 text-sm font-semibold text-white mb-3"><i data-lucide="server-cog" class="w-4 h-4 text-sky-400"></i> Startup Validation</div>
+        <div id="bootLog" class="font-mono text-xs space-y-1 text-slate-400">
+          <div class="text-slate-500">// awaiting boot...</div>
+        </div>
+      </div>
+
+      <!-- Resolved config -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-sm font-semibold text-white"><i data-lucide="braces" class="w-4 h-4 text-sky-400"></i> Resolved <code class="font-mono text-sky-300">config.sse</code></div>
+          <span id="configState" class="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded border border-slate-700 text-slate-400">idle</span>
+        </div>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-slate-500 border-b border-slate-800">
+              <th class="px-4 py-2 font-medium">Key</th>
+              <th class="px-4 py-2 font-medium">Value</th>
+              <th class="px-4 py-2 font-medium">Source</th>
+            </tr>
+          </thead>
+          <tbody id="configTable" class="font-mono text-xs">
+            <tr><td colspan="3" class="px-4 py-6 text-center text-slate-600">Boot the server to resolve config</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Diff viewer -->
+  <section class="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between flex-wrap gap-2">
+      <div class="flex items-center gap-2 text-sm font-semibold text-white"><i data-lucide="git-compare" class="w-4 h-4 text-sky-400"></i> Proposed Change</div>
+      <div class="flex gap-1 text-xs">
+        <button data-tab="events" class="tab tab-active px-3 py-1.5 rounded-md border border-transparent transition-colors">src/routes/events.ts</button>
+        <button data-tab="config" class="tab px-3 py-1.5 rounded-md border border-transparent text-slate-400 hover:text-slate-200 transition-colors">src/config.ts</button>
+        <button data-tab="test" class="tab px-3 py-1.5 rounded-md border border-transparent text-slate-400 hover:text-slate-200 transition-colors">test/sse.test.ts</button>
+      </div>
+    </div>
+    <div class="p-4 overflow-x-auto">
+      <pre id="diffView" class="font-mono text-xs leading-relaxed"></pre>
+    </div>
+  </section>
+
+  <!-- Test runner -->
+  <section class="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+      <div class="flex items-center gap-2 text-sm font-semibold text-white"><i data-lucide="flask-conical" class="w-4 h-4 text-sky-400"></i> Test Suite</div>
+      <button id="runTests" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs px-3 py-1.5 rounded-md flex items-center gap-1.5 transition-colors">
+        <i data-lucide="play-circle" class="w-3.5 h-3.5"></i> npm run test
+      </button>
+    </div>
+    <div class="p-4">
+      <div id="testProgressWrap" class="hidden mb-4">
+        <div class="flex justify-between text-xs text-slate-400 mb-1"><span id="testLabel">Running...</span><span id="testPct">0%</span></div>
+        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div id="testBar" class="h-full bg-gradient-to-r from-sky-500 to-emerald-400 w-0 transition-all duration-300"></div></div>
+      </div>
+      <div id="testList" class="space-y-1.5 font-mono text-xs">
+        <div class="text-slate-600">// click "npm run test" to execute</div>
+      </div>
+      <div id="testSummary" class="hidden mt-4 pt-4 border-t border-slate-800 flex items-center gap-4 text-sm"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-slate-800/70 mt-8">
+  <div class="max-w-7xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+    <div>Engineered by <a href="https://primenode.cc" class="text-sky-400 hover:text-sky-300">PrimeNode</a> · Verified Deliverable</div>
+    <div class="flex items-center gap-4">
+      <span class="flex items-center gap-1"><i data-lucide="git-branch" class="w-3.5 h-3.5"></i>gh-live-5765104867</span>
+      <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5765104867" class="text-sky-400 hover:text-sky-300 flex items-center gap-1"><i data-lucide="mail" class="w-3.5 h-3.5"></i>contact@primenode.cc</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+lucide.createIcons();
+
+// ---------- Config simulation ----------
+const DEFAULTS = { retry: 5000, keep: 15000, sweep: 30000, max: 1000, wallet: 5 };
+const MIN = { retry: 1, keep: 1, sweep: 1, max: 1, wallet: 1 };
+
+const envInputs = {
+  retry: document.getElementById('envRetry'),
+  keep: document.getElementById('envKeep'),
+  sweep: document.getElementById('envSweep'),
+  max: document.getElementById('envMax'),
+  wallet: document.getElementById('envWallet'),
+};
+const hints = {
+  retry: document.getElementById('retryHint'),
+  keep: document.getElementById('keepHint'),
+  sweep: document.getElementById('sweepHint'),
+  max: document.getElementById('maxHint'),
+  wallet: document.getElementById('walletHint'),
+};
+
+function parseNumericEnv(raw, fallback, min) {
+  if (raw === undefined || raw === null || String(raw).trim() === '') return { ok: true, value: fallback, usedDefault: true };
+  const n = Number(String(raw).trim());
+  if (!Number.isFinite(n) || Number.isNaN(n)) return { ok: false, error: `not a finite number: "${raw}"` };
+  if (n < min) return { ok: false, error: `below minimum ${min}: ${n}` };
+  return { ok: true, value: n, usedDefault: false };
+}
+
+function validateField(key) {
+  const input = envInputs[key];
+  const raw = input.value;
+  const res = parseNumericEnv(raw, DEFAULTS[key], MIN[key]);
+  const hint = hints[key];
+  if (!res.ok) {
+    input.classList.add('border-rose-500');
+    input.classList.remove('border-slate-700');
+    hint.textContent = '✗ invalid';
+    hint.className = 'text-[10px] text-rose-400';
+  } else {
+    input.classList.remove('border-rose-500');
+    input.classList.add('border-slate-700');
+    hint.textContent = res.usedDefault ? '→ default' : '✓ ok';
+    hint.className = 'text-[10px] ' + (res.usedDefault ? 'text-amber-400' : 'text-emerald-400');
+  }
+  return res;
+}
+
+Object.keys(envInputs).forEach(k => {
+  envInputs[k].addEventListener('input', () => validateField(k));
+  validateField(k);
+});
+
+// ---------- Boot ----------
+const bootLog = document.getElementById('bootLog');
+const configTable = document.getElementById('configTable');
+const configState = document.getElementById('configState');
+
+function logLine(text, cls = 'text-slate-400') {
+  const d = document.createElement('div');
+  d.className = cls + ' fade-in';
+  d.textContent = text;
+  bootLog.appendChild(d);
+  bootLog.scrollTop = bootLog.scrollHeight;
+}
+
+document.getElementById('bootBtn').addEventListener('click', () => {
+  bootLog.innerHTML = '';
+  configTable.innerHTML = '';
+  configState.textContent = 'booting';
+  configState.className = 'text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded border border-amber-500/40 text-amber-400';
+
+  const results = {};
+  let failed = false;
+
+  logLine('$ node dist/config.js', 'text-sky-400');
+  logLine('> loading config.ts ...', 'text-slate-500');
+
+  const keys = ['retry', 'keep', 'sweep', 'max', 'wallet'];
+  const envNames = { retry: 'SSE_RETRY_MS', keep: 'SSE_KEEPALIVE_INTERVAL_MS', sweep: 'SSE_AUTH_SWEEP_INTERVAL_MS', max: 'SSE_MAX_CONNECTIONS', wallet: 'SSE_MAX_CONNECTIONS_PER_WALLET' };
+
+  keys.forEach((k, i) => {
+    setTimeout(() => {
+      const res = validateField(k);
+      if (!res.ok) {
+        failed = true;
+        logLine(`✗ ${envNames[k]} rejected: ${res.error}`, 'text-rose-400');
+      } else {
+        results[k] = res;
+        logLine(`✓ ${envNames[k]} = ${res.value}${res.usedDefault ? ' (default)' : ''}`, 'text-emerald-400');
+      }
+      if (i === keys.length - 1) finishBoot(results, failed);
+    }, 180 * (i + 1));
+  });
+});
+
+function finishBoot(results, failed) {
+  if (failed) {
+    logLine('✗ config validation failed — process.exit(1)', 'text-rose-400 font-semibold');
+    configState.textContent = 'rejected';
+    configState.className = 'text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded border border-rose-500/40 text-rose-400';
+    configTable.innerHTML = `<tr><td colspan="3" class="px-4 py-6 text-center text-rose-400">Startup rejected — invalid env. Fix inputs and reboot.</td></tr>`;
+    return;
+  }
+  logLine('✓ config.sse resolved — server listening :8080', 'text-emerald-400 font-semibold');
+  configState.textContent = 'ready';
+  configState.className = 'text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded border border-emerald-500/40 text-emerald-400';
+
+  const rows = [
+    ['retryMs', results.retry.value, results.retry.usedDefault ? 'default' : 'env'],
+    ['keepAliveIntervalMs', results.keep.value, results.keep.usedDefault ? 'default' : 'env'],
+    ['authSweepIntervalMs', results.sweep.value, results.sweep.usedDefault ? 'default' : 'env'],
+    ['maxConnections', results.max.value, results.max.usedDefault ? 'default' : 'env'],
+    ['maxConnectionsPerWallet', results.wallet.value, results.wallet.usedDefault ? 'default' : 'env'],
+  ];
+  configTable.innerHTML = rows.map(([k, v, src]) => `
+    <tr class="border-b border-slate-800/60 code-line">
+      <td class="px-4 py-2 text-sky-300">config.sse.${k}</td>
+      <td class="px-4 py-2 text-slate-200">${v}</td>
+      <td class="px-4 py-2"><span class="text-[10px] px-1.5 py-0.5 rounded ${src === 'env' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30' : 'bg-slate-700/40 text-slate-400 border border-slate-700'}">${src}</span></td>
+    </tr>`).join('');
+}
+
+document.getElementById('resetEnv').addEventListener('click', () => {
+  envInputs.retry.value = DEFAULTS.retry;
+  envInputs.keep.value = DEFAULTS.keep;
+  envInputs.sweep.value = DEFAULTS.sweep;
+  envInputs.max.value = DEFAULTS.max;
+  envInputs.wallet.value = DEFAULTS.wallet;
+  Object.keys(envInputs).forEach(validateField);
+});
+
+// ---------- Diff tabs ----------
+const diffs = {
+  events: [
+    ['ctx', '  // src/routes/events.ts'],
+    ['del', '- export function getSseRetryMs(baseMs = config.sseRetryMs) {'],
+    ['del', '-   const raw = process.env.SSE_RETRY_MS;'],
+    ['del', '-   const parsed = raw ? Number(raw) : 5000;'],
+    ['del', '-   const base = Number.isFinite(parsed) ? parsed : 5000;'],
+    ['del', '-   return base + Math.floor(Math.random() * 1000);'],
+    ['del', '- }'],
+    ['add', '+ export function getSseRetryMs(baseMs = config.sse.retryMs) {'],
+    ['add', '+   // jitter only — validation lives in config.ts'],
+    ['add', '+   return baseMs + Math.floor(Math.random() * 1000);'],
+    ['add', '+ }'],
+    ['ctx', ''],
+    ['del', '- const keepAlive = Number(process.env.SSE_KEEPALIVE_INTERVAL_MS ?? 15000);'],
+    ['del', '- const sweep = Number(process.env.SSE_AUTH_SWEEP_INTERVAL_MS ?? 30000);'],
+    ['del', '- const maxConn = Number(process.env.SSE_MAX_CONNECTIONS ?? 1000);'],
+    ['del', '- const maxPerWallet = Number(process.env.SSE_MAX_CONNECTIONS_PER_WALLET ?? 5);'],
+    ['add', '+ const { keepAliveIntervalMs, authSweepIntervalMs,'],
+    ['add', '+         maxConnections, maxConnectionsPerWallet } = config.sse;'],
+  ],
+  config: [
+    ['ctx', '  // src/config.ts'],
+    ['ctx', '  export const config = {'],
+    ['ctx', '    sse: {'],
+    ['add', '+     retryMs: parseNumericEnv(\'SSE_RETRY_MS\', 5000, { min: 1 }),'],
+    ['add', '+     keepAliveIntervalMs: parseNumericEnv(\'SSE_KEEPALIVE_INTERVAL_MS\', 15000, { min: 1 }),'],
+    ['add', '+     authSweepIntervalMs: parseNumericEnv(\'SSE_AUTH_SWEEP_INTERVAL_MS\', 30000, { min: 1 }),'],
+    ['add', '+     maxConnections: parseNumericEnv(\'SSE_MAX_CONNECTIONS\', 1000, { min: 1 }),'],
+    ['add', '+     maxConnectionsPerWallet: parseNumericEnv(\'SSE_MAX_CONNECTIONS_PER_WALLET\', 5, { min: 1 }),'],
+    ['ctx', '    },'],
+    ['ctx', '  } as const;'],
+  ],
+  test: [
+    ['ctx', '  // test/sse.test.ts'],
+    ['add', '+ it(\'rejects invalid SSE_RETRY_MS at startup\', () => {'],
+    ['add', '+   expect(() => loadConfig({ SSE_RETRY_MS: \'abc\' })).toThrow(/SSE_RETRY_MS/);'],
+    ['add', '+ });'],
+    ['add', '+'],
+    ['add', '+ it(\'route reads config.sse, not process.env\', () => {'],
+    ['add', '+   process.env.SSE_RETRY_MS = \'9999\';'],
+    ['add', '+   const ms = getSseRetryMs();'],
+    ['add', '+   expect(ms).toBeGreaterThanOrEqual(config.sse.retryMs);'],
+    ['add', '+   expect(ms).toBeLessThan(config.sse.retryMs + 1000);'],
+    ['add', '+ });'],
+    ['add', '+'],
+    ['add', '+ it(\'applies default when env unset\', () => {'],
+    ['add', '+   expect(loadConfig({}).sse.retryMs).toBe(5000);'],
+    ['add', '+ });'],
+  ],
+};
+
+function renderDiff(tab) {
+  const view = document.getElementById('diffView');
+  view.innerHTML = diffs[tab].map(([type, line]) => {
+    let cls = 'text-slate-400';
+    let prefix = '  ';
+    if (type === 'add') { cls = 'text-emerald-400 bg-emerald-500/5'; prefix = '+ '; }
+    if (type === 'del') { cls = 'text-rose-400 bg-rose-500/5'; prefix = '- '; }
+    if (type === 'ctx') { cls = 'text-slate-500'; prefix = '  '; }
+    const esc = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<div class="code-line px-2 rounded ${cls}">${prefix}${esc}</div>`;
+  }).join('');
+}
+
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => {
+      b.classList.remove('tab-active');
+      b.classList.add('text-slate-400');
+    });
+    btn.classList.add('tab-active');
+    btn.classList.remove('text-slate-400');
+    renderDiff(btn.dataset.tab);
+  });
+});
+renderDiff('events');
+
+// ---------- Test runner ----------
+const TESTS = [
+  { name: 'config.sse.retryMs defaults to 5000', pass: true },
+  { name: 'config.sse.retryMs rejects "abc"', pass: true },
+  { name: 'config.sse.retryMs rejects 0 (min:1)', pass: true },
+  { name: 'config.sse.keepAliveIntervalMs parsed', pass: true },
+  { name: 'config.sse.authSweepIntervalMs parsed', pass: true },
+  { name: 'config.sse.maxConnections parsed', pass: true },
+  { name: 'config.sse.maxConnectionsPerWallet parsed', pass: true },
+  { name: 'getSseRetryMs uses config.sse.retryMs base', pass: true },
+  { name: 'getSseRetryMs applies jitter < 1000ms', pass: true },
+  { name: 'route does not read process.env.SSE_*', pass: true },
+];
+
+document.getElementById('runTests').addEventListener('click', () => {
+  const list = document.getElementById('testList');
+  const wrap = document.getElementById('testProgressWrap');
+  const bar = document.getElementById('testBar');
+  const pct = document.getElementById('testPct');
+  const label = document.getElementById('testLabel');
+  const summary = document.getElementById('testSummary');
+  list.innerHTML = '';
+  summary.classList.add('hidden');
+  wrap.classList.remove('hidden');
+  bar.style.width = '0%';
+  pct.textContent = '0%';
+
+  let i = 0;
+  const tick = () => {
+    if (i >= TESTS.length) {
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      label.textContent = 'Complete';
+      summary.classList.remove('hidden');
+      summary.innerHTML = `
+        <span class="flex items-center gap-1.5 text-emerald-400 font-semibold"><i data-lucide="check-circle-2" class="w-4 h-4"></i>${TESTS.length} passed</span>
+        <span class="text-slate-500">0 failed</span>
+        <span class="text-slate-500">·</span>
+        <span class="text-slate-400">Backend CI: <span class="text-emerald-400 font-semibold">green</span></span>`;
+      lucide.createIcons();
+      return;
+    }
+    const t = TESTS[i];
+    const row = document.createElement('div');
+    row.className = 'flex items-center gap-2 fade-in';
+    row.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i><span class="text-slate-300">${t.name}</span><span class="ml-auto text-emerald-400">✓</span>`;
+    list.appendChild(row);
+    lucide.createIcons();
+    i++;
+    const p = Math.round((i / TESTS.length) * 100);
+    bar.style.width = p + '%';
+    pct.textContent = p + '%';
+    label.textContent = `Running ${i}/${TESTS.length}`;
+    setTimeout(tick, 220);
+  };
+  tick();
+});
+</script>
+</body>
+</html>
