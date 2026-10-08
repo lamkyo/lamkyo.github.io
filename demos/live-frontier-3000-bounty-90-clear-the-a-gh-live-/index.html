@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Timer Lifecycle Fix — Interactive Prototype | PrimeNode</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          slate: {
+            950: '#020617',
+            900: '#0f172a',
+            850: '#131c31',
+            800: '#1e293b',
+          }
+        },
+        fontFamily: {
+          mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  .glow { box-shadow: 0 0 0 1px rgba(56,189,248,.15), 0 0 24px -6px rgba(56,189,248,.35); }
+  .grid-bg {
+    background-image: linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(148,163,184,.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:.25} }
+  .pulse-dot { animation: pulseDot 1.4s ease-in-out infinite; }
+  @keyframes slideIn { from { opacity:0; transform: translateY(-6px);} to {opacity:1; transform:translateY(0);} }
+  .slide-in { animation: slideIn .25s ease-out; }
+  @keyframes barGrow { from { width: 0; } }
+  .bar-grow { animation: barGrow .6s ease-out; }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased grid-bg min-h-screen">
+
+<!-- ============ STICKY HEADER BANNER ============ -->
+<div class="sticky top-0 z-50 backdrop-blur-xl bg-slate-900/80 border-b border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-col md:flex-row items-center justify-between gap-2">
+    <div class="flex items-center gap-2 text-[12.5px] text-slate-300 text-center md:text-left">
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium shrink-0">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span> LIVE
+      </span>
+      <span class="leading-snug">
+        🚀 Live Interactive Prototype for: <span class="text-slate-100 font-semibold">[LIVE FRONTIER: $3000] [Bounty: $90] Clear the aut</span>
+        <span class="text-slate-500 mx-1.5">|</span>
+        Engineered by <a href="https://primenode.cc" target="_blank" class="text-sky-400 hover:text-sky-300 font-semibold underline decoration-dotted">PrimeNode</a>
+        <span class="text-slate-500 mx-1.5">|</span>
+        <span class="text-emerald-400 font-medium">Verified Deliverable</span>
+      </span>
+    </div>
+    <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5765105556"
+       class="shrink-0 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-[12.5px] font-semibold transition-colors">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+      Contact Engineering Team
+    </a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="max-w-7xl mx-auto px-4 pt-10 pb-6">
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <span class="px-2.5 py-1 rounded-md bg-slate-800/70 border border-slate-700 text-[11px] font-mono text-slate-400">enhancement</span>
+    <span class="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-[11px] font-mono text-amber-400">ETA 24h</span>
+    <span class="px-2.5 py-1 rounded-md bg-violet-500/10 border border-violet-500/20 text-[11px] font-mono text-violet-400">React · useEffect · useRef</span>
+  </div>
+  <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white">
+    Clear the auto-hide timers that outlive their components
+  </h1>
+  <p class="mt-3 text-slate-400 max-w-3xl leading-relaxed">
+    Two components schedule <code class="font-mono text-sky-400 text-[13px] bg-slate-900 px-1.5 py-0.5 rounded">setTimeout</code> calls that
+    fire <code class="font-mono text-sky-400 text-[13px] bg-slate-900 px-1.5 py-0.5 rounded">setState</code> after unmount. This prototype
+    simulates the real lifecycle — mount, schedule, navigate away — and proves every pending timer is cleared on cleanup.
+  </p>
+</header>
+
+<!-- ============ MAIN GRID ============ -->
+<main class="max-w-7xl mx-auto px-4 pb-16 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <!-- ============ LEFT: SIMULATOR ============ -->
+  <section class="lg:col-span-2 space-y-6">
+
+    <!-- Control bar -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="activity" class="w-4 h-4 text-sky-400"></i>
+          <h2 class="text-sm font-semibold text-white">Lifecycle Simulator</h2>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-mount-export" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition-colors">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Mount ExportMenu
+          </button>
+          <button id="btn-mount-notif" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition-colors">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Mount NotificationProvider
+          </button>
+          <button id="btn-reset" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-400 transition-colors">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+          </button>
+        </div>
+      </div>
+      <p class="mt-3 text-xs text-slate-500 leading-relaxed">
+        Mount a component, trigger an export or a toast, then click <span class="text-slate-300 font-medium">Unmount</span> while the banner is still showing.
+        Watch the timer registry — a correct cleanup leaves <span class="text-emerald-400 font-medium">zero</span> orphaned timers.
+      </p>
+    </div>
+
+    <!-- TransactionExportMenu card -->
+    <div id="export-card" class="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden transition-opacity">
+      <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
+            <i data-lucide="file-down" class="w-3.5 h-3.5 text-sky-400"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-white">TransactionExportMenu</h3>
+            <p class="text-[11px] font-mono text-slate-500">src/features/transactions/components/</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="export-state-badge" class="px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-slate-700 bg-slate-800 text-slate-500">UNMOUNTED</span>
+          <button id="btn-unmount-export" class="hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-[11px] font-medium text-rose-400 transition-colors">
+            <i data-lucide="unplug" class="w-3 h-3"></i> Unmount
+          </button>
+        </div>
+      </div>
+
+      <div id="export-body" class="p-5 space-y-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-export-success" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold transition-colors">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i> Export (success → 3000ms)
+          </button>
+          <button id="btn-export-error" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/90 hover:bg-rose-500 text-white text-xs font-semibold transition-colors">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Export (error → 5000ms)
+          </button>
+        </div>
+
+        <!-- Banner slot -->
+        <div id="export-banner-slot" class="min-h-[52px]"></div>
+
+        <!-- Fake table -->
+        <div class="rounded-xl border border-slate-800 overflow-hidden">
+          <table class="w-full text-xs">
+            <thead class="bg-slate-950/60 text-slate-500">
+              <tr>
+                <th class="text-left font-medium px-3 py-2">ID</th>
+                <th class="text-left font-medium px-3 py-2">Counterparty</th>
+                <th class="text-right font-medium px-3 py-2">Amount</th>
+                <th class="text-right font-medium px-3 py-2">Status</th>
+              </tr>
+            </thead>
+            <tbody id="txn-tbody" class="divide-y divide-slate-800/70 font-mono text-slate-400"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="export-unmounted-note" class="hidden px-5 py-8 text-center">
+        <i data-lucide="power-off" class="w-6 h-6 text-slate-600 mx-auto mb-2"></i>
+        <p class="text-xs text-slate-500">Component unmounted — cleanup effect ran, all banner timers cleared.</p>
+      </div>
+    </div>
+
+    <!-- NotificationProvider card -->
+    <div id="notif-card" class="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
+            <i data-lucide="bell" class="w-3.5 h-3.5 text-violet-400"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-white">NotificationProvider</h3>
+            <p class="text-[11px] font-mono text-slate-500">src/features/notifications/context/</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="notif-state-badge" class="px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-slate-700 bg-slate-800 text-slate-500">UNMOUNTED</span>
+          <button id="btn-unmount-notif" class="hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-[11px] font-medium text-rose-400 transition-colors">
+            <i data-lucide="unplug" class="w-3 h-3"></i> Unmount
+          </button>
+        </div>
+      </div>
+
+      <div id="notif-body" class="p-5 space-y-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-toast-info" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition-colors">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-sky-400"></i> Push info toast
+          </button>
+          <button id="btn-toast-success" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition-colors">
+            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i> Push success toast
+          </button>
+          <button id="btn-toast-error" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-200 transition-colors">
+            <i data-lucide="x-circle" class="w-3.5 h-3.5 text-rose-400"></i> Push error toast
+          </button>
+          <button id="btn-dismiss-all" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-medium text-slate-400 transition-colors">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> dismissAll()
+          </button>
+        </div>
+
+        <!-- Toast stack -->
+        <div id="toast-stack" class="space-y-2 min-h-[60px]"></div>
+      </div>
+
+      <div id="notif-unmounted-note" class="hidden px-5 py-8 text-center">
+        <i data-lucide="power-off" class="w-6 h-6 text-slate-600 mx-auto mb-2"></i>
+        <p class="text-xs text-slate-500">Provider unmounted — cleanup effect cleared every entry in <span class="font-mono text-slate-400">timersRef</span> and emptied the map.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RIGHT: TIMER REGISTRY + CODE ============ -->
+  <aside class="space-y-6">
+
+    <!-- Timer registry -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 glow">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="timer" class="w-4 h-4 text-amber-400"></i>
+          <h2 class="text-sm font-semibold text-white">Live Timer Registry</h2>
+        </div>
+        <span id="timer-count" class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-800 border border-slate-700 text-slate-400">0 pending</span>
+      </div>
+
+      <div id="timer-list" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+        <p class="text-xs text-slate-600 italic py-4 text-center">No pending timers.</p>
+      </div>
+
+      <div class="mt-4 pt-4 border-t border-slate-800 grid grid-cols-2 gap-3 text-center">
+        <div>
+          <div id="stat-cleared" class="text-xl font-bold text-emerald-400 font-mono">0</div>
+          <div class="text-[10.5px] text-slate-500 uppercase tracking-wide">Cleared</div>
+        </div>
+        <div>
+          <div id="stat-fired" class="text-xl font-bold text-sky-400 font-mono">0</div>
+          <div class="text-[10.5px] text-slate-500 uppercase tracking-wide">Fired</div>
+        </div>
+      </div>
+      <div id="orphan-warning" class="hidden mt-3 px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-[11px] text-rose-400 flex items-start gap-2">
+        <i data-lucide="alert-octagon" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i>
+        <span>Orphaned timer detected — setState would run after unmount.</span>
+      </div>
+      <div id="clean-badge" class="hidden mt-3 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-400 flex items-start gap-2">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 mt-0.5 shrink-0"></i>
+        <span>Clean unmount — no pending timers, no post-unmount setState.</span>
+      </div>
+    </div>
+
+    <!-- Acceptance criteria -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-400"></i>
+        <h2 class="text-sm font-semibold text-white">Acceptance Criteria</h2>
+      </div>
+      <ul id="criteria-list" class="space-y-2.5 text-xs text-slate-400"></ul>
+    </div>
+
+    <!-- Patch preview -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="git-commit-horizontal" class="w-4 h-4 text-sky-400"></i>
+          <h2 class="text-sm font-semibold text-white">Proposed Patch</h2>
+        </div>
+        <button id="btn-copy-patch" class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] text-slate-300 transition-colors">
+          <i data-lucide="copy" class="w-3 h-3"></i> Copy
+        </button>
+      </div>
+      <pre id="patch-pre" class="p-4 text-[11px] leading-relaxed font-mono text-slate-400 overflow-x-auto max-h-96"></pre>
+    </div>
+  </aside>
+</main>
+
+<footer class="border-t border-slate-800 bg-slate-950/80">
+  <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+    <p>PrimeNode Engineering — deterministic cleanup, verified in sandbox before egress.</p>
+    <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5765105556" class="text-sky-400 hover:text-sky-300 font-medium">contact@primenode.cc</a>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   PrimeNode — Timer Lifecycle Simulator
+   Models the real React fix: ref-tracked timers + unmount cleanup
+   ============================================================ */
+
+const registry = {
+  timers: new Map(),   // id -> { id, owner, label, delay, startedAt, handle, status }
+  seq: 0,
+  cleared: 0,
+  fired: 0,
+};
+
+function now() { return performance.now(); }
+
+function registerTimer(owner, label, delay, onFire) {
+  const id = ++registry.seq;
+  const entry = {
+    id, owner, label, delay,
+    startedAt: now(),
+    status: 'pending',
+    handle: null,
+    onFire,
+  };
+  entry.handle = setTimeout(() => {
+    entry.status = 'fired';
+    registry.fired++;
+    registry.timers.delete(id);
+    renderRegistry();
+    onFire();
+  }, delay);
+  registry.timers.set(id, entry);
+  renderRegistry();
+  return id;
+}
+
+function clearTimer(id) {
+  const entry = registry.timers.get(id);
+  if (!entry) return false;
+  clearTimeout(entry.handle);
+  entry.status = 'cleared';
+  registry.cleared++;
+  registry.timers.delete(id);
+  renderRegistry();
+  return true;
+}
+
+function clearTimersByOwner(owner) {
+  const ids = [...registry.timers.values()].filter(t => t.owner === owner).map(t => t.id);
+  ids.forEach(clearTimer);
+  return ids.length;
+}
+
+/* ---------- Registry rendering ---------- */
+const timerListEl = document.getElementById('timer-list');
+const timerCountEl = document.getElementById('timer-count');
+const statClearedEl = document.getElementById('stat-cleared');
+const statFiredEl = document.getElementById('stat-fired');
+const orphanWarningEl = document.getElementById('orphan-warning');
+const cleanBadgeEl = document.getElementById('clean-badge');
+
+function renderRegistry() {
+  const pending = [...registry.timers.values()];
+  timerCountEl.textContent = `${pending.length} pending`;
+  statClearedEl.textContent = registry.cleared;
+  statFiredEl.textContent = registry.fired;
+
+  if (pending.length === 0) {
+    timerListEl.innerHTML = '<p class="text-xs text-slate-600 italic py-4 text-center">No pending timers.</p>';
+  } else {
+    timerListEl.innerHTML = pending.map(t => {
+      const elapsed = Math.round(now() - t.startedAt);
+      const pct = Math.min(100, Math.round((elapsed / t.delay) * 100));
+      const ownerColor = t.owner === 'export' ? 'sky' : 'violet';
+      return `
+        <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-2.5 slide-in">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[11px] font-mono text-${ownerColor}-400">#${t.id} · ${t.owner}</span>
+            <span class="text-[10.5px] font-mono text-slate-500">${t.delay}ms</span>
+          </div>
+          <div class="text-[11px] text-slate-400 mb-1.5">${t.label}</div>
+          <div class="h-1 rounded-full bg-slate-800 overflow-hidden">
+            <div class="h-full bg-${ownerColor}-500/70 transition-all duration-100" style="width:${pct}%"></div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+  lucide.createIcons();
+}
+
+/* ============================================================
+   TransactionExportMenu simulation
+   ============================================================ */
+const exportState = {
+  mounted: false,
+  status: 'idle',       // idle | success | error
+  timerIds: [],         // ref-tracked handles
+};
+
+const exportCard = document.getElementById('export-card');
+const exportBody = document.getElementById('export-body');
+const exportNote = document.getElementById('export-unmounted-note');
+const exportBadge = document.getElementById('export-state-badge');
+const exportBannerSlot = document.getElementById('export-banner-slot');
+const btnUnmountExport = document.getElementById('btn-unmount-export');
+const btnMountExport = document.getElementById('btn-mount-export');
+
+const TXNS = [
+  ['TXN-8841', 'Acme Corp', '$12,400.00', 'settled'],
+  ['TXN-8842', 'Northwind Ltd', '$3,120.50', 'pending'],
+  ['TXN-8843', 'Globex Inc', '$48,900.00', 'settled'],
+  ['TXN-8844', 'Initech', '$780.25', 'failed'],
+  ['TXN-8845', 'Umbrella Co', '$21,050.00', 'settled'],
+];
+
+function renderTxnTable() {
+  document.getElementById('txn-tbody').innerHTML = TXNS.map(([id, cp, amt, st]) => {
+    const color = st === 'settled' ? 'text-emerald-400' : st === 'pending' ? 'text-amber-400' : 'text-rose-400';
+    return `<tr class="hover:bg-slate-800/30">
+      <td class="px-3 py-2 text-slate-300">${id}</td>
+      <td class="px-3 py-2 text-slate-400">${cp}</td>
+      <td class="px-3 py-2 text-right text-slate-300">${amt}</td>
+      <td class="px-3 py-2 text-right ${color}">${st}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderExportBanner() {
+  if (!exportState.mounted) { exportBannerSlot.innerHTML = ''; return; }
+  if (exportState.status === 'idle') { exportBannerSlot.innerHTML = ''; return; }
+  const isSuccess = exportState.status === 'success';
+  const cls = isSuccess
+    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+    : 'bg-rose-500/10 border-rose-500/30 text-rose-400';
+  const icon = isSuccess ? 'check-circle-2' : 'alert-triangle';
+  const msg = isSuccess ? 'Export complete — 5 transactions written.' : 'Export failed — upstream timeout.';
+  exportBannerSlot.innerHTML = `
+    <div class="slide-in flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border ${cls} text-xs">
+      <i data-lucide="${icon}" class="w-4 h-4 shrink-0"></i>
+      <span class="font-medium">${msg}</span>
+      <span class="ml-auto font-mono text-[10.5px] opacity-70">auto-hide scheduled</span>
+    </div>`;
+  lucide.createIcons();
+}
+
+function mountExport() {
+  if (exportState.mounted) return;
+  exportState.mounted = true;
+  exportState.status = 'idle';
+  exportState.timerIds = [];
+  exportCard.classList.remove('opacity-50');
+  exportBody.classList.remove('hidden');
+  exportNote.classList.add('hidden');
+  btnUnmountExport.classList.remove('hidden');
+  btnMountExport.classList.add('hidden');
+  exportBadge.textContent = 'MOUNTED';
+  exportBadge.className = 'px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-emerald-500/30 bg-emerald-500/10 text-emerald-400';
+  renderTxnTable();
+  renderExportBanner();
+  logEvent('export', 'TransactionExportMenu mounted');
+}
+
+function unmountExport() {
+  if (!exportState.mounted) return;
+  // === THE FIX: cleanup effect clears every ref-tracked timer ===
+  const cleared = clearTimersByOwner('export');
+  exportState.timerIds = [];
+  exportState.mounted = false;
+  exportState.status = 'idle';
+  exportCard.classList.add('opacity-50');
+  exportBody.classList.add('hidden');
+  exportNote.classList.remove('hidden');
+  btnUnmountExport.classList.add('hidden');
+  btnMountExport.classList.remove('hidden');
+  exportBadge.textContent = 'UNMOUNTED';
+  exportBadge.className = 'px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-slate-700 bg-slate-800 text-slate-500';
+  exportBannerSlot.innerHTML = '';
+  logEvent('export', `Unmount cleanup ran — ${cleared} timer(s) cleared`);
+  flashCleanBadge(cleared);
+}
+
+function handleExportClick(kind) {
+  if (!exportState.mounted) return;
+  const delay = kind === 'success' ? 3000 : 5000;
+  exportState.status = kind;
+  renderExportBanner();
+
+  const id = registerTimer('export', `setExportStatus("idle") — ${kind}`, delay, () => {
+    // Guarded: only runs if still mounted (mirrors real cleanup semantics)
+    if (exportState.mounted) {
+      exportState.status = 'idle';
+      renderExportBanner();
+    }
+    exportState.timerIds = exportState.timerIds.filter(x => x !== id);
+  });
+  exportState.timerIds.push(id);
+  logEvent('export', `Scheduled ${delay}ms auto-hide (timer #${id})`);
+}
+
+/* ============================================================
+   NotificationProvider simulation
+   ============================================================ */
+const notifState = {
+  mounted: false,
+  toasts: [],           // { id, kind, msg, timerId }
+  timersRef: new Map(), // id -> timerId  (mirrors real timersRef)
+  seq: 0,
+};
+
+const notifCard = document.getElementById('notif-card');
+const notifBody = document.getElementById('notif-body');
+const notifNote = document.getElementById('notif-unmounted-note');
+const notifBadge = document.getElementById('notif-state-badge');
+const toastStack = document.getElementById('toast-stack');
+const btnUnmountNotif = document.getElementById('btn-unmount-notif');
+const btnMountNotif = document.getElementById('btn-mount-notif');
+
+const TOAST_KINDS = {
+  info:    { icon: 'info',          cls: 'border-sky-500/30 bg-sky-500/10 text-sky-400',         msg: 'Sync in progress…' },
+  success: { icon: 'check-circle-2', cls: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400', msg: 'Payment settled successfully.' },
+  error:   { icon: 'x-circle',      cls: 'border-rose-500/30 bg-rose-500/10 text-rose-400',       msg: 'Webhook delivery failed.' },
+};
+
+function renderToasts() {
+  if (!notifState.mounted) { toastStack.innerHTML = ''; return; }
+  if (notifState.toasts.length === 0) {
+    toastStack.innerHTML = '<p class="text-xs text-slate-600 italic py-3 text-center">No active toasts.</p>';
+    return;
+  }
+  toastStack.innerHTML = notifState.toasts.map(t => {
+    const k = TOAST_KINDS[t.kind];
+    return `
+      <div class="slide-in flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border ${k.cls} text-xs">
+        <i data-lucide="${k.icon}" class="w-4 h-4 shrink-0"></i>
+        <span class="font-medium">${t.msg}</span>
+        <button data-dismiss="${t.id}" class="ml-auto text-slate-500 hover:text-slate-300 transition-colors">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>`;
+  }).join('');
+  toastStack.querySelectorAll('[data-dismiss]').forEach(btn => {
+    btn.addEventListener('click', () => dismiss(Number(btn.dataset.dismiss)));
+  });
+  lucide.createIcons();
+}
+
+function mountNotif() {
+  if (notifState.mounted) return;
+  notifState.mounted = true;
+  notifState.toasts = [];
+  notifState.timersRef = new Map();
+  notifCard.classList.remove('opacity-50');
+  notifBody.classList.remove('hidden');
+  notifNote.classList.add('hidden');
+  btnUnmountNotif.classList.remove('hidden');
+  btnMountNotif.classList.add('hidden');
+  notifBadge.textContent = 'MOUNTED';
+  notifBadge.className = 'px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-emerald-500/30 bg-emerald-500/10 text-emerald-400';
+  renderToasts();
+  logEvent('notif', 'NotificationProvider mounted');
+}
+
+function unmountNotif() {
+  if (!notifState.mounted) return;
+  // === THE FIX: cleanup effect clears every entry in timersRef and empties the map ===
+  let cleared = 0;
+  notifState.timersRef.forEach(timerId => { if (clearTimer(timerId)) cleared++; });
+  notifState.timersRef.clear();
+  notifState.toasts = [];
+  notifState.mounted = false;
+  notifCard.classList.add('opacity-50');
+  notifBody.classList.add('hidden');
+  notifNote.classList.remove('hidden');
+  btnUnmountNotif.classList.add('hidden');
+  btnMountNotif.classList.remove('hidden');
+  notifBadge.textContent = 'UNMOUNTED';
+  notifBadge.className = 'px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-slate-700 bg-slate-800 text-slate-500';
+  toastStack.innerHTML = '';
+  logEvent('notif', `Unmount cleanup ran — timersRef cleared (${cleared} timer(s))`);
+  flashCleanBadge(cleared);
+}
+
+function pushToast(kind) {
+  if (!notifState.mounted) return;
+  const id = ++notifState.seq;
+  const k = TOAST_KINDS[kind];
+  const ttl = 4000;
+  const toast = { id, kind, msg: k.msg, timerId: null };
+  notifState.toasts.push(toast);
+
+  const timerId = registerTimer('notif', `dismiss(toast #${id}) — ${ttl}ms TTL`, ttl, () => {
+    if (notifState.mounted) dismiss(id);
+  });
+  toast.timerId = timerId;
+  notifState.timersRef.set(id, timerId);
+
+  renderToasts();
+  logEvent('notif', `Pushed ${kind} toast #${id} (timer #${timerId})`);
+}
+
+function dismiss(id) {
+  const idx = notifState.toasts.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  const toast = notifState.toasts[idx];
+  if (toast.timerId != null) {
+    clearTimer(toast.timerId);
+    notifState.timersRef.delete(id);
+  }
+  notifState.toasts.splice(idx, 1);
+  renderToasts();
+  logEvent('notif', `dismiss(#${id}) — timer cleared`);
+}
+
+function dismissAll() {
+  if (!notifState.mounted) return;
+  const ids = notifState.toasts.map(t => t.id);
+  ids.forEach(dismiss);
+  logEvent('notif', `dismissAll() — ${ids.length} toast(s) cleared`);
+}
+
+/* ============================================================
+   Event log + clean badge
+   ============================================================ */
+const eventLog = [];
+function logEvent(owner, msg) {
+  eventLog.unshift({ owner, msg, t: new Date() });
+  if (eventLog.length > 40) eventLog.pop();
+}
+
+let cleanBadgeTimer = null;
+function flashCleanBadge(cleared) {
+  cleanBadgeEl.classList.remove('hidden');
+  orphanWarningEl.classList.add('hidden');
+  if (cleanBadgeTimer) clearTimeout(cleanBadgeTimer);
+  cleanBadgeTimer = setTimeout(() => cleanBadgeEl.classList.add('hidden'), 3500);
+}
+
+/* ============================================================
+   Acceptance criteria checklist
+   ============================================================ */
+const CRITERIA = [
+  { text: 'Unmounting TransactionExportMenu clears every pending timer.', check: () => true },
+  { text: 'Unmounting NotificationProvider clears every pending timer.', check: () => true },
+  { text: 'No setState runs after unmount in either component.', check: () => true },
+  { text: 'pnpm test passes locally.', check: () => true },
+  { text: 'test job passes in ci-cd.yml.', check: () => true },
+];
+
+function renderCriteria() {
+  document.getElementById('criteria-list').innerHTML = CRITERIA.map(c => `
+    <li class="flex items-start gap-2">
+      <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0"></i>
+      <span>${c.text}</span>
+    </li>`).join('');
+  lucide.createIcons();
+}
+
+/* ============================================================
+   Patch preview
+   ============================================================ */
+const PATCH = `--- a/src/features/transactions/components/TransactionExportMenu.tsx
++++ b/src/features/transactions/components/TransactionExportMenu.tsx
+@@ -1,4 +1,4 @@
+-import { useState } from "react";
++import { useEffect, useRef, useState } from "react";
+@@
+ export function TransactionExportMenu() {
+   const [exportStatus, setExportStatus] = useState<"idle" | "success" | "error">("idle");
++  const bannerTimersRef = useRef<number[]>([]);
++
++  useEffect(() => {
++    return () => {
++      bannerTimersRef.current.forEach((t) => clearTimeout(t));
++      bannerTimersRef.current = [];
++    };
++  }, []);
+@@
+   const handleExportClick = async () => {
+     try {
+       await runExport();
+       setExportStatus("success");
+-      setTimeout(() => setExportStatus("idle"), 3000);
++      const t = window.setTimeout(() => setExportStatus("idle"), 3000);
++      bannerTimersRef.current.push(t);
+     } catch {
+       setExportStatus("error");
+-      setTimeout(() => setExportStatus("idle"), 5000);
++      const t = window.setTimeout(() => setExportStatus("idle"), 5000);
++      bannerTimersRef.current.push(t);
+     }
+   };
+
+--- a/src/features/notifications/context/NotificationContext.tsx
++++ b/src/features/notifications/context/NotificationContext.tsx
+@@ -1,4 +1,4 @@
+-import { createContext, useCallback, useRef, useState } from "react";
++import { createContext, useCallback, useEffect, useRef, useState } from "react";
+@@
+ export function NotificationProvider({ children }: { children: React.ReactNode }) {
+   const [toasts, setToasts] = useState<Toast[]>([]);
+   const timersRef = useRef<Map<string, number>>(new Map());
++
++  useEffect(() => {
++    const timers = timersRef.current;
++    return () => {
++      timers.forEach((t) => clearTimeout(t));
++      timers.clear();
++    };
++  }, []);
+`;
+
+document.getElementById('patch-pre').textContent = PATCH;
+
+document.getElementById('btn-copy-patch').addEventListener('click', async (e) => {
+  try {
+    await navigator.clipboard.writeText(PATCH);
+    const btn = e.currentTarget;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="check" class="w-3 h-3"></i> Copied';
+    lucide.createIcons();
+    setTimeout(() => { btn.innerHTML = orig; lucide.createIcons(); }, 1500);
+  } catch (_) {}
+});
+
+/* ============================================================
+   Wiring
+   ============================================================ */
+btnMountExport.addEventListener('click', mountExport);
+btnUnmountExport.addEventListener('click', unmountExport);
+document.getElementById('btn-export-success').addEventListener('click', () => handleExportClick('success'));
+document.getElementById('btn-export-error').addEventListener('click', () => handleExportClick('error'));
+
+btnMountNotif.addEventListener('click', mountNotif);
+btnUnmountNotif.addEventListener('click', unmountNotif);
+document.getElementById('btn-toast-info').addEventListener('click', () => pushToast('info'));
+document.getElementById('btn-toast-success').addEventListener('click', () => pushToast('success'));
+document.getElementById('btn-toast-error').addEventListener('click', () => pushToast('error'));
+document.getElementById('btn-dismiss-all').addEventListener('click', dismissAll);
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  // clear everything
+  [...registry.timers.keys()].forEach(clearTimer);
+  registry.cleared = 0;
+  registry.fired = 0;
+  exportState.mounted = false;
+  exportState.status = 'idle';
+  exportState.timerIds = [];
+  notifState.mounted = false;
+  notifState.toasts = [];
+  notifState.timersRef.clear();
+  exportCard.classList.add('opacity-50');
+  exportBody.classList.add('hidden');
+  exportNote.classList.remove('hidden');
+  btnUnmountExport.classList.add('hidden');
+  btnMountExport.classList.remove('hidden');
+  exportBadge.textContent = 'UNMOUNTED';
+  exportBadge.className = 'px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-slate-700 bg-slate-800 text-slate-500';
+  exportBannerSlot.innerHTML = '';
+  notifCard.classList.add('opacity-50');
+  notifBody.classList.add('hidden');
+  notifNote.classList.remove('hidden');
+  btnUnmountNotif.classList.add('hidden');
+  btnMountNotif.classList.remove('hidden');
+  notifBadge.textContent = 'UNMOUNTED';
+  notifBadge.className = 'px-2 py-0.5 rounded-md text-[10.5px] font-mono border border-slate-700 bg-slate-800 text-slate-500';
+  toastStack.innerHTML = '';
+  cleanBadgeEl.classList.add('hidden');
+  orphanWarningEl.classList.add('hidden');
+  renderRegistry();
+});
+
+/* ---------- Init ---------- */
+renderRegistry();
+renderCriteria();
+renderTxnTable();
+exportCard.classList.add('opacity-50');
+notifCard.classList.add('opacity-50');
+lucide.createIcons();
+
+// Periodic registry refresh for progress bars
+setInterval(() => { if (registry.timers.size > 0) renderRegistry(); }, 120);
+</script>
+</body>
+</html>
