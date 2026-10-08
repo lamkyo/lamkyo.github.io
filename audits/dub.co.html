@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Security & Performance Audit: dub.co</title>
+    <style>
+        body {
+            background: #0f172a;
+            color: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 30px 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 36px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+        }
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f59e0b22;
+            border: 3px solid #f59e0b;
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        .score-val { font-size: 26px; line-height: 1; }
+        .score-grade { font-size: 12px; text-transform: uppercase; }
+        .card {
+            background: #1f2937;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        pre {
+            background: #030712;
+            border: 1px solid #374151;
+            padding: 14px;
+            border-radius: 6px;
+            overflow-x: auto;
+            color: #38bdf8;
+            font-size: 13px;
+        }
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+        .btn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <span style="color: #38bdf8; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Antigravity Technical Audit</span>
+                <h1 style="margin: 4px 0 0 0; font-size: 26px; color: #fff;">dub.co</h1>
+                <div style="color: #64748b; font-size: 13px; margin-top: 4px;">Audited on 2026-10-07 21:36:13 UTC • Server: Vercel • TTFB Latency: 89ms</div>
+            </div>
+            <div class="score-circle">
+                <span class="score-val">60</span>
+                <span class="score-grade">Grade C</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top: 0; color: #f8fafc;">🚨 Security Vulnerabilities Detected (3)</h3>
+            <p style="color: #94a3b8; font-size: 14px;">The following standard HTTP security headers are missing from your web server response. This exposes your domain to clickjacking, XSS injections, and protocol downgrade attacks.</p>
+            
+        <div style="background: #1e1e2d; border-left: 4px solid #ef4444; padding: 16px; margin-bottom: 12px; border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #f87171; font-size: 16px;">❌ Thiếu X-Frame-Options</strong>
+                <span style="background: #ef444422; color: #ef4444; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">-15 Pts</span>
+            </div>
+            <p style="color: #94a3b8; margin: 8px 0 0 0; font-size: 14px;">Nguy cơ Clickjacking (kẻ xấu nhúng website vào iFrame ẩn để đánh lừa thao tác người dùng).</p>
+        </div>
+        
+        <div style="background: #1e1e2d; border-left: 4px solid #ef4444; padding: 16px; margin-bottom: 12px; border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #f87171; font-size: 16px;">❌ Thiếu X-Content-Type-Options</strong>
+                <span style="background: #ef444422; color: #ef4444; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">-15 Pts</span>
+            </div>
+            <p style="color: #94a3b8; margin: 8px 0 0 0; font-size: 14px;">Nguy cơ MIME-type Sniffing (trình duyệt tự đoán kiểu dữ liệu gây thực thi mã lạ).</p>
+        </div>
+        
+        <div style="background: #1e1e2d; border-left: 4px solid #ef4444; padding: 16px; margin-bottom: 12px; border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #f87171; font-size: 16px;">❌ Thiếu Permissions-Policy</strong>
+                <span style="background: #ef444422; color: #ef4444; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">-10 Pts</span>
+            </div>
+            <p style="color: #94a3b8; margin: 8px 0 0 0; font-size: 14px;">Không giới hạn quyền truy cập nhạy cảm của client (Geolocation, Camera, Microphone).</p>
+        </div>
+        
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top: 0; color: #f8fafc;">🛠️ Ready-to-Apply Patch (Nginx & Caddy)</h3>
+            <p style="color: #94a3b8; font-size: 14px;">You can copy and paste the snippet below directly into your server block to achieve a perfect 100/100 (A+) security rating.</p>
+            <strong style="color: #e2e8f0; font-size: 13px;">Option A: Nginx Configuration</strong>
+            <pre><code># Nginx Security Header Patch for dub.co
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Content-Security-Policy "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';" always;
+add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;</code></pre>
+
+            <strong style="color: #e2e8f0; font-size: 13px;">Option B: Caddy Configuration</strong>
+            <pre><code># Caddyfile Security Header Patch for dub.co
+header {
+    Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    X-Frame-Options "SAMEORIGIN"
+    X-Content-Type-Options "nosniff"
+    Content-Security-Policy "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval';"
+    Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Referrer-Policy "strict-origin-when-cross-origin"
+}</code></pre>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #1e1b4b, #172554); border: 1px solid #3b82f6; border-radius: 8px; padding: 24px; text-align: center;">
+            <h3 style="margin: 0 0 8px 0; color: #fff; font-size: 20px;">Need Us to Implement & Verify This For You?</h3>
+            <p style="color: #93c5fd; font-size: 14px; max-width: 600px; margin: 0 auto 16px auto;">
+                Our DevOps engineering team can configure, test, and verify these patches across your DNS, CDN, and web servers within 24 hours for a flat fee of <strong>$150 USD</strong>.
+            </p>
+            <a href="mailto:lamvukyo3001@gmail.com?subject=Implement%20Security%20Patch%20for%20dub.co" class="btn">Book Implementation ($150 USD)</a>
+            <div style="margin-top: 14px; font-size: 12px; color: #60a5fa;">
+                Payment Rails: PayPal (<code>lamvukyo3001@gmail.com</code>) | EVM (<code>0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA</code>)
+            </div>
+        </div>
+    </div>
+</body>
+</html>
