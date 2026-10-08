@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal: Shopify Store Development with Website Integration | Antigravity OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen py-10 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Sticky Action Header -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-800 rounded-2xl p-6 shadow-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mb-3">
+                    <i class="fa-solid fa-bolt"></i> Verified Autonomous Proposal
+                </span>
+                <h1 class="text-2xl font-bold text-white">Shopify Store Development with Website Integration</h1>
+                <p class="text-sm text-slate-400 mt-1">Platform: <span class="capitalize text-slate-300">freelancer</span> | Job ID: <code>ext-freelancer-fl-40749535</code></p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <a href="https://www.paypal.com/paypalme/lamvukyo/960USD" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-all text-sm">
+                    <i class="fa-brands fa-paypal"></i> Hire via PayPal ($960)
+                </a>
+                <a href="https://t.me/Youbichet_bot" target="_blank" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 text-sm">
+                    <i class="fa-brands fa-telegram"></i> Telegram Contact
+                </a>
+            </div>
+        </div>
+
+        <!-- Proposal Content Card -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-8 md:p-12 shadow-xl backdrop-blur-sm">
+            <div class="prose prose-invert max-w-none">
+                <p class="text-slate-300 leading-relaxed"><h1 class="text-3xl font-extrabold text-white mt-10 mb-4">Technical Proposal &amp; Statement of Work</h1>
+<h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">Shopify Storefront Development with Existing Website Integration</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Prepared for:</strong> Prospective Client — Shopify Physical Products Store
+<strong class="text-white font-semibold">Prepared by:</strong> Staff Software Architect &amp; Technical Proposal Lead
+<strong class="text-white font-semibold">Engagement Type:</strong> Fixed-Price, Milestone-Based
+<strong class="text-white font-semibold">Total Investment:</strong> $960 USD</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">1. Executive Hook — The Diagnostic</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>You've asked for "a Shopify store integrated with my existing website." That single sentence hides the three decisions that actually determine whether this project succeeds or quietly bleeds money six months from now:</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Pitfall #1 — "Integration" is ambiguous, and the wrong interpretation is expensive.</strong>
+There are two fundamentally different architectures hiding behind the word *integrate*:
+- <strong class="text-white font-semibold">Subdomain handoff</strong> (`shop.yourdomain.com` → Shopify-hosted storefront), or
+- <strong class="text-white font-semibold">Headless / embedded commerce</strong> (Shopify as the backend, your existing site as the presentation layer via Storefront API).</p><p class='mt-4 text-slate-300 leading-relaxed'>Most bidders will silently pick the cheaper option (subdomain) and bill you for "integration." If your existing site is your brand's primary traffic and SEO surface, that choice fragments your domain authority and your analytics. <strong class="text-white font-semibold">We will make this decision explicitly, in writing, on Day 1 — before a single line of theme code is written.</strong></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Pitfall #2 — Custom features are where fixed-price projects die.</strong>
+"Implement custom..." (truncated in your brief) is the highest-risk phrase in the posting. Custom functionality scoped loosely becomes unbounded. We counter this with a <strong class="text-white font-semibold">written feature contract</strong>: every custom requirement is enumerated, estimated, and either included or explicitly deferred — no ambiguity at handover.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Pitfall #3 — Nobody tests the checkout.</strong>
+Themes get built, the homepage looks great, and then a discount code, a tax rule, or a shipping zone silently breaks conversion. We ship with an <strong class="text-white font-semibold">automated verification pass</strong> covering cart, checkout, and integration endpoints — not just a visual "looks good to me."</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">What you actually need:</strong> a scoped, tested Shopify storefront that either cleanly hands off from or embeds into your existing site, with custom features frozen in a written contract, and a handover package you own outright.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">2. Architecture &amp; Technical Plan</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Eliminate ambiguity and establish a safe, reversible baseline.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Architecture Decision Record (ADR-001):</strong> Documented choice between subdomain handoff vs. headless Storefront API, with trade-offs on SEO, maintenance cost, and performance. *You approve this before Phase 2 begins.*
+- <strong class="text-white font-semibold">Feature Contract:</strong> Every "custom" requirement enumerated into a numbered, testable specification. Anything out of scope is listed explicitly as deferred.
+- <strong class="text-white font-semibold">Environment Isolation:</strong> A Shopify development store + theme duplicate. <strong class="text-white font-semibold">Your live theme is never touched until you sign off.</strong>
+- <strong class="text-white font-semibold">Baseline Capture:</strong> Full snapshot of existing website (DOM structure, analytics tags, DNS records, current conversion paths) so we can prove zero regressions later.
+- <strong class="text-white font-semibold">Integration Surface Map:</strong> Exact endpoints, webhooks, and data flows between Shopify and your existing site (product sync, cart, customer accounts, order handoff).</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Deliverable:</strong> `DISCOVERY.md` + `ADR-001.md` + approved Feature Contract.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 2 — Implementation &amp; Automated Verification (Day 2–3)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Build the storefront and the integration, with tests written alongside.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Theme Development:</strong> Shopify Online Store 2.0 (JSON templates, sections, blocks) — Liquid, semantic HTML, responsive CSS, accessible markup (WCAG 2.1 AA targets on core flows).
+- <strong class="text-white font-semibold">Custom Features:</strong> Implemented strictly against the Feature Contract, each with an associated test.
+- <strong class="text-white font-semibold">Website Integration:</strong> Implemented per ADR-001 — either DNS/subdomain routing with shared header/footer parity, or Storefront API calls from your existing site.
+- <strong class="text-white font-semibold">Automated Verification Suite:</strong>
+  - Cart add/update/remove logic tests
+  - Checkout initiation smoke test
+  - Discount code + tax + shipping rule validation
+  - Integration endpoint contract tests (request/response shape)
+  - Lighthouse CI run (performance, accessibility, best practices, SEO)
+- <strong class="text-white font-semibold">Continuous Preview:</strong> Every push deploys to a Shopify preview theme URL you can review live.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Deliverable:</strong> Working storefront on preview theme + passing test suite + Lighthouse report.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 3 — Hardening, Performance &amp; Handover (Day 3–4)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Make it production-safe and hand you full ownership.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Performance Hardening:</strong> Image optimization (Shopify CDN + responsive `srcset`), critical CSS, deferred non-critical JS, font loading strategy. Target: Lighthouse Performance ≥ 90 on mobile.
+- <strong class="text-white font-semibold">Regression Verification:</strong> Re-run the full baseline comparison from Phase 1 — confirm existing site's analytics, DNS, and conversion paths are untouched.
+- <strong class="text-white font-semibold">Cross-Browser &amp; Device Pass:</strong> Chrome, Safari, Firefox, Edge; iOS + Android; 360px → 1920px.
+- <strong class="text-white font-semibold">Documentation:</strong> Setup, deployment, and maintenance runbook.
+- <strong class="text-white font-semibold">Handover Session:</strong> 45-minute walkthrough (recorded) covering theme editing, product management, and how to run the test suite yourself.
+- <strong class="text-white font-semibold">Go-Live:</strong> Theme published to production only after your explicit written approval.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Deliverable:</strong> Production storefront + full handover package.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">3. Concrete Deliverables Checklist</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>You receive, in a single handover repository:</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Code</strong>
+- [ ] Shopify theme (Online Store 2.0), fully commented Liquid
+- [ ] Custom feature implementations per Feature Contract
+- [ ] Integration layer (DNS config scripts *or* Storefront API client code, per ADR-001)
+- [ ] `docker-compose.yml` for local theme dev + test runner (Shopify CLI + Lighthouse CI)</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Tests</strong>
+- [ ] Cart / checkout / discount / tax smoke tests
+- [ ] Integration endpoint contract tests
+- [ ] Lighthouse CI configuration + baseline thresholds</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Documentation</strong>
+- [ ] `DISCOVERY.md` — requirements &amp; decisions
+- [ ] `ADR-001.md` — architecture decision record
+- [ ] `FEATURE_CONTRACT.md` — signed scope
+- [ ] `RUNBOOK.md` — deploy, rollback, maintenance
+- [ ] `HANDOVER.md` — recorded walkthrough link + credentials transfer checklist</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Assets</strong>
+- [ ] Lighthouse before/after reports
+- [ ] Regression comparison report (baseline vs. final)
+- [ ] Full ownership transfer: theme, DNS, Shopify collaborator access revoked in your favor</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">4. Regression Guardrails — Zero-Impact Guarantee</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>| Risk | Guardrail |
+|---|---|
+| Live theme broken | All work on duplicate/preview theme; production publish requires your written approval |
+| Existing site degraded | Phase 1 baseline snapshot; Phase 3 automated diff against it |
+| DNS / email disruption | DNS changes staged and documented; MX records explicitly preserved and verified |
+| Analytics/tracking lost | Tag audit before and after; conversion path test on both surfaces |
+| Silent checkout failure | Automated cart→checkout smoke test on every deploy |
+| Scope creep | Feature Contract is the single source of truth; changes are written amendments |
+| Rollback needed | One-command theme rollback documented in `RUNBOOK.md` |</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Principle:</strong> *Nothing touches production until it has passed the same test twice — once in preview, once against the baseline.*</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">5. Commercial Terms &amp; Direct CTA</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Engagement Model:</strong> Fixed-Price, Milestone-Based
+<strong class="text-white font-semibold">Total Investment:</strong> <strong class="text-white font-semibold">$960 USD</strong> — no hourly billing, no surprise invoices.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Milestone Schedule</strong>
+| Milestone | Trigger | Amount |
+|---|---|---|
+| M1 — Discovery &amp; ADR approved | End of Day 1 | $320 |
+| M2 — Storefront + tests passing | End of Day 3 | $320 |
+| M3 — Production go-live + handover | End of Day 4 | $320 |</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Accepted Payout Channels</strong>
+- <strong class="text-white font-semibold">PayPal:</strong> `lamvukyo3001@gmail.com`
+- <strong class="text-white font-semibold">USDC:</strong> EVM or Solana (address provided on request)</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Book Instantly — Start Today</strong>
+👉 <strong class="text-white font-semibold">[Secure the engagement — $960 USD](https://www.paypal.com/paypalme/lamvukyo/960USD)</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Next Step:</strong> Reply with your existing website URL and the full text of your "custom..." requirement. I'll return ADR-001 and the Feature Contract within 24 hours — before any payment changes hands.</p><p class='mt-4 text-slate-300 leading-relaxed'>*Fixed price. Written scope. Tested delivery. You own everything at the end.*</p>
+            </div>
+
+            <!-- Payment & Security Guarantee Box -->
+            <div class="mt-12 pt-8 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/60 p-6 rounded-xl border border-slate-800/60">
+                <div>
+                    <h4 class="text-white font-bold flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Dual-Rail Commercial Terms
+                    </h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Milestone-gated engagement with zero upfront risk. Code deliverables include full test harness and 30-day bug warranty.
+                    </p>
+                    <ul class="text-xs text-slate-300 mt-3 space-y-1">
+                        <li>• <strong>PayPal:</strong> <code>lamvukyo3001@gmail.com</code></li>
+                        <li>• <strong>Web3 EVM:</strong> <code>0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA</code></li>
+                        <li>• <strong>Solana:</strong> <code>HST3wcFgRzvcNeWowVpZzBDFp3imy1VWW4q9XNyhQYmW</code></li>
+                    </ul>
+                </div>
+                <div class="flex flex-col justify-center items-start md:items-end gap-2">
+                    <span class="text-xs text-slate-400">Total Fixed Investment</span>
+                    <span class="text-3xl font-extrabold text-emerald-400">$960 <span class="text-sm font-normal text-slate-400">USD</span></span>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo/960USD" target="_blank" class="mt-2 text-xs text-sky-400 hover:underline">
+                        Instant Booking Link &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

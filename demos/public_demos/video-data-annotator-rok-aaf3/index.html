@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Data Annotator — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        ink: { 950:'#070a12', 900:'#0b0f1a', 850:'#0f1524', 800:'#131a2b', 700:'#1b2438' },
+        accent: { 400:'#5eead4', 500:'#2dd4bf', 600:'#14b8a6' }
+      },
+      fontFamily: { sans: ['Inter','ui-sans-serif','system-ui','sans-serif'], mono:['ui-monospace','SFMono-Regular','Menlo','monospace'] }
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family:'Inter',sans-serif; background:#070a12; }
+  .glass { background:rgba(15,21,36,.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+  .card { background:linear-gradient(160deg,rgba(19,26,43,.9),rgba(11,15,26,.9)); border:1px solid rgba(148,163,184,.10); }
+  .card:hover { border-color:rgba(45,212,191,.35); }
+  .glow { box-shadow:0 0 0 1px rgba(45,212,191,.25), 0 12px 40px -12px rgba(45,212,191,.35); }
+  .grid-bg { background-image:linear-gradient(rgba(148,163,184,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.06) 1px,transparent 1px); background-size:44px 44px; }
+  ::-webkit-scrollbar{width:9px;height:9px} ::-webkit-scrollbar-track{background:#0b0f1a} ::-webkit-scrollbar-thumb{background:#1b2438;border-radius:9px} ::-webkit-scrollbar-thumb:hover{background:#2dd4bf55}
+  .bar { transition: width .7s cubic-bezier(.4,0,.2,1); }
+  .fade-in { animation: fade .45s ease both; }
+  @keyframes fade { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+  .pulse-dot { animation: pd 1.6s infinite; }
+  @keyframes pd { 0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.6)} 50%{box-shadow:0 0 0 7px rgba(52,211,153,0)} }
+  .tab-active { background:rgba(45,212,191,.12); color:#5eead4; border-color:rgba(45,212,191,.4); }
+  input[type=range]{ -webkit-appearance:none; height:5px; border-radius:99px; background:#1b2438; }
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:16px;height:16px;border-radius:50%;background:#2dd4bf; cursor:pointer; box-shadow:0 0 0 4px rgba(45,212,191,.2); }
+</style>
+</head>
+<body class="bg-ink-950 text-slate-300 antialiased">
+
+<!-- ===== HEADER BANNER ===== -->
+<div class="sticky top-0 z-50 glass border-b border-slate-700/40">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3 min-w-0">
+      <span class="relative flex h-2.5 w-2.5 shrink-0">
+        <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      </span>
+      <p class="text-[13px] sm:text-sm text-slate-300 truncate">
+        🚀 Live Interactive Prototype for: <span class="text-white font-semibold">Video Data Annotator</span>
+        <span class="hidden sm:inline text-slate-500"> | Built autonomously by </span>
+        <span class="hidden sm:inline text-accent-400 font-medium">Antigravity OS</span>
+        <span class="hidden sm:inline text-slate-500"> | Ready for deployment</span>
+      </p>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20rok-aaf3b335"
+       class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-accent-600 to-emerald-500 px-4 py-2 text-[13px] font-semibold text-ink-950 hover:brightness-110 transition shadow-lg shadow-teal-500/20">
+       <i data-lucide="rocket" class="w-4 h-4"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<header class="relative overflow-hidden grid-bg border-b border-slate-800/60">
+  <div class="absolute -top-32 -left-32 w-[480px] h-[480px] bg-teal-500/10 rounded-full blur-3xl"></div>
+  <div class="absolute -bottom-40 right-0 w-[420px] h-[420px] bg-emerald-500/10 rounded-full blur-3xl"></div>
+  <div class="relative max-w-7xl mx-auto px-4 py-14 sm:py-20">
+    <div class="flex items-center gap-2 mb-5">
+      <span class="text-[11px] uppercase tracking-[.18em] text-accent-400 border border-accent-500/30 bg-accent-500/10 rounded-full px-3 py-1">Interactive Prototype</span>
+      <span class="text-[11px] uppercase tracking-[.18em] text-slate-500 border border-slate-700 rounded-full px-3 py-1">v1.0 · Deploy-ready</span>
+    </div>
+    <h1 class="text-4xl sm:text-6xl font-extrabold text-white leading-[1.05] tracking-tight max-w-3xl">
+      Video Data Annotation, <span class="bg-gradient-to-r from-accent-400 to-emerald-400 bg-clip-text text-transparent">managed end-to-end.</span>
+    </h1>
+    <p class="mt-5 text-slate-400 max-w-2xl text-base sm:text-lg leading-relaxed">
+      A working prototype of the annotation workspace, QA pipeline, and reviewer analytics built for the <span class="text-slate-200">Video Data Annotator</span> role — guideline-driven labeling, consensus scoring, and live throughput tracking.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="#workspace" class="inline-flex items-center gap-2 rounded-lg bg-white text-ink-950 px-5 py-2.5 text-sm font-semibold hover:bg-slate-200 transition">
+        <i data-lucide="play" class="w-4 h-4"></i> Launch live workspace
+      </a>
+      <a href="#analytics" class="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-ink-900/60 px-5 py-2.5 text-sm font-semibold text-slate-200 hover:border-accent-500/50 hover:text-accent-400 transition">
+        <i data-lucide="bar-chart-3" class="w-4 h-4"></i> View QA analytics
+      </a>
+    </div>
+
+    <div class="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="card rounded-xl p-4 transition"><div class="text-3xl font-bold text-white" data-count="12480">0</div><div class="text-xs text-slate-500 mt-1 uppercase tracking-wider">Frames labeled</div></div>
+      <div class="card rounded-xl p-4 transition"><div class="text-3xl font-bold text-accent-400"><span data-count="98">0</span>.4%</div><div class="text-xs text-slate-500 mt-1 uppercase tracking-wider">QA accuracy</div></div>
+      <div class="card rounded-xl p-4 transition"><div class="text-3xl font-bold text-white"><span data-count="42">0</span>h</div><div class="text-xs text-slate-500 mt-1 uppercase tracking-wider">Weekly capacity</div></div>
+      <div class="card rounded-xl p-4 transition"><div class="text-3xl font-bold text-emerald-400"><span data-count="6">0</span></div><div class="text-xs text-slate-500 mt-1 uppercase tracking-wider">Guideline passes</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ===== NAV TABS ===== -->
+<nav class="sticky top-[52px] z-40 glass border-b border-slate-800/60">
+  <div class="max-w-7xl mx-auto px-4 flex gap-2 py-2.5 overflow-x-auto">
+    <button data-tab="workspace" class="tab-btn tab-active whitespace-nowrap text-sm rounded-lg border border-transparent px-4 py-1.5 transition">Annotation Workspace</button>
+    <button data-tab="queue" class="tab-btn whitespace-nowrap text-sm rounded-lg border border-transparent px-4 py-1.5 text-slate-400 hover:text-white transition">Task Queue</button>
+    <button data-tab="analytics" class="tab-btn whitespace-nowrap text-sm rounded-lg border border-transparent px-4 py-1.5 text-slate-400 hover:text-white transition">QA Analytics</button>
+    <button data-tab="guidelines" class="tab-btn whitespace-nowrap text-sm rounded-lg border border-transparent px-4 py-1.5 text-slate-400 hover:text-white transition">Guideline Engine</button>
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 py-10">
+
+<!-- ===== TAB 1: WORKSPACE ===== -->
+<section id="workspace" class="tab-panel fade-in">
+  <div class="grid lg:grid-cols-3 gap-6">
+
+    <!-- Video player -->
+    <div class="lg:col-span-2 card rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-mono bg-ink-950 border border-slate-700 rounded px-2 py-1 text-accent-400">VID_0472.mp4</span>
+          <span class="text-xs text-slate-500">1920×1080 · 30fps · 00:12 clip</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="wsStatus" class="text-[11px] px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">In review</span>
+        </div>
+      </div>
+
+      <!-- Fake video frame -->
+      <div class="relative rounded-xl overflow-hidden bg-ink-950 border border-slate-800 aspect-video grid-bg flex items-center justify-center">
+        <div id="trackBox" class="absolute border-2 border-accent-400 rounded transition-all duration-300" style="left:34%;top:30%;width:24%;height:38%;">
+          <span class="absolute -top-6 left-0 text-[10px] font-mono bg-accent-500 text-ink-950 px-1.5 py-0.5 rounded-t">person_01 · 0.97</span>
+        </div>
+        <div class="absolute left-3 bottom-3 flex items-center gap-2 text-[11px] text-slate-500 font-mono">
+          <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span> FRAME <span id="frameNo" class="text-slate-300">0184</span>/0360
+        </div>
+        <div class="absolute right-3 top-3 text-[10px] font-mono text-slate-600">YOLOv8-track · mock overlay</div>
+        <button id="playBtn" class="relative z-10 w-16 h-16 rounded-full bg-white/10 border border-white/20 backdrop-blur flex items-center justify-center text-white hover:bg-accent-500 hover:text-ink-950 transition">
+          <i data-lucide="play" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- Timeline -->
+      <div class="mt-4">
+        <input id="timeline" type="range" min="0" max="360" value="184" class="w-full">
+        <div class="flex justify-between text-[11px] font-mono text-slate-600 mt-1"><span>00:00</span><span id="timeLabel">00:06.1</span><span>00:12</span></div>
+      </div>
+
+      <!-- Tools -->
+      <div class="mt-5 flex flex-wrap gap-2">
+        <button class="tool-btn tab-active text-sm rounded-lg border border-transparent px-3.5 py-2 flex items-center gap-2" data-tool="box"><i data-lucide="square" class="w-4 h-4"></i> Bounding Box</button>
+        <button class="tool-btn text-sm rounded-lg border border-transparent px-3.5 py-2 text-slate-400 flex items-center gap-2" data-tool="polygon"><i data-lucide="pentagon" class="w-4 h-4"></i> Polygon</button>
+        <button class="tool-btn text-sm rounded-lg border border-transparent px-3.5 py-2 text-slate-400 flex items-center gap-2" data-tool="keypoint"><i data-lucide="git-branch" class="w-4 h-4"></i> Keypoint</button>
+        <button class="tool-btn text-sm rounded-lg border border-transparent px-3.5 py-2 text-slate-400 flex items-center gap-2" data-tool="flag"><i data-lucide="flag" class="w-4 h-4"></i> Flag Issue</button>
+      </div>
+
+      <!-- Labels -->
+      <div class="mt-5">
+        <div class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Class label</div>
+        <div class="flex flex-wrap gap-2" id="labelRow">
+          <button class="lbl-btn tab-active text-xs rounded-md border border-transparent px-3 py-1.5" data-lbl="person">person</button>
+          <button class="lbl-btn text-xs rounded-md border border-transparent px-3 py-1.5 text-slate-400" data-lbl="vehicle">vehicle</button>
+          <button class="lbl-btn text-xs rounded-md border border-transparent px-3 py-1.5 text-slate-400" data-lbl="animal">animal</button>
+          <button class="lbl-btn text-xs rounded-md border border-transparent px-3 py-1.5 text-slate-400" data-lbl="occluded">oc

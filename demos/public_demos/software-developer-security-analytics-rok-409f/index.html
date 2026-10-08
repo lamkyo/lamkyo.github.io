@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RedMimicry · Security Analytics Platform — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        ink: { 950:'#070a12', 900:'#0b0f1a', 850:'#0f1422', 800:'#131a2b', 700:'#1b2337' },
+        mint: { 400:'#4ade80', 500:'#22c55e' },
+        cy: { 400:'#22d3ee', 500:'#06b6d4' }
+      },
+      fontFamily: {
+        sans: ['Inter','ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'],
+        mono: ['ui-monospace','SFMono-Regular','Menlo','Consolas','monospace']
+      }
+    }
+  }
+}
+</script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  html,body{background:#070a12;}
+  body{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:#0b0f1a}
+  ::-webkit-scrollbar-thumb{background:#232c44;border-radius:6px}
+  ::-webkit-scrollbar-thumb:hover{background:#33405f}
+  .glass{background:rgba(15,20,34,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .card{background:linear-gradient(180deg,rgba(19,26,43,.9),rgba(11,15,26,.9));border:1px solid rgba(148,163,184,.10);border-radius:14px}
+  .card-hi{border-color:rgba(56,189,248,.28);box-shadow:0 0 0 1px rgba(56,189,248,.06),0 18px 40px -22px rgba(0,0,0,.9)}
+  .grid-lines{background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);background-size:44px 44px}
+  .fade-in{animation:fi .35s ease both}
+  @keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .pulse-dot{position:relative}
+  .pulse-dot::after{content:'';position:absolute;inset:-4px;border-radius:999px;background:currentColor;opacity:.35;animation:pl 1.6s ease-out infinite}
+  @keyframes pl{0%{transform:scale(.6);opacity:.5}100%{transform:scale(1.9);opacity:0}}
+  .bar{transition:height .5s cubic-bezier(.22,1,.36,1)}
+  .tab-active{background:rgba(56,189,248,.12);color:#7dd3fc;border:1px solid rgba(56,189,248,.35)}
+  .row-hover:hover{background:rgba(56,189,248,.06)}
+  .pill{font-size:10.5px;letter-spacing:.04em;padding:2px 8px;border-radius:999px;font-weight:600}
+  .marquee{overflow:hidden;white-space:nowrap}
+  input[type=range]{-webkit-appearance:none;height:4px;background:#1e293b;border-radius:99px;outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#38bdf8;border:2px solid #0b0f1a;cursor:pointer;box-shadow:0 0 0 3px rgba(56,189,248,.25)}
+  .kpi-spark{opacity:.85}
+  .timeline-line{position:absolute;left:11px;top:0;bottom:0;width:1px;background:linear-gradient(180deg,rgba(56,189,248,.5),rgba(56,189,248,0))}
+  details>summary{list-style:none;cursor:pointer}
+  details>summary::-webkit-details-marker{display:none}
+</style>
+</head>
+<body class="text-slate-300 selection:bg-sky-500/30 selection:text-sky-100">
+
+<!-- ══════════ TOP HEADER BANNER ══════════ -->
+<div class="sticky top-0 z-50 glass border-b border-sky-500/20">
+  <div class="max-w-[1500px] mx-auto px-4 py-2.5 flex flex-wrap items-center gap-3 justify-between">
+    <div class="flex items-center gap-3 min-w-0">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 text-emerald-400 pulse-dot shrink-0"></span>
+      <p class="text-[13px] sm:text-sm text-slate-200 truncate">
+        <span class="font-semibold text-white">🚀 Live Interactive Prototype for:</span>
+        <span class="text-sky-300 font-medium">Software Developer Security Analytics</span>
+        <span class="text-slate-500 hidden sm:inline"> | Built autonomously by </span>
+        <span class="text-slate-400 hidden sm:inline font-medium">Antigravity OS</span>
+        <span class="text-slate-500 hidden md:inline"> | </span>
+        <span class="text-emerald-400 hidden md:inline font-medium">Ready for deployment</span>
+      </p>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20rok-409f5091"
+       class="shrink-0 inline-flex items-center gap-2 text-[13px] font-semibold px-4 py-2 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-400 text-slate-950 hover:from-sky-400 hover:to-cyan-300 transition shadow-lg shadow-sky-500/25">
+       <i class="fa-solid fa-paper-plane text-[11px]"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- ══════════ NAV ══════════ -->
+<header class="border-b border-slate-800/70 bg-ink-950/80 sticky top-[52px] z-40">
+  <div class="max-w-[1500px] mx-auto px-4 h-14 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-sky-400 to-indigo-500 grid place-items-center text-slate-950 font-black text-sm shadow-lg shadow-sky-500/20">RM</div>
+      <div class="leading-tight">
+        <div class="text-sm font-semibold text-white tracking-tight">RedMimicry · Security Analytics</div>
+        <div class="text-[10.5px] text-slate-500 font-mono">CONTINUITY · RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==</div>
+      </div>
+    </div>
+    <nav id="nav" class="hidden lg:flex items-center gap-1 text-[13px]">
+      <button data-view="overview" class="nav-btn tab-active px-3 py-1.5 rounded-lg transition">Overview</button>
+      <button data-view="pipeline" class="nav-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition border border-transparent">Ingestion</button>
+      <button data-view="detections" class="nav-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition border border-transparent">Detections</button>
+      <button data-view="schema" class="nav-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition border border-transparent">Schema Contract</button>
+      <button data-view="ci" class="nav-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition border border-transparent">Detection-as-Code</button>
+      <button data-view="architecture" class="nav-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition border border-transparent">Architecture</button>
+    </nav>
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-2 text-[11px] font-mono px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/25 text-emerald-300">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot text-emerald-400"></span> PIPELINE HEALTHY
+      </div>
+      <button id="mobileMenu" class="lg:hidden text-slate-400 hover:text-white"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+  <div id="mobileNav" class="lg:hidden hidden border-t border-slate-800 px-4 py-2 grid grid-cols-2 gap-1 text-sm">
+    <button data-view="overview" class="nav-btn text-left px-3 py-2 rounded-lg bg-sky-500/10 text-sky-300">Overview</button>
+    <button data-view="pipeline" class="nav-btn text-left px-3 py-2 rounded-lg text-slate-400">Ingestion</button>
+    <button data-view="detections" class="nav-btn text-left px-3 py-2 rounded-lg text-slate-400">Detections</button>
+    <button data-view="schema" class="nav-btn text-left px-3 py-2 rounded-lg text-slate-400">Schema Contract</button>
+    <button data-view="ci" class="nav-btn text-left px-3 py-2 rounded-lg text-slate-400">Detection-as-Code</button>
+    <button data-view="architecture" class="nav-btn text-left px-3 py-2 rounded-lg text-slate-400">Architecture</button>
+  </div>
+</header>
+
+<main class="max-w-[1500px] mx-auto px-4 py-6">
+
+<!-- ══════════════════ OVERVIEW ══════════════════ -->
+<section id="view-overview" class="view fade-in">
+
+  <!-- Hero -->
+  <div class="card card-hi relative overflow-hidden mb-6 grid-lines">
+    <div class="absolute -top-24 -right-24 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-28 -left-16 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl"></div>
+    <div class="relative p-6 md:p-8 flex flex-col lg:flex-row gap-8 items-start lg:items-center justify-between">
+      <div class="max-w-2xl">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pill bg-sky-500/15 text-sky-300 border border-sky-500/30">STREAMING</span>
+          <span class="pill bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">WINDOWS-FIRST</span>
+          <span class="pill bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">EXACTLY-ONCE</span>
+        </div>
+        <h1 class="text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">
+          Turn fragmented, noisy security logs into <span class="bg-gradient-to-r from-sky-300 to-cyan-200 bg-clip-text text-transparent">usable signal</span>.
+        </h1>
+        <p class="mt-3 text-sm text-slate-400 leading-relaxed">
+          Three-plane system: <b class="text-slate-200">ingestion</b> (Kafka/Redpanda, transactional producers, idempotent sinks),
+          <b class="text-slate-200">normalization</b> (versioned ECS/OCSF contract with golden-file tests over EVTX, Sysmon, and AD/DC telemetry), and
+          <b class="text-slate-200">detection</b> (rules-as-code with CI fixtures). Built to stay fast under adversarial data shapes.
+        </p>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <button data-goto="pipeline" class="goto text-[13px] font-semibold px-4 py-2 rounded-lg bg-sky-500/15 border border-sky-500/35 text-sky-200 hover:bg-sky-500/25 transition"><i class="fa-solid fa-wave-square mr-2"></i>Watch live ingestion</button>
+          <button data-goto="ci" class="goto text-[13px] font-semibold px-4 py-2 rounded-lg bg-slate-800/70 border border-slate-700 text-slate-300 hover:border-slate-500 transition"><i class="fa-solid fa-flask mr-2"></i>Run detection CI</button>
+          <button data-goto="detections" class="goto text-[13px] font-semibold px-4 py-2 rounded-lg bg-slate-800/70 border border-slate-700 text-slate-300 hover:border-slate-500 transition"><i class="fa-solid fa-shield-halved mr-2"></i>Alert queue</button>
+        </div>
+      </div>
+      <!-- live throughput -->
+      <div class="w-full lg:w-[340px] shrink-0">
+        <div class="card p-4 bg-ink-900/80">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Ingest throughput</span>
+            <span id="epsNow" class="text-sm font-bold text-emerald-300 font-mono">— ev/s</span>
+          </div>
+          <div id="epsChart" class="flex items-end gap-[3px] h-20"></div>
+          <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800">
+            <div><div class="text-[10px] text-slate-500 uppercase">p95 query</div><div id="p95" class="text-sm font-mono font-semibold text-white">412 ms</div></div>
+            <div><div class="text-[10px] text-slate-500 uppercase">lag</div><div id="lagMs" class="text-sm font-mono font-semibold text-white">0.8 s</div></div>
+            <div><div class="text-[10px] text-slate-500 uppercase">dupes</div><div class="text-sm font-mono font-semibold text-emerald-400">0</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI grid -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="card p-4 row-hover">
+      <div class="flex justify-between items-start"><span class="text-[11px] uppercase tracking-widest text-slate-500 font-semibold">Events / 24h</span><i class="fa-solid fa-bolt text-s

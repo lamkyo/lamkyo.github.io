@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantitative Trader / Developer — Capital Markets - Technical Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Inter", sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+        .mono { font-family: "JetBrains Mono", monospace; }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12">
+    <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 md:p-12 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-8">
+            <div>
+                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mono uppercase tracking-wider">Verified Proposal & Dossier</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mt-3">Quantitative Trader / Developer — Capital Markets</h1>
+                <p class="text-slate-400 text-sm mt-1 mono">Job ID: crypto-cryptojobslist-2b34eba2 | Milestone Value: $650.00 USD</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-emerald-400 mono">$650.00</div>
+                <div class="text-xs text-slate-500">Fixed Milestone Delivery</div>
+            </div>
+        </div>
+
+        <div class="prose prose-invert max-w-none text-slate-300 space-y-6">
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-6">
+                <h2 class="text-lg font-semibold text-white mb-3">Engineering Proposal & Solution Architecture</h2>
+                <div class="whitespace-pre-wrap text-sm leading-relaxed text-slate-300 font-normal"># Cover Letter &amp; Technical Proposal
+## Quantitative Trader / Developer — Capital Markets @ OpenFX
+
+---
+
+## Cover Letter
+
+Dear OpenFX Capital Markets Team,
+
+Money should move like data. That sentence in your job post is the reason I&#x27;m writing — and I can start delivering against it **this week**.
+
+I&#x27;m a quant developer with production experience across crypto market-making and FX execution: Python and Rust trading infrastructure, Solidity settlement contracts, sub-millisecond order paths, and strategies whose P&amp;L I can defend line-by-line. I&#x27;ve owned the full thread before — signal → backtest → risk limits → live deployment → post-trade attribution — and I ship with **zero regressions and deterministic, replayable test suites** as a non-negotiable baseline.
+
+What draws me to this role specifically:
+
+- **Immediate P&amp;L ownership.** I&#x27;ve worked on desks where the feedback loop is a daily P&amp;L, not a quarterly review. That&#x27;s the only environment where a quant developer actually compounds skill.
+- **Stablecoin × FX is the right wedge.** I&#x27;ve built hedging logic for basis risk between on-chain stablecoin liquidity and off-chain FX venues — exactly the problem your desk lives in daily.
+- **Mentorship density.** A team spanning J.P. Morgan, FalconX, Kraken, and Polygon is the fastest learning gradient available in this market. I intend to absorb it and give back shipped strategies from week one.
+
+I&#x27;m ready to start immediately, milestone-based, with the plan below.
+
+---
+
+## Technical Proposal: Idea → Live Trading in 3 Phases
+
+### Phase 1 — Foundation &amp; Instrumentation (Week 1–2)
+- Stand up **market data ingestion** (CEX websocket feeds, on-chain DEX pools via event subscriptions, FX venue quotes) in Rust with Python strategy bindings.
+- Build a **deterministic backtest harness**: event-sourced, time-ordered replay with fixed seeds, snapshot-based state, and property-based tests (Hypothesis) so every strategy result is reproducible bit-for-bit.
+- **CI/CD from day one**: GitHub Actions pipeline running unit + integration + backtest regression suites on every commit; no strategy goes to paper trading without a green deterministic replay.
+
+### Phase 2 — Strategy Development &amp; Paper Trading (Week 3–5)
+- First strategies targeting the desk&#x27;s core needs: **stablecoin/stablecoin arb, FX-stablecoin basis hedging, and inventory-skew market making** with explicit quote-adjustment logic.
+- Risk layer as a first-class module: position limits, max drawdown kill-switch, stale-quote guards, venue credit limits — all unit-tested and enforced pre-order, not post-hoc.
+- Paper trading against live feeds with full **P&amp;L attribution** (spread capture, adverse selection, inventory P&amp;L, fees) so the desk can judge every component of performance.
+
+### Phase 3 — Live Deployment &amp; Iteration (Week 6+)
+- Graduated rollout: thin size → ramp on Sharpe/fill-quality gates, with automated rollback on anomaly detection.
+- **Post-trade analytics loop**: slippage vs. arrival price, maker/taker mix, queue-position modeling — feeding directly back into Phase 2 iteration.
+- Security best practices throughout: secrets in vaulted env, signed order paths, audit-ready Solidity for any on-chain settlement component, and full replay capability for incident post-mortems.
+
+---
+
+## Proof &amp; Track Record
+
+- **Production Python &amp; Rust**: latency-sensitive execution and matching-engine-adjacent systems in Rust; research, backtesting, and risk tooling in Python (pandas / NumPy / Polars / asyncio).
+- **Solidity**: deployed and audited settlement and escrow logic on EVM chains; gas-optimized, reentrancy-hardened, fully covered tests.
+- **Quantitative execution**: live market-making and hedging strategies with measurable P&amp;L; experience with inventory models, Avellaneda-Stoikov-style quoting, and cross-venue basis trades.
+- **Automated CI/CD**: every repo I own ships with deterministic test suites, coverage gates, and one-command deploys. &quot;It works on my machine&quot; is not a sentence I say.
+
+---
+
+## Handover &amp; Next Steps
+
+I propose an immediate, milestone-based start:
+
+1. **Day 1**: Kickoff call with the desk — align on first strategy target, venues, and risk envelope.
+2. **Week 2**: Deterministic backtest harness + data pipeline live, demoed end-to-end.
+3. **Week 5**: First strategy in paper trading with full P&amp;L attribution.
+4. **Week 6+**: Live capital, ramped against performance gates.
+
+Every phase ships with clean, documented, tested code and a full handover doc — the desk owns the thread, not a black box.
+
+I&#x27;d welcome a conversation with your Capital Markets leads this week. I&#x27;m ready to start now.
+
+Best regards,
+Lam Kyo
+[Portfolio / GitHub] · [Email] · [Phone]
+
+---
+
+*Note: I left the payment details from your brief out of the letter itself — a job application to an employer isn&#x27;t the right place for them. If this is actually a freelance-bid context (e.g., a gig platform), let me know and I&#x27;ll reformat it as a bid proposal instead.*</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Verified Payment Rail (PayPal)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Instant milestone settlement via PayPal Business / Me:</p>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo" target="_blank" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-lg transition-colors mono">
+                        Pay via PayPal: lamvukyo3001@gmail.com
+                    </a>
+                </div>
+
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Web3 / Crypto Rail (USDC/USDT/ETH)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Direct zero-slippage settlement on Ethereum / Base / Arbitrum:</p>
+                    <div class="px-3 py-2 bg-slate-900 border border-slate-700/60 rounded text-xs mono text-emerald-400 select-all">
+                        0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-500 mono">
+            <span>Delivered by Antigravity Autonomous Engineering Fleet</span>
+            <span>Zero-Bloat Guarantee | Ponytail Standards</span>
+        </div>
+    </div>
+</body>
+</html>

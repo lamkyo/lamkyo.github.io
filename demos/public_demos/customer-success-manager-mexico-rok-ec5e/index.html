@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JumpCloud CSM · Portfolio Cockpit — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'], mono: ['JetBrains Mono','ui-monospace','monospace'] },
+      colors: {
+        ink:   { 950:'#05080e', 900:'#080c14', 850:'#0b111b', 800:'#0f1623', 750:'#141d2c', 700:'#1a2434' },
+        edge:  '#1e293b',
+        brand: { DEFAULT:'#6366f1', soft:'#818cf8', dim:'#4338ca' },
+        mint:  '#34d399',
+        amber: '#fbbf24',
+        rose:  '#fb7185',
+        sky:   '#38bdf8'
+      },
+      boxShadow: {
+        glow: '0 0 0 1px rgba(99,102,241,.25), 0 12px 40px -12px rgba(99,102,241,.45)',
+        card: '0 1px 0 0 rgba(255,255,255,.03) inset, 0 20px 40px -24px rgba(0,0,0,.8)'
+      }
+    }
+  }
+}
+</script>
+<style>
+  html,body{background:#05080e;}
+  body{font-feature-settings:'cv02','cv03','cv04','ss01';-webkit-font-smoothing:antialiased;}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:#080c14}
+  ::-webkit-scrollbar-thumb{background:#1e293b;border-radius:99px;border:2px solid #080c14}
+  ::-webkit-scrollbar-thumb:hover{background:#334155}
+  .grid-bg{
+    background-image:linear-gradient(rgba(148,163,184,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.045) 1px,transparent 1px);
+    background-size:44px 44px;
+  }
+  .glass{background:linear-gradient(180deg,rgba(20,29,44,.85),rgba(11,17,27,.85));backdrop-filter:blur(12px)}
+  .grad-text{background:linear-gradient(96deg,#818cf8 0%,#38bdf8 45%,#34d399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .fade-in{animation:fadeIn .45s cubic-bezier(.2,.7,.3,1) both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .slide-in{animation:slideIn .35s cubic-bezier(.2,.7,.3,1) both}
+  @keyframes slideIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+  .row-hover:hover{background:linear-gradient(90deg,rgba(99,102,241,.10),rgba(99,102,241,.02));}
+  .bar-fill{transition:width .9s cubic-bezier(.2,.7,.3,1)}
+  .cell{transition:background .35s ease, transform .2s ease}
+  .cell:hover{transform:scale(1.12);outline:1px solid rgba(255,255,255,.35);z-index:5;position:relative;border-radius:6px}
+  .live-dot{animation:pulseDot 1.6s infinite}
+  @keyframes pulseDot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,.55)}50%{opacity:.65;box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+  .tab-active{background:linear-gradient(180deg,rgba(99,102,241,.22),rgba(99,102,241,.08));color:#e0e7ff;border-color:rgba(129,140,248,.45)!important}
+  .chip{transition:all .2s ease}
+  .chip:hover{transform:translateY(-1px)}
+  .noise:before{content:'';position:absolute;inset:0;opacity:.35;pointer-events:none;
+    background:radial-gradient(1200px 400px at 10% -10%,rgba(99,102,241,.16),transparent 60%),radial-gradient(900px 380px at 90% 0%,rgba(56,189,248,.10),transparent 60%);}
+  th.sortable{cursor:pointer;user-select:none}
+  th.sortable:hover{color:#c7d2fe}
+  .marching{background-image:repeating-linear-gradient(45deg,rgba(99,102,241,.35) 0 8px,rgba(99,102,241,.12) 8px 16px);animation:march 1s linear infinite;background-size:200% 100%}
+  @keyframes march{to{background-position:32px 0}}
+</style>
+</head>

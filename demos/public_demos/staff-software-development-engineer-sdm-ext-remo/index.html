@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Staff Software Development Engineer SDM – Interactive Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Enable dark mode colors
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              900: '#0f172a',
+              800: '#1e293b',
+              700: '#334155',
+              600: '#475569',
+              500: '#64748b',
+              400: '#94a3b8',
+              300: '#cbd5e1',
+              200: '#e2e8f0',
+              100: '#f1f5f9',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased">
+  <!-- Sticky Header Banner -->
+  <header class="sticky top-0 z-50 bg-slate-800 border-b border-slate-700">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <div class="flex items-center space-x-2 text-sm">
+        <span class="inline-flex items-center"><i data-lucide="rocket" class="w-4 h-4 mr-1"></i>Live Interactive Prototype for: Staff Software Development Engineer SDM</span>
+        <span class="inline-flex items-center"><i data-lucide="cpu" class="w-4 h-4 mr-1"></i>Built autonomously by Antigravity OS</span>
+        <span class="inline-flex items-center"><i data-lucide="check-circle" class="w-4 h-4 mr-1"></i>Ready for deployment</span>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20ext-remoteok-remoteok-1136796"
+         class="inline-flex items-center bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-md transition">
+        <i data-lucide="users" class="w-4 h-4 mr-1"></i>Hire Team ($150 - $500)
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <!-- KPI Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-slate-800 rounded-lg p-6 shadow">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium text-slate-300">Open Positions</h3>
+          <i data-lucide="briefcase" class="w-6 h-6 text-indigo-400"></i>
+        </div>
+        <p class="mt-4 text-3xl font-bold text-indigo-300" id="open-positions">5</p>
+      </div>
+      <div class="bg-slate-800 rounded-lg p-6 shadow">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium text-slate-300">Applicants</h3>
+          <i data-lucide="users" class="w-6 h-6 text-indigo-400"></i>
+        </div>
+        <p class="mt-4 text-3xl font-bold text-indigo-300" id="applicants-count">124</p>
+      </div>
+      <div class="bg-slate-800 rounded-lg p-6 shadow">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium text-slate-300">Time to Fill</h3>
+          <i data-lucide="clock" class="w-6 h-6 text-indigo-400"></i>
+        </div>
+        <p class="mt-4 text-3xl font-bold text-indigo-300" id="time-to-fill">14d</p>
+      </div>
+    </section>
+
+    <!-- Search & Filters -->
+    <section class="bg-slate-800 rounded-lg p-6 shadow">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center space-x-2">
+          <input type="text" id="search-input" placeholder="Search candidates…" 
+                 class="bg-slate-700 text-slate-100 placeholder-slate-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64">
+          <button id="clear-search" class="text-slate-400 hover:text-slate-200">
+            <i data-lucide="x-circle" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="flex items-center space-x-3">
+          <label class="flex items-center space-x-1">
+            <input type="checkbox" id="senior-filter" class="form-checkbox h-4 w-4 text-indigo-600 bg-slate-700 border-slate-600 rounded">
+            <span class="text-sm">Senior Only</span>
+          </label>
+          <button id="refresh-data" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-3 py-2 rounded-md transition">
+            <i data-lucide="refresh-ccw" class="w-4 h-4 mr-1"></i>Refresh
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Candidates Table -->
+    <section class="bg-slate-800 rounded-lg shadow overflow-hidden">
+      <table class="min-w-full divide-y divide-slate-700">
+        <thead class="bg-slate-700">
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-medium text-slate-300">Name</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-slate-300">Level</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-slate-300">Experience</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-slate-300">Score</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-slate-300">Action</th>
+          </tr>
+        </thead>
+        <tbody id="candidates-body" class="divide-y divide-slate-700">
+          <!-- Rows injected by JS -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Progress Bar -->
+    <section class="bg-slate-800 rounded-lg p-6 shadow">
+      <h3 class="text-lg font-medium text-slate-300 mb-4">Hiring Pipeline Progress</h3>
+      <div class="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
+        <div id="pipeline-progress" class="bg-indigo-600 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+      </div>
+      <p class="mt-2 text-sm text-slate-400" id="progress-text">0% completed</p>
+    </section>
+
+    <!-- Chart -->
+    <section class="bg-slate-800 rounded-lg p-6 shadow">
+      <h3 class="text-lg font-medium text

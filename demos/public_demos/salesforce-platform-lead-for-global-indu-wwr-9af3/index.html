@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salesforce Platform Lead Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module" src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { @apply bg-gray-900 text-gray-100 font-sans; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="h-full flex flex-col">
+  <!-- Sticky Header Banner -->
+  <header class="sticky top-0 z-10 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 py-3 text-sm">
+    <div class="flex items-center space-x-2">
+      <span class="inline-block">🚀 Live Interactive Prototype for: Salesforce Platform Lead for Global Industrial Com</span>
+      <span class="ml-2 text-gray-400">| Built autonomously by Antigravity OS | Ready for deployment</span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-9af306d1"
+       class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-md flex items-center space-x-1">
+      <i data-lucide="mail" class="w-4 h-4"></i>
+      <span>Hire Team ($150 - $500)</span>
+    </a>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-auto p-6 space-y-8">
+    <!-- Overview Cards -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-slate-800 rounded-lg p-5 shadow-lg">
+        <h2 class="text-lg font-medium mb-3 flex items-center">
+          <i data-lucide="activity" class="w-5 h-5 mr-2"></i>Release Success Rate
+        </h2>
+        <div class="w-full bg-slate-700 rounded-full h-4 overflow-hidden">
+          <div id="successBar" class="bg-green-500 h-4 w-0 transition-all duration-500"></div>
+        </div>
+        <p id="successText" class="mt-2 text-sm text-gray-400">Calculating...</p>
+      </div>
+
+      <div class="bg-slate-800 rounded-lg p-5 shadow-lg">
+        <h2 class="text-lg font-medium mb-3 flex items-center">
+          <i data-lucide="alert-circle" class="w-5 h-5 mr-2"></i>Open Incidents
+        </h2>
+        <p class="text-4xl font-bold text-red-400">3</p>
+        <p class="text-sm text-gray-400">Critical issues in production</p>
+      </div>
+
+      <div class="bg-slate-800 rounded-lg p-5 shadow-lg">
+        <h2 class="text-lg font-medium mb-3 flex items-center">
+          <i data-lucide="users" class="w-5 h-5 mr-2"></i>Active Developers
+        </h2>
+        <p class="text-4xl font-bold text-indigo-400">12</p>
+        <p class="text-sm text-gray-400">Engineers with recent commits</p>
+      </div>
+    </section>
+
+    <!-- Deployments Table -->
+    <section class="bg-slate-800 rounded-lg p-5 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold flex items-center">
+          <i data-lucide="list" class="w-5 h-5 mr-2"></i>Recent Deployments
+        </h2>
+        <div class="flex items-center space-x-3">
+          <input type="text" id="searchInput" placeholder="Search by name..."
+                 class="px-3 py-1 rounded bg-slate-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+          <button id="toggleFailures" class="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-500">
+            Show Only Failures
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto scrollbar-hide">
+        <table class="w-full table-auto text-sm">
+          <thead class="bg-slate-700">
+            <tr>
+              <th class="px-4 py-2 text-left">Deployment</th>
+              <th class="px-4 py-2 text-left">Status</th>
+              <th class="px-4 py-2 text-left">Env</th>
+              <th class="px-4 py-2 text-left">Date</th>
+            </tr>
+          </thead>
+          <tbody id="deployTableBody" class="divide-y divide-slate-700">
+            <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Incidents Chart -->
+    <section class="bg-slate-800 rounded-lg p-5 shadow-lg">
+      <h2 class="text-xl font-semibold mb-4 flex items-center">
+        <i data-lucide="bar-chart-2" class="w-5 h-5 mr-2"></i>Incidents Over Last 30 Days
+      </h2>
+      <canvas id="incidentsChart" class="w-full h-64"></canvas>
+    </section>
+  </main>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Simulated data
+    const deployments = [
+      {name: 'Release 1.2.0', status: 'Success', env: 'Prod', date: '2024-09-28'},
+      {name: 'Hotfix 2024-09-15', status: 'Failed', env: 'Prod

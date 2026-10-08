@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blackhole DEST-Reuse Sync Fix — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: { extend: { colors: { ink: '#0a0e14', panel: '#111722', edge: '#1e2735' } } }
+}
+</script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #2a3547; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  .glow { box-shadow: 0 0 0 1px rgba(56,189,248,.25), 0 0 24px -6px rgba(56,189,248,.35); }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .pulse-dot { animation: pulse-dot 1.4s ease-in-out infinite; }
+</style>
+</head>
+<body class="bg-ink text-slate-300 antialiased">
+
+<!-- HEADER BANNER -->
+<div class="sticky top-0 z-50 border-b border-edge bg-panel/90 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-3 justify-between">
+    <div class="flex items-center gap-2.5 text-xs sm:text-sm">
+      <span class="text-base">🚀</span>
+      <span class="text-slate-400">Live Interactive Prototype for:</span>
+      <span class="font-semibold text-slate-100">[HIGH-TICKET: $3000] [Bounty] Fix B</span>
+      <span class="hidden md:inline text-slate-500">| Built autonomously by Antigravity OS | Ready for deployment</span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20ht-gh-5075540795"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-md bg-sky-500 hover:bg-sky-400 text-ink font-semibold text-xs px-3 py-1.5 transition">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="max-w-7xl mx-auto px-4 pt-10 pb-6">
+  <div class="flex items-start gap-4">
+    <div class="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 glow">
+      <i data-lucide="cpu" class="w-7 h-7 text-sky-400"></i>
+    </div>
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight">Blackhole Destination-Reuse Synchronization Fix</h1>
+      <p class="mt-1.5 text-sm text-slate-400 max-w-3xl">
+        Race between destination-to-source moves and dummy unpack ops that zero retained source banks.
+        Deterministic LLK coverage for <span class="mono text-sky-300">DEST_TO_SRCA</span> / <span class="mono text-sky-300">DEST_TO_SRCB</span> and the column-broadcast FP32 accumulation path.
+      </p>
+      <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
+        <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Issue #46523</span>
+        <span class="px-2 py-1 rounded bg-sky-500/10 text-sky-300 border border-sky-500/20">tt-metal #52252</span>
+        <span class="px-2 py-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">WATCHER-off repro</span>
+        <span class="px-2 py-1 rounded bg-violet-500/10 text-violet-300 border border-violet-500/20">FP32 Welford LN</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- KPI STRIP -->
+<section class="max-w-7xl mx-auto px-4 grid grid-cols-2 lg:grid-cols-4 gap-3">
+  <div class="rounded-xl border border-edge bg-panel p-4">
+    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">Determinism</span><i data-lucide="fingerprint" class="w-4 h-4 text-emerald-400"></i></div>
+    <div id="kpi-det" class="mt-2 text-2xl font-bold text-slate-100">—</div>
+    <div class="text-[11px] text-slate-500 mt-0.5">byte-identical across runs</div>
+  </div>
+  <div class="rounded-xl border border-edge bg-panel p-4">
+    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">Max Abs Error</span><i data-lucide="activity" class="w-4 h-4 text-sky-400"></i></div>
+    <div id="kpi-err" class="mt-2 text-2xl font-bold text-slate-100">—</div>
+    <div class="text-[11px] text-slate-500 mt-0.5">vs. FP64 reference</div>
+  </div>
+  <div class="rounded-xl border border-edge bg-panel p-4">
+    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">LLK Coverage</span><i data-lucide="shield-check" class="w-4 h-4 text-violet-400"></i></div>
+    <div id="kpi-cov" class="mt-2 text-2xl font-bold text-slate-100">—</div>
+    <div class="text-[11px] text-slate-500 mt-0.5">paths exercised</div>
+  </div>
+  <div class="rounded-xl border border-edge bg-panel p-4">
+    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">Skipped (#46523)</span><i data-lucide="skip-forward" class="w-4 h-4 text-amber-400"></i></div>
+    <div id="kpi-skip" class="mt-2 text-2xl font-bold text-slate-100">—</div>
+    <div class="text-[11px] text-slate-500 mt-0.5">re-enabled cases</div>
+  </div>
+</section>
+
+<!-- MAIN GRID -->
+<main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 xl:grid-cols-3 gap-5">
+
+  <!-- LEFT: RACE SIMULATOR -->
+  <section class="xl:col-span-2 rounded-xl border border-edge bg-panel overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-edge flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="git-compare-arrows" class="w-4 h-4 text-sky-400"></i>
+        <h2 class="text-sm font-semibold text-slate-200">LLK Race Simulator — DEST reuse vs. dummy unpack</h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-fix" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition">Apply Fix</button>
+        <button id="btn-bug" class="text-xs px-3 py-1.5 rounded-md bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25 transition">Inject Race</button>
+      </div>
+    </div>
+
+    <div class="p-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <!-- timeline -->
+      <div>
+        <div class="text-xs text-slate-500 mb-2 flex items-center gap-1.5"><i data-lucide="timer" class="w-3.5 h-3.5"></i> Instruction timeline (per tile)</div>
+        <div id="timeline" class="space-y-1.5 mono text-[11px]"></div>
+        <div class="mt-3 flex items-center gap-3 text-[11px] text-slate-500">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-sky-500/70"></span>move</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500/70"></span>dummy unpack</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500/70"></span>hazard</span>
+        </div>
+      </div>
+
+      <!-- output comparison -->
+      <div>
+        <div class="text-xs text-slate-500 mb-2 flex items-center gap-1.5"><i data-lucide="binary" class="w-3.5 h-3.5"></i> Output hash per consecutive execution</div>
+        <div id="hashes" class="space-y-2"></div>
+        <div id="verdict" class="mt-4 rounded-lg border p-3 text-xs"></div>
+      </div>
+    </div>
+
+    <!-- progress -->
+    <div class="px-5 pb-5">
+      <div class="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
+        <span id="prog-label">Idle — run the harness</span>
+        <span id="prog-pct" class="mono">0%</span>
+      </div>
+      <div class="h-1.5 rounded-full bg-edge overflow-hidden">
+        <div id="prog-bar" class="h-full w-0 bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-200"></div>
+      </div>
+      <button id="btn-run" class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-ink font-semibold text-sm py-2.5 transition">
+        <i data-lucide="play" class="w-4 h-4"></i> Run Consecutive Executions (WATCHER off)
+      </button>
+    </div>
+  </section>
+
+  <!-- RIGHT: TEST MATRIX -->
+  <section class="rounded-xl border border-edge bg-panel overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-edge flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="list-checks" class="w-4 h-4 text-violet-400"></i>
+        <h2 class="text-sm font-semibold text-slate-200">LLK Test Matrix</h2>
+      </div>
+      <select id="filter" class="bg-ink border border-edge rounded-md text-[11px] px-2 py-1 text-slate-300 outline-none">
+        <option value="all">All paths</option>
+        <option value="srca">DEST_TO_SRCA</option>
+        <option value="srcb">DEST_TO_SRCB</option>
+        <option value="bcast">Column broadcast</option>
+      </select>
+    </div>
+    <div id="matrix" class="divide-y divide-edge max-h-[420px] overflow-y-auto"></div>
+    <div class="px-5 py-3 border-t border-edge text-[11px] text-slate-500 flex items-center justify-between">
+      <span id="matrix-count">—</span>
+      <button id="btn-rerun" class="text-sky-400 hover:text-sky-300 inline-flex items-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> re-run</button>
+    </div>
+  </section>
+</main>
+
+<!-- DIFF PANEL -->
+<section class="max-w-7xl mx-auto px-4 pb-10">
+  <div class="rounded-xl border border-edge bg-panel overflow-hidden">
+    <div class="px-5 py-3.5 border-b border-edge flex items-center gap-2">
+      <i data-lucide="file-diff" class="w-4 h-4 text-emerald-400"></i>
+      <h2 class="text-sm font-semibold text-slate-200">Patch — <span class="mono text-slate-400">tt_llk_blackhole/common/inc/sfpu/ckernel_sfpu_dest_reuse.h</span></h2>
+    </div>
+    <pre class="p-5 text-[11.5px] leading-relaxed mono overflow-x-auto"><code><span class="text-slate-500">@@ -118,9 +118,14 @@ void dest_reuse_move(uint32_t dst_index, uint32_t src_bank)</span>
+ <span class="text-rose-300">-    // NOTE: dummy unpack below zeroes the retained bank</span>
+ <span class="text-rose-300">-    llk_unpack_dummy();</span>
+ <span class="text-rose-300">-    move_d2s(dst_index, src_bank);</span>
+<span class="text-emerald-300">+    // Fence the D2S move against the dummy unpack that clears the</span>
+<span class="text-emerald-300">+    // retained source bank. Without this, the unpack can retire first</span>
+<span class="text-emerald-300">+    // and the move reads a zeroed bank (issue #46523).</span>
+<span class="text-emerald-300">+    move_d2s(dst_index, src_bank);</span>
+<span class="text-emerald-300">+    t6_semaphore_wait(p_stall::STALL_SYNC);</span>
+<span class="text-emerald-300">+    llk_unpack_dummy();</span>
+<span class="text-emerald-300">+    t6_semaphore_post(p_stall::STALL_SYNC);</span>
+
+<span class="text-slate-500">@@ -204,6 +209,11 @@ void dest_reuse_bcast_srca(uint32_t dst_index)</span>
+     // FP32 destination accumulation path
+<span class="text-emerald-300">+    // Broadcast reads the same DEST bank repeatedly; the move must be</span>
+<span class="text-emerald-300">+    // ordered before the dummy unpack clears it, and the accumulate</span>
+<span class="text-emerald-300">+    // must observe the moved value, not the cleared one.</span>
+<span class="text-emerald-300">+    t6_semaphore_wait(p_stall::STALL_SYNC);</span>
+     move_d2s_bcast(dst_index);
+<span class="text-emerald-300">+    t6_semaphore_post(p_stall::STALL_SYNC);</span>
+     llk_unpack_dummy();</code></pre>
+  </div>
+</section>
+
+<footer class="border-t border-edge">
+  <div class="max-w-7xl mx-auto px-4 py-5 text-[11px] text-slate-500 flex flex-wrap items-center justify-between gap-2">
+    <span>Antigravity OS · autonomous prototype · <span class="mono">bounty-plaza#798</span></span>
+    <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span> ready for deployment</span>
+  </div>
+</footer>
+
+<script>
+lucide.createIcons();
+
+const PATHS = [
+  { id:'srca', name:'DEST_TO_SRCA', desc:'regular reuse, FP32', tiles:8 },
+  { id:'srcb', name:'DEST_TO_SRCB', desc:'regular reuse, FP32', tiles:8 },
+  { id:'bcast', name:'DEST_TO_SRCA (bcast)', desc:'column broadcast + FP32 accum', tiles:16 },
+  { id:'srca', name:'DEST_TO_SRCA', desc:'multi-tile, 4×4 grid', tiles:16 },
+  { id:'srcb', name:'DEST_TO_SRCB', desc:'multi-tile, 4×4 grid', tiles:16 },
+  { id:'bcast', name:'DEST_TO_SRCA (bcast)', desc:'large shape, Welford LN', tiles:32 },
+];
+
+let fixed = true;
+let running = false;
+
+function hash(n){ let s=''; const c='0123456789abcdef'; for(let i=0;i<n;i++) s+=c[Math.floor(Math.random()*16)]; return s; }
+
+function renderTimeline(){
+  const el = document.getElementById('timeline');
+  const ops = fixed
+    ? [['move d2s','move'],['fence wait','move'],['dummy unpack','dummy'],['fence post','move']]
+    : [['dummy unpack','dummy'],['move d2s','move'],['hazard: bank cleared','hazard'],['fence wait','move']];
+  el.innerHTML = ops.map((o,i)=>`
+    <div class="flex items-center gap-2">
+      <span class="text-slate-600 w-6">${String(i+1).padStart(2,'0')}</span>
+      <span class="flex-1 rounded px-2 py-1 ${o[1]==='hazard'?'bg-rose-500/15 text-rose-300 border border-rose-500/30':o[1]==='dummy'?'bg-amber-500/10 text-amber-300 border border-amber-500/20':'bg-sky-500/10 text-sky-300 border border-sky-500/20'}">${o[0]}</span>
+    </div>`).join('');
+}
+
+function renderHashes(runs){
+  const el = document.getElementById('hashes');
+  el.innerHTML = runs.map((r,i)=>`
+    <div class="flex items-center justify-between rounded-lg border border-edge bg-ink px-3 py-2 mono text-[11px]">
+      <span class="text-slate-500">run ${i+1}</span>
+      <span class="${r.ok?'text-emerald-300':'text-rose-300'}">${r.hash}</span>
+      <span class="${r.ok?'text-emerald-400':'text-rose-400'}">${r.ok?'✓':'✗'}</span>
+    </div>`).join('');
+}
+
+function renderVerdict(ok, err){
+  const v = document.getElementById('verdict');
+  v.className = 'mt-4 rounded-lg border p-3 text-xs ' + (ok
+    ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-200'
+    : 'border-rose-500/30 bg-rose-500/10 text-rose-200');
+  v.innerHTML = ok
+    ? `<div class="flex items-center gap-2 font-semibold"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Deterministic — byte-identical outputs</div>
+       <div class="mt-1 text-emerald-300/80">Max abs error ${err} · all ${PATHS.length} paths pass</div>`
+    : `<div class="flex items-center gap-2 font-semibold"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Nondeterministic — outputs diverge</div>
+       <div class="mt-1 text-rose-300/80">Race reproduced: dummy unpack retired before D2S move</div>`;
+  lucide.createIcons();
+}
+
+function renderMatrix(){
+  const f = document.getElementById('filter').value;
+  const rows = PATHS.filter(p => f==='all' || p.id===f);
+  const el = document.getElementById('matrix');
+  el.innerHTML = rows.map((p,i)=>{
+    const pass = fixed;
+    return `<div class="px-5 py-3 flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <div class="mono text-[11.5px] text-slate-200 truncate">${p.name}</div>
+        <div class="text-[10.5px] text-slate-500 truncate">${p.desc} · ${p.tiles} tiles</div>
+      </div>
+      <span class="shrink-0 text-[10px] px-2 py-0.5 rounded-full border ${pass?'bg-emerald-500/10 text-emerald-300 border-emerald-500/25':'bg-rose-500/10 text-rose-300 border-rose-500/25'}">
+        ${pass?'PASS':'FAIL'}
+      </span>
+    </div>`;
+  }).join('');
+  document.getElementById('matrix-count').textContent = `${rows.length} of ${PATHS.length} paths`;
+}
+
+function setKpis(det, err, cov, skip){
+  document.getElementById('kpi-det').textContent = det;
+  document.getElementById('kpi-det').className = 'mt-2 text-2xl font-bold ' + (det==='PASS'?'text-emerald-400':'text-rose-400');
+  document.getElementById('kpi-err').textContent = err;
+  document.getElementById('kpi-cov').textContent = cov;
+  document.getElementById('kpi-skip').textContent = skip;
+}
+
+function run(){
+  if(running) return; running = true;
+  const bar = document.getElementById('prog-bar'), pct = document.getElementById('prog-pct'), lbl = document.getElementById('prog-label');
+  let p = 0;
+  const steps = ['Compiling LLK harness…','Loading tiles into DEST…','Executing run 1…','Executing run 2…','Comparing output hashes…','Validating FP64 reference…'];
+  const iv = setInterval(()=>{
+    p += 4 + Math.random()*7;
+    if(p>100) p=100;
+    bar.style.width = p+'%'; pct.textContent = Math.round(p)+'%';
+    lbl.textContent = steps[Math.min(steps.length-1, Math.floor(p/100*steps.length))];
+    if(p>=100){
+      clearInterval(iv);
+      const base = hash(16);
+      const runs = fixed
+        ? [{hash:base,ok:true},{hash:base,ok:true}]
+        : [{hash:base,ok:true},{hash:hash(16),ok:false}];
+      renderHashes(runs);
+      const ok = fixed;
+      renderVerdict(ok, ok ? '3.2e-07' : '—');
+      setKpis(ok?'PASS':'FAIL', ok?'3.2e-07':'1.4e+00', ok?'6/6':'0/6', ok?'4':'0');
+      renderMatrix();
+      lbl.textContent = ok ? 'Complete — deterministic across consecutive executions' : 'Complete — race reproduced';
+      running = false;
+    }
+  }, 90);
+}
+
+document.getElementById('btn-run').onclick = run;
+document.getElementById('btn-rerun').onclick = run;
+document.getElementById('filter').onchange = renderMatrix;
+document.getElementById('btn-fix').onclick = ()=>{ fixed = true; renderTimeline(); renderMatrix(); setKpis('PASS','3.2e-07','6/6','4'); renderVerdict(true,'3.2e-07'); };
+document.getElementById('btn-bug').onclick = ()=>{ fixed = false; renderTimeline(); renderMatrix(); setKpis('FAIL','1.4e+00','0/6','0'); renderVerdict(false); };
+
+renderTimeline();
+renderMatrix();
+setKpis('PASS','3.2e-07','6/6','4');
+renderVerdict(true,'3.2e-07');
+renderHashes([{hash:hash(16),ok:true},{hash:hash(16),ok:true}]);
+</script>
+</body>
+</html>

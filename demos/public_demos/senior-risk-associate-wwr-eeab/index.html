@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lithic RiskOS — Senior Risk Associate Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#080b14',
+            panel: '#101624',
+            line: '#202a3d',
+            cyan: '#5eead4',
+            violet: '#a78bfa',
+            amber: '#fbbf24'
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root { color-scheme: dark; }
+    * { scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+    body {
+      background:
+        radial-gradient(circle at 78% -10%, rgba(45, 212, 191, .10), transparent 32rem),
+        radial-gradient(circle at 18% 0%, rgba(139, 92, 246, .10), transparent 28rem),
+        #080b14;
+    }
+    .glass {
+      background: linear-gradient(145deg, rgba(18,25,40,.93), rgba(12,17,29,.94));
+      border: 1px solid rgba(148,163,184,.13);
+      box-shadow: 0 18px 60px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.025);
+    }
+    .soft-border { border-color: rgba(148,163,184,.14); }
+    .grid-bg {
+      background-image: linear-gradient(rgba(148,163,184,.045) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(148,163,184,.045) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.55), transparent 80%);
+    }
+    .pulse-dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(94,234,212,.35); } 50% { box-shadow: 0 0 0 7px rgba(94,234,212,0); } }
+    .bar-fill { transition: width .6s ease; }
+    .tab-active { background: rgba(94,234,212,.12); color: #99f6e4; border-color: rgba(94,234,212,.25); }
+    .row-hover:hover { background: rgba(255,255,255,.025); }
+    .fade-in { animation: fade .35s ease both; }
+    @keyframes fade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .progress-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
+    .toast { animation: toastIn .25s ease, toastOut .3s ease 3.7s forwards; }
+    @keyframes toastIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+    @keyframes toastOut { to { opacity:0; transform: translateY(12px); } }
+  </style>
+</head>
+<body class="font-sans text-slate-200 min-h-screen">
+  <div class="fixed inset-0 grid-bg pointer-events-none"></div>
+
+  <div class="sticky top-0 z-50 border-b border-teal-300/20 bg-[#0b171b]/95 backdrop-blur-xl">
+    <div class="max-w-[1500px] mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-xs sm:text-sm text-teal-100 min-w-0">
+        <span class="pulse-dot rounded-full h-2 w-2 bg-teal-300 shrink-0"></span>
+        <span class="truncate">🚀 Live Interactive Prototype for: Senior Risk Associate | Built autonomously by Antigravity OS | Ready for deployment</span>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-eeab9f62" class="shrink-0 inline-flex items-center gap-1.5 rounded-md bg-teal-300 px-3 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-950 hover:bg-teal-200 transition">
+        Hire Team ($150 - $500) <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+      </a>
+    </div>
+  </div>
+
+  <main class="relative max-w-[1500px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <header class="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-7">
+      <div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-teal-300 to-violet-400 flex items-center justify-center text-slate-950 shadow-lg shadow-teal-500/10">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="font-semibold tracking-tight text-white text-lg">RiskOS</div>
+            <div class="text-[10px] uppercase tracking-[.22em] text-slate-500">Lithic partner risk workspace</div>
+          </div>
+          <span class="rounded-full border border-teal-300/20 bg-teal-300/10 px-2.5 py-1 text-[10px] font-mono text-teal-200">PROD SANDBOX</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-white">Good morning, Maya <span class="text-teal-300">↗</span></h1>
+        <p class="text-sm text-slate-400 mt-1">Your assessment command center is current through 18 Jun 2025.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openModal('Export evidence pack')" class="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900/70 px-3.5 py-2 text-xs font-medium hover:border-slate-500 hover:bg-slate-800 transition">
+          <i data-lucide="download" class="w-4 h-4"></i> Export evidence pack
+        </button>
+        <button onclick="openModal('New assessment')" class="inline-flex items-center gap-2 rounded-lg bg-teal-300 px-3.5 py-2 text-xs font-semibold text-slate-950 hover:bg-teal-200 transition">
+          <i data-lucide="plus" class="w-4 h-4"></i> New assessment
+        </button>
+      </div>
+    </header>
+
+    <section class="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 mb-4">
+      <div class="glass rounded-xl p-4 sm:p-5">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs text-slate-400">Active assessments</span>
+          <span class="rounded-lg bg-violet-400/10 p-2 text-violet-300"><i data-lucide="clipboard-list" class="w-4 h-4"></i></span>
+        </div>
+        <div class="text-2xl font-semibold text-white">24</div>
+        <div class="mt-2 text-[11px] text-slate-500"><span class="text-teal-300">+4</span> since last cycle</div>
+      </div>
+      <div class="glass rounded-xl p-4 sm:p-5">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs text-slate-400">Portfolio exposure</span>
+          <span class="rounded-lg bg-teal-300/10 p-2 text-teal-300"><i data-lucide="chart-no-axes-combined" class="w-4 h-4"></i></span>
+        </div>
+        <div class="text-2xl font-semibold text-white">$1.84B</div>
+        <div class="mt-2 text-[11px] text-slate-500"><span class="text-teal-300">−8.2%</span> concentration-adjusted</div>
+      </div>
+      <div class="glass rounded-xl p-4 sm:p-5">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs text-slate-400">Open findings</span>
+          <span class="rounded-lg bg-amber-300/10 p-2 text-amber-300"><i data-lucide="triangle-alert" class="w-4 h-4"></i></span>
+        </div>
+        <div class="text-2xl font-semibold text-white">17</div>
+        <div class="mt-2 text-[11px] text-slate-500"><span class="text-amber-300">5 high priority</span> require review</div>
+      </div>
+      <div class="glass rounded-xl p-4 sm:p-5">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-xs text-slate-400">Evidence health</span>
+          <span class="rounded-lg bg-blue-300/10 p-2 text-blue-300"><i data-lucide="fingerprint" class="w-4 h-4"></i></span>
+        </div>
+        <div class="text-2xl font-semibold text-white">98.6%</div>
+        <div class="mt-2 text-[11px] text-slate-500"><span class="text-teal-300">↑ 1.4 pts</span> lineage verified</div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 xl:grid-cols-[1.55fr_1fr] gap-4 mb-4">
+      <div class="glass rounded-xl p-4 sm:p-5 min-h-[360px]">
+        <div class="flex flex-col sm:flex-row justify-between gap-3 sm:items-center mb-5">
+          <div>
+            <h2 class="text-sm font-semibold text-white">Portfolio risk distribution</h2>
+            <p class="text-xs text-slate-500 mt-1">Weighted assessment score · rolling 12 months</p>
+          </div>
+          <div class="flex rounded-lg border border-slate-700/70 p-1 self-start">
+            <button class="chart-period px-2.5 py-1.5 rounded-md text-[10px] text-slate-400 chart-active" onclick="switchPeriod(this, 'risk')">Risk score</button>
+            <button class="chart-period px-2.5 py-1.5 rounded-md text-[10px] text-slate-400" onclick="switchPeriod(this, 'exposure')">Exposure</button>
+          </div>
+        </div>
+        <div class="flex items-center gap-6 mb-5 text-[11px] text-slate-400">
+          <span class="flex items-center gap-2"><i class="h-2 w-2 rounded-full bg-teal-300"></i><span id="legendPrimary">Current portfolio</span></span>
+          <span class="flex items-center gap-2"><i class="h-2 w-2 rounded-full bg-violet-400"></i><span id="legendSecondary">Prior quarter</span></span>
+          <span class="ml-auto text-slate-600">Score / 100</span>
+        </div>
+        <div class="relative h-[220px]">
+          <div class="absolute inset-0 flex flex-col justify-between text-[10px] text-slate-600">
+            <div class="border-t border-dashed border-slate-800"><span class="absolute -top-2">100</span></div>
+            <div class="border-t border-dashed border-slate-800"><span class="absolute -top-2">75</span></div>
+            <div class="border-t border-dashed border-slate-800"><span class="absolute -top-2">50</span></div>
+            <div class="border-t border-dashed border-slate-800"><span class="absolute -top-2">25</span></div>
+            <div class="border-t border-slate-800"><span class="absolute -top-2">0</span></div>
+          </div>
+          <svg id="riskChart" viewBox="0 0 700 220" class="absolute left-8 right-0 top-0 h-full w-[calc(100%-2rem)] overflow-visible" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="areaGradient" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#5eead4" stop-opacity=".28" />
+                <stop offset="100%" stop-color="#5eead4" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path d="M0 176 C45 170 60 158 104 162 S164 145 210 151 S270 132 315 140 S376 118 420 124 S480 102 526 112 S596 76 700 82 L700 220 L0 220Z" fill="url(#areaGradient)" />
+            <path d="M0 176 C45 170 60 158 104 162 S164 145 210 151 S270 132 315 140 S376 118 420 124 S480 102 526 112 S596 76 700 82" fill="none" stroke="#5eead4" stroke-width="3" stroke-linecap="round" />
+            <path d="M0 185 C55 176 65 182 105 178 S166 168 210 174 S270 160 315 166 S370 150 420 157 S480 137 526 145 S590 126 700 133" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 6" opacity=".8" />
+            <g fill="#5eead4" stroke="#0f172a" stroke-width="3">
+              <circle cx="210" cy="151" r="4"/><circle cx="315" cy="140" r="4"/><circle cx="420" cy="124" r="4"/><circle cx="526" cy="112" r="4"/><circle cx="700" cy="82" r="5"/>
+            </g>
+          </svg>
+        </div>
+        <div class="ml-8 mt-1 flex justify-between text-[10px] text-slate-600"><span>Jul</span><span>Sep</span><span>Nov</span><span>Jan</span><span>Mar</span><span>May</span><span>Jun</span></div>
+      </div>
+
+      <div class="glass rounded-xl p-4 sm:p-5">
+        <div class="flex justify-between items-center mb-5">
+          <div>
+            <h2 class="text-sm font-semibold text-white">Decision queue</h2>
+            <p class="text-xs text-slate-500 mt-1">Prioritized by deadline & severity</p>
+          </div>
+          <button onclick="filterQueue('all')" class="text-[11px] text-teal-300 hover:text-teal-200">View all</button>
+        </div>
+        <div id="queue" class="space-y-2.5"></div>
+        <div class="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+          <div class="flex -space-x-2">
+            <span class="h-7 w-7 rounded-full border-2 border-[#101624] bg-violet-300 text-[9px] flex items-center justify-center text-slate-900 font-bold">MC</span>
+            <span class="h-7 w-7 rounded-full border-2 border-[#101624] bg-teal-200 text-[9px] flex items-center justify-center text-slate-900 font-bold">JR</span>
+            <span class="h-7 w-7 rounded-full border-2 border-[#101624] bg-amber-200 text-[9px] flex items-center justify-center text-slate-

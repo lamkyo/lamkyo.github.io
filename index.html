@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lam Kyo | Autonomous Engineering & High-Performance Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glow { box-shadow: 0 0 50px -10px rgba(16, 185, 129, 0.15); }
+    </style>
+</head>
+<body class="min-h-screen bg-[#070b14] text-slate-200">
+    <!-- Navigation -->
+    <nav class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold mono text-sm">λ</div>
+                <span class="font-bold text-white tracking-tight">Lam Kyo</span>
+                <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 mono border border-slate-700/60">Autonomous Fleet</span>
+            </div>
+            <div class="flex items-center space-x-6 text-sm mono">
+                <a href="#proposals" class="text-slate-400 hover:text-white transition">Proposals</a>
+                <a href="#demos" class="text-slate-400 hover:text-white transition">Live Demos</a>
+                <a href="#rails" class="text-slate-400 hover:text-white transition">Settlement Rails</a>
+                <a href="https://github.com/lamkyo" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="max-w-6xl mx-auto px-6 pt-20 pb-16 text-center">
+        <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mono mb-6">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Production-Grade Verified Deliverables & Solutions</span>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-tight max-w-4xl mx-auto">
+            Autonomous Systems, AI Infrastructure & High-Value Bounties
+        </h1>
+        <p class="mt-6 text-slate-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            Delivering zero-bloat, TDD-verified engineering solutions across AI compiler optimization, Web3 protocols, and resilient distributed services.
+        </p>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-4">
+            <a href="#proposals" class="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 mono">
+                Browse Technical Proposals →
+            </a>
+            <a href="#rails" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm border border-slate-700/80 transition-all mono">
+                Verified Payment Rails
+            </a>
+        </div>
+    </header>
+
+    <!-- Key Metrics Grid -->
+    <section class="max-w-6xl mx-auto px-6 py-10">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 text-center">
+                <div class="text-3xl font-extrabold text-emerald-400 mono">100%</div>
+                <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider mono">Test Pass Rate</div>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 text-center">
+                <div class="text-3xl font-extrabold text-cyan-400 mono">&ge; 94%</div>
+                <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider mono">Tensix Peak TFLOPs</div>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 text-center">
+                <div class="text-3xl font-extrabold text-indigo-400 mono">338+</div>
+                <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider mono">Engineered Solutions</div>
+            </div>
+            <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 text-center">
+                <div class="text-3xl font-extrabold text-violet-400 mono">0-Leak</div>
+                <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider mono">Financial Integrity</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Solutions & Demos -->
+    <section id="demos" class="max-w-6xl mx-auto px-6 py-12">
+        <h2 class="text-2xl font-bold text-white tracking-tight mb-2">Featured Frontier Demos</h2>
+        <p class="text-sm text-slate-400 mb-8 mono">Interactive sandboxes and verified algorithmic implementations.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/50 transition glow flex flex-col justify-between">
+                <div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold mono">Compiler / AI</span>
+                    <h3 class="text-lg font-bold text-white mt-3">Tenstorrent Tensix SRAM Autotuner</h3>
+                    <p class="text-slate-400 text-sm mt-2 leading-relaxed">
+                        Eliminated L1 SRAM bank conflicts and deadlocks in systolic GEMM kernels, restoring ≥94% compute efficiency.
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs mono">
+                    <span class="text-emerald-400 font-semibold">$15,000 Milestone</span>
+                    <span class="text-slate-500">Verified OK</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/50 transition glow flex flex-col justify-between">
+                <div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-semibold mono">Ledger / Accounting</span>
+                    <h3 class="text-lg font-bold text-white mt-3">Auditable Revenue Split Calculator</h3>
+                    <p class="text-slate-400 text-sm mt-2 leading-relaxed">
+                        Deterministic micro-allocation algorithm with strict 0-leak rounding deltas and zero-settlement boundary verification.
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs mono">
+                    <span class="text-cyan-400 font-semibold">$3,000 Milestone</span>
+                    <span class="text-slate-500">10/10 Tests Passed</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/50 transition glow flex flex-col justify-between">
+                <div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold mono">High Concurrency</span>
+                    <h3 class="text-lg font-bold text-white mt-3">Shortlink Service & Collision Defense</h3>
+                    <p class="text-slate-400 text-sm mt-2 leading-relaxed">
+                        Thread-safe URL shortener with atomic deduplication and 20-thread concurrency invariant probe.
+                    </p>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs mono">
+                    <span class="text-indigo-400 font-semibold">$3,000 Milestone</span>
+                    <span class="text-slate-500">20-Thread Safe</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Rails Section -->
+    <section id="rails" class="max-w-6xl mx-auto px-6 py-12">
+        <h2 class="text-2xl font-bold text-white tracking-tight mb-2">Verified Settlement Rails</h2>
+        <p class="text-sm text-slate-400 mb-8 mono">Zero-friction payment destinations for client milestones and bug bounties.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-lg mono">P</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">PayPal Business Settlement</h3>
+                        <p class="text-xs text-slate-400 mono">Instant milestone release & invoice settlement</p>
+                    </div>
+                </div>
+                <div class="mt-4 p-4 rounded-xl bg-slate-950/80 border border-slate-800 mono text-sm flex items-center justify-between">
+                    <span class="text-slate-300">lamvukyo3001@gmail.com</span>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo" target="_blank" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition">
+                        Pay via PayPal
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-lg mono">Ξ</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">EVM Multi-Chain Rail (USDC / ETH)</h3>
+                        <p class="text-xs text-slate-400 mono">Base L2, Ethereum Mainnet, Arbitrum One, Polygon</p>
+                    </div>
+                </div>
+                <div class="mt-4 p-4 rounded-xl bg-slate-950/80 border border-slate-800 mono text-xs text-emerald-400 break-all select-all flex items-center justify-between">
+                    <span>0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 py-10 mt-16 bg-slate-950/40 text-center text-xs text-slate-500 mono">
+        <div class="max-w-6xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
+            <span>&copy; 2026 Lam Kyo. All Rights Reserved.</span>
+            <span>Zero-Bloat Engineering Standard | Ponytail Architecture</span>
+            <a href="https://github.com/lamkyo" target="_blank" class="text-slate-400 hover:text-white transition">github.com/lamkyo</a>
+        </div>
+    </footer>
+</body>
+</html>

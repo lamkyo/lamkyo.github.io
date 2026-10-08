@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twikey Senior Java Developer - Autonomous Engineering Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151c2c',
+                            900: '#0f172a',
+                            950: '#090d16',
+                        },
+                        brand: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for interactive metrics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+    <!-- Top Header Banner -->
+    <div class="bg-gradient-to-r from-indigo-900 via-purple-900 to-slate-900 border-b border-indigo-500/20 px-4 py-2.5 text-xs sm:text-sm sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+            <div class="flex items-center gap-2">
+                <span class="inline-flex items-center justify-center bg-indigo-500/20 text-indigo-400 p-1 rounded-md">
+                    <i data-lucide="rocket" class="w-4 h-4"></i>
+                </span>
+                <span class="font-medium text-indigo-100">
+                    Live Interactive Prototype for: <strong class="text-white underline decoration-indigo-500 underline-offset-2">[US Remote] Senior Java Developer at Twikey</strong> | Built autonomously by Antigravity OS
+                </span>
+            </div>
+            <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-a99f86a8" 
+               class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3 py-1.5 rounded-lg shadow-lg shadow-indigo-500/20 transition-all duration-200 transform hover:scale-105">
+                <i data-lucide="briefcase" class="w-3.5 h-3.5"></i>
+                Hire Team ($150 - $500)
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-[41px] z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-base tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Twikey Engine Core</span>
+                    <span class="text-xs text-indigo-400 block font-mono">v2.4.0-SEPA-PROD</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-2 bg-indigo-600 text-white shadow">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Ledger & Webhooks
+                </button>
+                <button onclick="switchTab('mandates')" id="nav-mandates" class="px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="file-key" class="w-4 h-4"></i> SEPA Mandates
+                </button>
+                <button onclick="switchTab('architecture')" id="nav-architecture" class="px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="network" class="w-4 h-4"></i> System Blueprint
+                </button>
+                <button onclick="switchTab('simulator')" id="nav-simulator" class="px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800">
+                    <i data-lucide="cpu" class="w-4 h-4"></i> Bank API Simulator
+                </button>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <div class="hidden lg:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-medium text-emerald-400">Kafka CDC Active</span>
+                </div>
+                <button onclick="triggerSimulatedEvent()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-medium px-3 py-2 rounded-lg flex items-center gap-1.5 transition">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-yellow-400"></i> Test Webhook
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Nav Selector -->
+    <div class="md:hidden flex overflow-x-auto gap-2 p-3 bg-slate-900 border-b border-slate-800">
+        <button onclick="switchTab('dashboard')" id="mnav-dashboard" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-indigo-600 text-white font-medium">Ledger & Webhooks</button>
+        <button onclick="switchTab('mandates')" id="mnav-mandates" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300 font-medium">SEPA Mandates</button>
+        <button onclick="switchTab('architecture')" id="mnav-architecture" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300 font-medium">System Blueprint</button>
+        <button onclick="switchTab('simulator')" id="mnav-simulator" class="px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300 font-medium">Bank API Simulator</button>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- TAB 1: DASHBOARD / LEDGER & WEBHOOKS -->
+        <section id="tab-dashboard" class="space-y-6">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Processed Today</span>
+                        <span class="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl"><i data-lucide="activity" class="w-4 h-4"></i></span>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <div class="text-2xl font-bold tracking-tight text-white" id="stat-transactions">148,294</div>
+                        <span class="text-xs font-semibold text-emerald-400 flex items-center">+12.4% <i data-lucide="trending-up" class="w-3 h-3 ml-0.5"></i></span>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500 font-mono">SEPA Direct Debit & PSD2</div>
+                </div>
+
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Webhook Latency (p99)</span>
+                        <span class="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl"><i data-lucide="zap" class="w-4 h-4"></i></span>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <div class="text-2xl font-bold tracking-tight text-white">18.4ms</div>
+                        <span class="text-xs font-semibold text-emerald-400 flex items-center">-2.1ms</span>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500 font-mono">Go Edge Gateway Engine</div>
+                </div>
+
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Active Mandate States</span>
+                        <span class="p-2 bg-purple-500/10 text-purple-400 rounded-xl"><i data-lucide="file-check" class="w-4 h-4"></i></span>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <div class="text-2xl font-bold tracking-tight text-white">42,891</div>
+                        <span class="text-xs font-semibold text-purple-400 flex items-center">99.99% ACID</span>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500 font-mono">PostgreSQL Partitioned Ledger</div>
+                </div>
+
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Idempotency Hit Rate</span>
+                        <span class="p-2 bg-blue-500/10 text-blue-400 rounded-xl"><i data-lucide="shield" class="w-4 h-4"></i></span>
+                    </div>
+                    <div class="mt-4 flex items-baseline justify-between">
+                        <div class="text-2xl font-bold tracking-tight text-white">100%</div>
+                        <span class="text-xs font-semibold text-blue-400 flex items-center">0 Double-Charges</span>
+                    </div>
+                    <div class="mt-2 text-xs text-slate-500 font-mono">Outbox Pattern Enforced</div>
+                </div>
+            </div>
+
+            <!-- Charts & Realtime Stream Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Throughput Chart -->
+                <div class="lg:col-span-2 bg-slate-900/70 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                        <div>
+                            <h2 class="text-base font-semibold text-white">High-Frequency Transaction Ingestion</h2>
+                            <p class="text-xs text-slate-400">Real-time throughput across Spring Boot microservices & Go bank workers</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span> Live Stream
+                            </span>
+                        </div>
+                    </div>
+                    <div class="h-64 sm:h-72 w-full relative">
+                        <canvas id="throughputChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Live Webhook Activity Feed -->
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 flex flex-col">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-base font-semibold text-white">Webhook Event Stream</h2>
+                            <p class="text-xs text-slate-400">Incoming bank & ERP notifications</p>
+                        </div>
+                        <span class="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">Debezium CDC</span>
+                    </div>
+                    
+                    <div id="webhook-stream" class="flex-1 space-y-3 overflow-y-auto max-h-72 pr-1 font-mono text-xs">
+                        <!-- Dynamically populated events -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Ledger Table -->
+            <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="text-base font-semibold text-white">Recent Mandate & Payment Transactions</h2>
+                        <p class="text-xs text-slate-400">Optimized index queries on PostgreSQL partitioned ledger</p>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <div class="relative flex-1 sm:w-64">
+                            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-500"></i>
+                            <input type="text" id="ledger-search" oninput="filterLedger()" placeholder="Search reference, IBAN, debtor..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <select id="ledger-status-filter" onchange="filterLedger()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition">
+                            <option value="ALL">All States</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="PENDING">PENDING</option>
+                            <option value="REVOKED">REVOKED</option>
+                            <option value="FAILED">FAILED</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-950/60 text-slate-400 uppercase font-mono tracking-wider border-b border-slate-800">
+                            <tr>
+                                <th class="py-3 px-4">Transaction ID</th>
+                                <th class="py-3 px-4">Mandate Ref</th>
+                                <th class="py-3 px-4">Debtor / Bank</th>
+                                <th class="py-3 px-4">Amount</th>
+                                <th class="py-3 px-4">State</th>
+                                <th class="py-3 px-4">Protocol</th>
+                                <th class="py-3 px-4 text-right">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-table-body" class="divide-y divide-slate-800/60 font-mono">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: SEPA MANDATES -->
+        <section id="tab-mandates" class="space-y-6 hidden">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900/70 border border-slate-800 rounded-2xl p-6">
+                <div>
+                    <h2 class="text-lg font-bold text-white">SEPA Mandate State Engine</h2>
+                    <p class="text-xs text-slate-400">Cryptographic auditability and lifecycle management across European banking rails</p>
+                </div>
+                <button onclick="openNewMandateModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20 flex items-center gap-2 transition">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Create Mandate
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Mandate State Card 1 -->
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20">PENDING</span>
+                        <span class="text-xs text-slate-500 font-mono">1,402 items</span>
+                    </div>
+                    <div class="space-y-3" id="mandate-list-pending">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Mandate State Card 2 -->
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVE</span>
+                        <span class="text-xs text-slate-500 font-mono">38,190 items</span>
+                    </div>
+                    <div class="space-y-3" id="mandate-list-active">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Mandate State Card 3 -->
+                <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-mono font-semibold px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20">REVOKED</span>
+                        <span class="text-xs text-slate-500 font-mono">3,299 items</span>
+                    </div>
+                    <div class="space-y-3" id="mandate-list-revoked">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: SYSTEM ARCHITECTURE -->
+        <section id="tab-architecture" class="space-y-6 hidden">
+            <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 sm:p-8">
+                <div class="max-w-3xl mb-8">
+                    <h2 class="text-xl font-bold text-white tracking-tight">Enterprise Architecture Blueprint</h2>
+                    <p class="text-sm text-slate-400 mt-1">High-throughput, fault-tolerant distributed system designed for Twikey's SEPA, PSD2, and recurring payment ecosystem.</p>
+                </div>
+
+                <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 font-mono text-xs text-slate-300 overflow-x-auto shadow-inner">
+                    <pre class="leading-relaxed">
+[Banks / ERPs / APIs] 
+       │
+       ▼ (mTLS / Signed Webhooks)
+[API Gateway / Edge Proxy (Go / Envoy)]
+       │
+       ├─────────────────────────┐
+       ▼                         ▼
+[Core Java Service (Spring)]   [Go Integration Worker]
+       │                         │
+       ├─────────┬───────────────┘
+       ▼         ▼
+[PostgreSQL Primary / Replica] ──> [Debezium / Kafka CDC] ──> [AI Insights / Analytics Engine]
+                    </pre>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="p-2 bg-indigo-500/10 text-indigo-400 rounded-lg"><i data-lucide="cpu" class="w-5 h-5"></i></div>
+                            <h3 class="font-semibold text-white text-sm">Polyglot Microservices</h3>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">Go edge proxy handles 50k+ concurrent webhook requests with negligible memory overhead, routing transactions to Spring Boot core services.</p>
+                    </div>
+
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg"><i data-lucide="database" class="w-5 h-5"></i></div>
+                            <h3 class="font-semibold text-white text-sm">ACID Ledger & Outbox Pattern</h3>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">Strict transactional consistency in PostgreSQL. Outbox pattern ensures guaranteed event publishing to Kafka without dual-write anomalies.</p>
+                    </div>
+
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-5">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="p-2 bg-purple-500/10 text-purple-400 rounded-lg"><i data-lucide="lock" class="w-5 h-5"></i></div>
+                            <h3 class="font-semibold text-white text-sm">Zero-Trust & mTLS Security</h3>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed">Cryptographic mandate signatures, OAuth2 token introspection, and strict MTLS enforcement for all bank API integrations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: BANK API SIMULATOR -->
+        <section id="tab-simulator" class="space-y-6 hidden">
+            <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 sm:p-8">
+                <div class="max-w-2xl mb-6">
+                    <h2 class="text-lg font-bold text-white">Interactive Bank & ERP Integration Sandbox</h2>
+                    <p class="text-xs text-slate-400">Trigger mock SEPA mandate registrations and payment status callbacks to test engine resilience.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="space-y-4 bg-slate-950/60 border border-slate-800 p-6 rounded-2xl">
+                        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                            <i data-lucide="terminal" class="w-4 h-4 text-indigo-400"></i> Dispatch Webhook Payload
+                        </h3>
+                        
+                        <div>
+                            <label class="block text-xs font-mono text-slate-400 mb-1">EVENT TYPE</label>
+                            <select id="sim-event-type" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                                <option value="mandate.signed">mandate.signed (SEPA Core)</option>
+                                <option value="mandate.revoked">mandate.revoked (Debtor Initiated)</option>
+                                <option value="payment.collected">payment.collected (Successful Settlement)</option>
+                                <option value="payment.rejected">payment.rejected (Insufficient Funds / R-transaction)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-mono text-slate-400 mb-1">DEBTOR IBAN</label>
+                            <input type="text" id="sim-iban" value="NL89INGB0001234567" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-mono text-slate-400 mb-1">AMOUNT (€)</label>
+                            <input type="number" id="sim-amount" value="149.50" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <button onclick="runSimulation()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs py-3 rounded-xl shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2">
+                            <i data-lucide="play" class="w-4 h-4"></i> Execute Test Ingestion
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 p-6 rounded-2xl flex flex-col">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs font-mono text-slate-400">ENGINE RESPONSE CONSOLE</span>
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        </div>
+                        <div id="sim-console" class="flex-1 bg-slate-900/90 border border-slate-800/80 rounded-xl p-4 font-mono text-xs text-emerald-400 overflow-y-auto max-h-72">
+                            [System Ready] Waiting for simulated bank payload...
+                            > Connected to Twikey Spring Boot Embedded Broker.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-900/40 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                Built autonomously by <span class="text-indigo-400 font-medium">Antigravity OS</span> for Twikey Senior Java Developer Application.
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-a99f86a8" class="text-indigo-400 hover:underline">Contact Candidate</a>
+                <span>•</span>
+                <span>Java 21</span>
+                <span>•</span>
+                <span>Spring Boot 3.2</span>
+                <span>•</span>
+                <span>Go 1.22</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- New Mandate Modal -->
+    <div id="mandate-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-white">Create New SEPA Mandate</h3>
+                <button onclick="closeNewMandateModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-mono text-slate-400 mb-1">DEBTOR NAME</label>
+                    <input type="text" id="modal-name" value="Acme Corporation BV" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200">
+                </div>
+                <div>
+                    <label class="block font-mono text-slate-400 mb-1">IBAN</label>
+                    <input type="text" id="modal-iban" value="NL34ABNA0583920182" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono">
+                </div>
+                <div>
+                    <label class="block font-mono text-slate-400 mb-1">INITIAL AMOUNT (€)</label>
+                    <input type="number" id="modal-amount" value="500.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-slate-200 font-mono">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="closeNewMandateModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700">Cancel</button>
+                <button onclick="submitNewMandate()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20">Register Mandate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Mock Data Store
+        const ledgerData = [
+            { id: "TX-94812", ref: "MND-2024-8812", debtor: "Philips Lighting NV (NL)", amount: "€1,250.00", status: "ACTIVE", protocol: "SEPA Core", time: "14:22:01" },
+            { id: "TX-94811", ref: "MND-2024-8811", debtor: "ASML Holding (NL)", amount: "€4,800.00", status: "ACTIVE", protocol: "SEPA B2B", time: "14:21:45" },
+            { id: "TX-94810", ref: "MND-2024-8810", debtor: "Coolblue BV (NL)", amount: "€89.50", status: "PENDING", protocol: "PSD2 iDEAL", time: "14:20:12" },
+            { id: "TX-94809", ref: "MND-2024-8809", debtor: "Heineken Supply Chain (NL)", amount: "€3,400.00", status: "ACTIVE", protocol: "SEPA B2B", time: "14:18:50" },
+            { id: "TX-94808", ref: "MND-2024-8808", debtor: "Spotify AB (SE)", amount: "€11.99", status: "REVOKED", protocol: "Card Token", time: "14:15:33" },
+            { id: "TX-94807", ref: "MND-2024-8807", debtor: "Exact Software (NL)", amount: "€240.00", status: "ACTIVE", protocol: "SEPA Core", time: "14:12:05" },
+            { id: "TX-94806", ref: "MND-2024-8806", debtor: "Bol.com Retail (NL)", amount: "€65.20", status: "FAILED", protocol: "PSD2 OpenBanking", time: "14:10:01" }
+        ];
+
+        const mandatesData = {
+            pending: [
+                { ref: "MND-2024-9011", name: "Stripe Payments Europe", iban: "IE29AIBK930291", amount: "€1,500.00" },
+                { ref: "MND-2024-9012", name: "Adyen NV", iban: "NL04INGB0675849", amount: "€3,200.00" }
+            ],
+            active: [
+                { ref: "MND-2024-8812", name: "Philips Lighting NV", iban: "NL91ABNA0417283", amount: "€1,250.00" },
+                { ref: "MND-2024-8811", name: "ASML Holding", iban: "NL12RABO0537281", amount: "€4,800.00" },
+                { ref: "MND-2024-8809", name: "Heineken Supply", iban: "NL55INGB0993821", amount: "€3,400.00" }
+            ],
+            revoked: [
+                { ref: "MND-2024-7710", name: "Netflix International", iban: "LU88BCEE0001928", amount: "€17.99" },
+                { ref: "MND-2024-7621", name: "Amazon EU S.a.r.l.", iban: "LU23BCEE0998172", amount: "€49.00" }
+            ]
+        };
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'mandates', 'architecture', 'simulator'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`nav-${t}`);
+                const mbtn = document.getElementById(`mnav-${t}`);
+                if (t === tabId) {
+                    if(el) el.classList.remove('hidden');
+                    if(btn) {
+                        btn.className = "px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-2 bg-indigo-600 text-white shadow";
+                    }
+                    if(mbtn) {
+                        mbtn.className = "px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-indigo-600 text-white font-medium";
+                    }
+                } else {
+                    if(el) el.classList.add('hidden');
+                    if(btn) {
+                        btn.className = "px-4 py-2 rounded-lg text-xs font-medium transition-all duration-150 flex items-center gap-2 text-slate-400 hover:text-white hover:bg-slate-800";
+                    }
+                    if(mbtn) {
+                        mbtn.className = "px-3 py-1.5 rounded-lg text-xs whitespace-nowrap bg-slate-800 text-slate-300 font-medium";
+                    }
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // Render Ledger Table
+        function renderLedger(dataToRender = ledgerData) {
+            const tbody = document.getElementById('ledger-table-body');
+            tbody.innerHTML = '';
+            dataToRender.forEach(row => {
+                let badgeColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                if(row.status === 'PENDING') badgeColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                if(row.status === 'REVOKED') badgeColor = "bg-rose-500/10 text-rose-400 border-rose-500/20";
+                if(row.status === 'FAILED') badgeColor = "bg-red-500/10 text-red-400 border-red-500/20";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-semibold text-indigo-400">${row.id}</td>
+                    <td class="py-3 px-4 text-slate-300">${row.ref}</td>
+                    <td class="py-3 px-4 text-slate-200">${row.debtor}</td>
+                    <td class="py-3 px-4 text-white font-bold">${row.amount}</td>
+                    <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-mono border ${badgeColor}">${row.status}</span></td>
+                    <td class="py-3 px-4 text-slate-400">${row.protocol}</td>
+                    <td class="py-3 px-4 text-right text-slate-500">${row.time}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Filter Ledger
+        function filterLedger() {
+            const query = document.getElementById('ledger-search').value.toLowerCase();
+            const status = document.getElementById('ledger-status-filter').value;
+
+            const filtered = ledgerData.filter(item => {
+                const matchesQuery = item.debtor.toLowerCase().includes(query) || item.ref.toLowerCase().includes(query) || item.id.toLowerCase().includes(query);
+                const matchesStatus = status === 'ALL' || item.status === status;
+                return matchesQuery && matchesStatus;
+            });
+            renderLedger(filtered);
+        }
+
+        // Render Mandates Lists
+        function renderMandates() {
+            ['pending', 'active', 'revoked'].forEach(state => {
+                const container = document.getElementById(`mandate-list-${state}`);
+                container.innerHTML = '';
+                mandatesData[state].forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = "bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5 space-y-1 font-mono text-xs";
+                    div.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-white">${m.ref}</span>
+                            <span class="text-indigo-400 font-bold">${m.amount}</span>
+                        </div>
+                        <div class="text-slate-300">${m.name}</div>
+                        <div class="text-[11px] text-slate-500">${m.iban}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            });
+        }
+
+        // Realtime Webhook Stream Simulation
+        const webhookEvents = [
+            { type: "mandate.signed", msg: "Mandate MND-2024-8813 authorized via ING Bank PSD2 API", time: "Just now" },
+            { type: "payment.collected", msg: "SEPA Direct Debit €340.00 settled for ASML Holding", time: "5s ago" },
+            { type: "webhook.dispatched", msg: "ERP webhook delivered to exactonline.nl (HTTP 200 OK)", time: "12s ago" }
+        ];
+
+        function renderWebhookStream() {
+            const stream = document.getElementById('webhook-stream');
+            stream.innerHTML = '';
+            webhookEvents.forEach(ev => {
+                const div = document.createElement('div');
+                div.className = "p-2.5 rounded-lg bg-slate-950 border border-slate-800/80 space-y-1";
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-indigo-400 font-bold">event:${ev.type}</span>
+                        <span class="text-[10px] text-slate-500">${ev.time}</span>
+                    </div>
+                    <div class="text-slate-300">${ev.msg}</div>
+                `;
+                stream.appendChild(div);
+            });
+        }
+
+        function triggerSimulatedEvent() {
+            const types = ["mandate.signed", "payment.collected", "payment.rejected", "mandate.revoked"];
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            webhookEvents.unshift({
+                type: randomType,
+                msg: `Simulated event triggered via Go Edge proxy worker for IBAN NL99ABNA...`,
+                time: "Just now"
+            });
+            if(webhookEvents.length > 5) webhookEvents.pop();
+            renderWebhookStream();
+
+            // Flash stat
+            const statTx = document.getElementById('stat-transactions');
+            let current = parseInt(statTx.innerText.replace(/,/g, ''));
+            statTx.innerText = (current + 1).toLocaleString();
+        }
+
+        // Bank API Simulator Execution
+        function runSimulation() {
+            const eventType = document.getElementById('sim-event-type').value;
+            const iban = document.getElementById('sim-iban').value;
+            const amount = document.getElementById('sim-amount').value;
+            const consoleEl = document.getElementById('sim-console');
+
+            consoleEl.innerHTML += `\n> [POST] /api/v2/webhooks/incoming [${eventType}]`;
+            consoleEl.innerHTML += `\n> Payload: { iban: "${iban}", amount: "${amount}", timestamp: "${new Date().toISOString()}" }`;
+            
+            setTimeout(() => {
+                consoleEl.innerHTML += `\n> Go Edge Proxy validated HMAC SHA-256 signature (OK).`;
+                consoleEl.innerHTML += `\n> Spring Boot Outbox Pattern published event to Kafka topic [twikey.mandates.events].`;
+                consoleEl.innerHTML += `\n> PostgreSQL transaction committed successfully (ACID verified). [HTTP 200 OK]`;
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }, 400);
+        }
+
+        // Modal Controls
+        function openNewMandateModal() {
+            document.getElementById('mandate-modal').classList.remove('hidden');
+        }
+        function closeNewMandateModal() {
+            document.getElementById('mandate-modal').classList.add('hidden');
+        }
+        function submitNewMandate() {
+            const name = document.getElementById('modal-name').value;
+            const iban = document.getElementById('modal-iban').value;
+            const amount = '€' + parseFloat(document.getElementById('modal-amount').value).toFixed(2);
+            const ref = 'MND-2024-' + Math.floor(1000 + Math.random() * 9000);
+
+            mandatesData.pending.unshift({ ref, name, iban, amount });
+            ledgerData.unshift({
+                id: "TX-" + Math.floor(10000 + Math.random() * 90000),
+                ref,
+                debtor: name,
+                amount,
+                status: "PENDING",
+                protocol: "SEPA Core",
+                time: "Just now"
+            });
+
+            renderMandates();
+            renderLedger();
+            closeNewMandateModal();
+        }
+
+        // Initialize Chart.js
+        window.addEventListener('DOMContentLoaded', () => {
+            renderLedger();
+            renderMandates();
+            renderWebhookStream();
+
+            const ctx = document.getElementById('throughputChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['13:40', '13:50', '14:00', '14:10', '14:20', '14:30'],
+                    datasets: [{
+                        label: 'Transactions / sec',
+                        data: [1200, 1900, 2400, 2100, 3100, 3850],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b', font: { family: 'monospace', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b', font: { family: 'monospace', size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // Periodic live simulation tick
+            setInterval(() => {
+                triggerSimulatedEvent();
+            }, 7000);
+        });
+    </script>
+</body>
+</html>

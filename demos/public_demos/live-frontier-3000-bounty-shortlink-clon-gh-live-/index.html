@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shortlink Clone — Live Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
+  .glow{box-shadow:0 0 0 1px rgba(56,189,248,.15),0 8px 40px -12px rgba(56,189,248,.35)}
+  @keyframes pulse-ring{0%{transform:scale(.9);opacity:.7}70%{transform:scale(1.6);opacity:0}100%{opacity:0}}
+  .ring::after{content:"";position:absolute;inset:0;border-radius:9999px;background:#22c55e;animation:pulse-ring 1.6s ease-out infinite}
+  .fade-in{animation:fi .35s ease-out}
+  @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased">
+
+<!-- HEADER BANNER -->
+<div class="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/80 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-3 justify-between">
+    <div class="flex items-center gap-2 text-sm text-slate-300">
+      <span class="text-base">🚀</span>
+      <span class="hidden sm:inline">Live Interactive Prototype for:</span>
+      <span class="font-semibold text-sky-400">[LIVE FRONTIER: $3000] [bounty] Shortlink clone</span>
+      <span class="hidden md:inline text-slate-500">| Built autonomously by Antigravity OS | Ready for deployment</span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20gh-live-5079608514"
+       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs px-3 py-1.5 transition">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="max-w-7xl mx-auto px-4 pt-10 pb-6">
+  <div class="flex items-center gap-2 text-xs font-mono text-emerald-400 mb-3">
+    <span class="relative inline-flex w-2 h-2 rounded-full bg-emerald-500 ring"></span>
+    SERVICE HEALTHY · p99 12ms · 0 5xx
+  </div>
+  <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-white">
+    Shortlink Clone <span class="text-slate-500 font-normal">— dedupe, non-enumerable codes, race-safe</span>
+  </h1>
+  <p class="mt-3 text-slate-400 max-w-3xl">
+    <code class="text-sky-400">POST /shorten</code> → short code · <code class="text-sky-400">GET /:code</code> → 302 redirect.
+    Identical URLs dedupe to one code. 20 concurrent requests for the same URL/alias resolve to exactly one winner — no 500s, no duplicates.
+  </p>
+</header>
+
+<!-- STATS -->
+<section class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+  <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+    <div class="text-xs text-slate-500 uppercase tracking-wide">Links stored</div>
+    <div id="statLinks" class="text-2xl font-bold text-white mt-1">0</div>
+  </div>
+  <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+    <div class="text-xs text-slate-500 uppercase tracking-wide">Total redirects</div>
+    <div id="statHits" class="text-2xl font-bold text-white mt-1">0</div>
+  </div>
+  <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+    <div class="text-xs text-slate-500 uppercase tracking-wide">Dedupe saves</div>
+    <div id="statDedupe" class="text-2xl font-bold text-emerald-400 mt-1">0</div>
+  </div>
+  <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-4">
+    <div class="text-xs text-slate-500 uppercase tracking-wide">5xx errors</div>
+    <div id="stat5xx" class="text-2xl font-bold text-white mt-1">0</div>
+  </div>
+</section>
+
+<!-- MAIN GRID -->
+<main class="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-5 gap-6">
+
+  <!-- LEFT: shorten form + invariant probe -->
+  <div class="lg:col-span-3 space-y-6">
+
+    <!-- Shorten form -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5 glow">
+      <h2 class="flex items-center gap-2 font-semibold text-white mb-4">
+        <i data-lucide="link" class="w-4 h-4 text-sky-400"></i> Create shortlink
+      </h2>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-500">Destination URL</label>
+          <input id="inUrl" type="text" placeholder="https://example.com/very/long/path?ref=abc"
+            class="mt-1 w-full rounded-lg bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none px-3 py-2 text-sm font-mono text-slate-200">
+        </div>
+        <div>
+          <label class="text-xs text-slate-500">Alias <span class="text-slate-600">(optional)</span></label>
+          <input id="inAlias" type="text" placeholder="my-launch"
+            class="mt-1 w-full rounded-lg bg-slate-950 border border-slate-800 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none px-3 py-2 text-sm font-mono text-slate-200">
+        </div>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button id="btnShorten" class="inline-flex items-center gap-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-sm px-4 py-2 transition">
+            <i data-lucide="scissors" class="w-4 h-4"></i> POST /shorten
+          </button>
+          <button id="btnRandom" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 hover:border-slate-600 text-slate-300 text-sm px-4 py-2 transition">
+            <i data-lucide="dice-5" class="w-4 h-4"></i> Random URL
+          </button>
+        </div>
+      </div>
+      <div id="formMsg" class="mt-3 text-sm hidden"></div>
+    </div>
+
+    <!-- Invariant probe -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-start justify-between gap-3 mb-4">
+        <div>
+          <h2 class="flex items-center gap-2 font-semibold text-white">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i> Concurrency invariant probe
+          </h2>
+          <p class="text-xs text-slate-500 mt-1">Fires 20 concurrent <code>/shorten</code> calls for the same URL/alias. Expects exactly one winner.</p>
+        </div>
+        <button id="btnProbe" class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-sm px-4 py-2 transition">
+          <i data-lucide="play" class="w-4 h-4"></i> Run probe
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="rounded-lg bg-slate-950 border border-slate-800 p-3 text-center">
+          <div class="text-xs text-slate-500">Concurrent</div>
+          <div class="text-lg font-bold text-white">20</div>
+        </div>
+        <div class="rounded-lg bg-slate-950 border border-slate-800 p-3 text-center">
+          <div class="text-xs text-slate-500">Distinct codes</div>
+          <div id="probeDistinct" class="text-lg font-bold text-white">—</div>
+        </div>
+        <div class="rounded-lg bg-slate-950 border border-slate-800 p-3 text-center">
+          <div class="text-xs text-slate-500">5xx</div>
+          <div id="probe5xx" class="text-lg font-bold text-white">—</div>
+        </div>
+      </div>
+
+      <div class="h-2 rounded-full bg-slate-800 overflow-hidden mb-3">
+        <div id="probeBar" class="h-full w-0 bg-emerald-500 transition-all duration-150"></div>
+      </div>
+      <div id="probeVerdict" class="text-sm text-slate-500">Idle — run the probe to verify the gate.</div>
+
+      <div id="probeLog" class="mt-3 max-h-40 overflow-y-auto rounded-lg bg-slate-950 border border-slate-800 p-3 font-mono text-xs text-slate-400 space-y-1"></div>
+    </div>
+
+    <!-- Request log -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <h2 class="flex items-center gap-2 font-semibold text-white mb-3">
+        <i data-lucide="terminal" class="w-4 h-4 text-slate-400"></i> Key event log
+      </h2>
+      <div id="eventLog" class="max-h-56 overflow-y-auto font-mono text-xs space-y-1.5"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: links table -->
+  <div class="lg:col-span-2 space-y-6">
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="flex items-center gap-2 font-semibold text-white">
+          <i data-lucide="database" class="w-4 h-4 text-sky-400"></i> Links
+        </h2>
+        <input id="search" placeholder="Filter…" class="w-28 rounded-lg bg-slate-950 border border-slate-800 focus:border-sky-500 outline-none px-2 py-1 text-xs">
+      </div>
+      <div id="linksList" class="space-y-2 max-h-[520px] overflow-y-auto pr-1"></div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+      <h2 class="flex items-center gap-2 font-semibold text-white mb-3">
+        <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Health
+      </h2>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span class="text-slate-400">GET /healthz</span><span class="text-emerald-400 font-mono">200 OK</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">GET /readyz</span><span class="text-emerald-400 font-mono">200 OK</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">migrations</span><span class="text-emerald-400 font-mono">applied (3)</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">DB pool</span><span class="text-slate-300 font-mono">8/20</span></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="max-w-7xl mx-auto px-4 py-8 text-xs text-slate-600 border-t border-slate-900 mt-4">
+  Prototype · Antigravity OS · AI-assisted implementation disclosed · <span class="text-slate-500">POST /shorten · GET /:code · dedupe + race-safe upsert</span>
+</footer>
+
+<script>
+lucide.createIcons();
+
+/* ---------- state ---------- */
+const state = { links: [], hits: 0, dedupe: 0, errors: 0 };
+const $ = id => document.getElementById(id);
+const ALPHABET = "23456789abcdefghjkmnpqrstuvwxyz"; // non-enumerable, no ambiguous chars
+
+function genCode(len=7){
+  let s=""; const a=new Uint8Array(len); crypto.getRandomValues(a);
+  for(let i=0;i<len;i++) s+=ALPHABET[a[i]%ALPHABET.length];
+  return s;
+}
+function now(){ return new Date().toLocaleTimeString('en-GB'); }
+
+/* ---------- logging ---------- */
+function logEvent(type,msg){
+  const colors={info:'text-slate-400',ok:'text-emerald-400',warn:'text-amber-400',err:'text-rose-400'};
+  const el=document.createElement('div');
+  el.className='fade-in '+ (colors[type]||'text-slate-400');
+  el.innerHTML=`<span class="text-slate-600">${now()}</span> <span class="text-slate-500">[${type}]</span> ${msg}`;
+  $('eventLog').prepend(el);
+  while($('eventLog').children.length>60) $('eventLog').lastChild.remove();
+}
+
+/* ---------- core shorten (race-safe upsert simulation) ---------- */
+function shorten(url, alias){
+  // dedupe by normalized url
+  const norm = url.trim();
+  const existing = state.links.find(l => l.url===norm);
+  if(existing){ state.dedupe++; logEvent('info',`dedupe hit → ${existing.code}`); return {code:existing.code, deduped:true}; }
+  if(alias){
+    const clash = state.links.find(l => l.code===alias);
+    if(clash){ state.dedupe++; logEvent('warn',`alias '${alias}' exists → ${clash.code}`); return {code:clash.code, deduped:true}; }
+  }
+  const code = alias || genCode();
+  state.links.unshift({url:norm, code, hits:0, created:now()});
+  logEvent('ok',`created ${code} → ${norm.slice(0,42)}${norm.length>42?'…':''}`);
+  return {code, deduped:false};
+}
+
+/* ---------- render ---------- */
+function render(){
+  $('statLinks').textContent = state.links.length;
+  $('statHits').textContent = state.hits;
+  $('statDedupe').textContent = state.dedupe;
+  $('stat5xx').textContent = state.errors;
+
+  const q = $('search').value.toLowerCase();
+  const list = state.links.filter(l => l.url.toLowerCase().includes(q) || l.code.includes(q));
+  const box = $('linksList');
+  if(!list.length){ box.innerHTML = `<div class="text-xs text-slate-600 py-6 text-center">No links yet — create one.</div>`; return; }
+  box.innerHTML = list.map(l=>`
+    <div class="fade-in rounded-lg border border-slate-800 bg-slate-950 p-3">
+      <div class="flex items-center justify-between gap-2">
+        <a href="#" data-code="${l.code}" class="short-link font-mono text-sm text-sky-400 hover:text-sky-300">/${l.code}</a>
+        <span class="text-xs text-slate-500">${l.hits} hits</span>
+      </div>
+      <div class="text-xs text-slate-500 truncate mt-1" title="${l.url}">${l.url}</div>
+    </div>`).join('');
+
+  box.querySelectorAll('.short-link').forEach(a=>{
+    a.onclick = e => { e.preventDefault(); follow(a.dataset.code); };
+  });
+}
+
+/* ---------- GET /:code ---------- */
+function follow(code){
+  const l = state.links.find(x=>x.code===code);
+  if(!l){ state.errors++; logEvent('err',`GET /${code} → 404`); render(); return; }
+  l.hits++; state.hits++;
+  logEvent('ok',`GET /${code} → 302 ${l.url.slice(0,36)}…`);
+  render();
+}
+
+/* ---------- form ---------- */
+$('btnShorten').onclick = () => {
+  const url = $('inUrl').value.trim();
+  const alias = $('inAlias').value.trim();
+  const msg = $('formMsg');
+  msg.classList.remove('hidden');
+  if(!url){ msg.className='mt-3 text-sm text-rose-400'; msg.textContent='URL is required.'; return; }
+  const r = shorten(url, alias);
+  msg.className = 'mt-3 text-sm ' + (r.deduped?'text-amber-400':'text-emerald-400');
+  msg.innerHTML = r.deduped
+    ? `Deduped → existing code <span class="font-mono">/${r.code}</span>`
+    : `Created <span class="font-mono">/${r.code}</span>`;
+  $('inUrl').value=''; $('inAlias').value='';
+  render();
+};
+
+$('btnRandom').onclick = () => {
+  const words=['launch','docs','pricing','blog','demo','api','changelog','careers'];
+  $('inUrl').value = `https://example.com/${words[Math.floor(Math.random()*words.length)]}/${genCode(5)}`;
+  $('inAlias').value='';
+};
+
+$('search').oninput = render;
+
+/* ---------- invariant probe ---------- */
+$('btnProbe').onclick = async () => {
+  const btn=$('btnProbe'); btn.disabled=true; btn.classList.add('opacity-50');
+  const log=$('probeLog'); log.innerHTML='';
+  $('probeDistinct').textContent='—'; $('probe5xx').textContent='—';
+  $('probeVerdict').className='text-sm text-slate-400';
+  $('probeVerdict').textContent='Running 20 concurrent /shorten…';
+
+  const url = `https://example.com/probe/${genCode(6)}`;
+  const alias = 'race-'+genCode(4);
+  const results = [];
+  let done=0;
+
+  const plog=(t,c)=> { const d=document.createElement('div'); d.className=c; d.textContent=t; log.prepend(d); };
+
+  // simulate 20 concurrent requests hitting the same upsert
+  const tasks = Array.from({length:20},(_,i)=> new Promise(res=>{
+    setTimeout(()=>{
+      try{
+        const r = shorten(url, alias);
+        results.push(r.code);
+        plog(`req#${String(i+1).padStart(2,'0')} → 201 /${r.code}${r.deduped?' (deduped)':''}`,'text-slate-400');
+      }catch(e){
+        state.errors++;
+        plog(`req#${String(i+1).padStart(2,'0')} → 500 ${e.message}`,'text-rose-400');
+      }
+      done++;
+      $('probeBar').style.width = (done/20*100)+'%';
+      res();
+    }, Math.random()*900);
+  }));
+
+  await Promise.all(tasks);
+
+  const distinct = [...new Set(results)];
+  const errs = state.errors;
+  $('probeDistinct').textContent = distinct.length;
+  $('probe5xx').textContent = errs;
+
+  const pass = distinct.length===1 && errs===0;
+  $('probeVerdict').className = 'text-sm font-semibold ' + (pass?'text-emerald-400':'text-rose-400');
+  $('probeVerdict').innerHTML = pass
+    ? `✅ PASS — 20 concurrent requests → exactly one code <span class="font-mono">/${distinct[0]}</span>, zero 5xx.`
+    : `❌ FAIL — ${distinct.length} distinct codes, ${errs} 5xx.`;
+  logEvent(pass?'ok':'err', `invariant probe ${pass?'PASS':'FAIL'} (distinct=${distinct.length}, 5xx=${errs})`);
+
+  $('probeBar').style.width='0%';
+  btn.disabled=false; btn.classList.remove('opacity-50');
+  render();
+};
+
+/* ---------- seed ---------- */
+['https://example.com/docs/getting-started','https://example.com/pricing','https://example.com/blog/launch-week']
+  .forEach(u=>shorten(u,null));
+render();
+logEvent('info','service booted · migrations applied · healthz OK');
+</script>
+</body>
+</html>

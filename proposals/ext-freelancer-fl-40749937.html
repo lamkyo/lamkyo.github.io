@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Embroidery Design Software - Technical Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Inter", sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+        .mono { font-family: "JetBrains Mono", monospace; }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12">
+    <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 md:p-12 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-8">
+            <div>
+                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mono uppercase tracking-wider">Verified Proposal & Dossier</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mt-3">Windows Embroidery Design Software</h1>
+                <p class="text-slate-400 text-sm mt-1 mono">Job ID: ext-freelancer-fl-40749937 | Milestone Value: $250.00 USD</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-emerald-400 mono">$250.00</div>
+                <div class="text-xs text-slate-500">Fixed Milestone Delivery</div>
+            </div>
+        </div>
+
+        <div class="prose prose-invert max-w-none text-slate-300 space-y-6">
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-6">
+                <h2 class="text-lg font-semibold text-white mb-3">Engineering Proposal & Solution Architecture</h2>
+                <div class="whitespace-pre-wrap text-sm leading-relaxed text-slate-300 font-normal"># Technical Proposal &amp; Statement of Work
+## Windows Embroidery Design Software — Intermediate-User Digitizing Suite
+
+**Prepared for:** Project Owner, Embroidery Design Software (Windows Desktop)
+**Prepared by:** Principal Software Architect
+**Engagement Type:** Fixed-Price Milestone — $250 USD
+**Reference Budget Context:** Client-posted range £5,000–£10,000 GBP (full product build)
+
+---
+
+## 1. Executive Hook — The Diagnostic Most Bidders Miss
+
+You are not asking for &quot;an app that draws stitches.&quot; You are asking for a **digitizing engine with a UI bolted on top** — and the failure mode of 90% of embroidery software projects is that the team builds the UI first, treats the stitch engine as a black box, and discovers on delivery day that the exported file won&#x27;t run on the client&#x27;s machine.
+
+Here is what your brief actually implies, and where the subtle traps live:
+
+**The real problem is not pattern creation. It is stitch-path correctness.**
+An &quot;intricate embroidery pattern&quot; is a geometric path plus a **stitch-type decision** (satin, fill, running, motif) plus **underlay** plus **pull compensation**. Intermediate users will judge your software on one thing: *does the exported design sew out without puckering, gaps, or thread breaks?* A beautiful canvas that produces a bad `.DST` is worthless.
+
+**The traps that sink this class of project:**
+
+| Trap | Why it kills the project | Our mitigation |
+|---|---|---|
+| **File-format endianness &amp; header checksums** | Tajima `.DST`, Melco `.EXP`, and Barudan `.DSB` encode stitch deltas in signed 3-byte little-endian with format-specific terminators. A single off-by-one byte produces a file that opens in the editor and fails on the machine. | Byte-exact round-trip tests against known-good reference files before any UI work. |
+| **Coordinate space confusion** | Design space (mm), stitch space (0.1 mm units), and screen space (px) get conflated. Zoom/pan then silently corrupts exported geometry. | Single canonical internal unit (0.1 mm integer), explicit conversion boundary, property-based tests. |
+| **Pull compensation &amp; underlay treated as &quot;polish&quot;** | They are not. Without them, satin columns gap and fills pucker. Retrofitting them means rewriting the stitch generator. | Compensation and underlay are first-class parameters in the Phase 2 data model, not a later patch. |
+| **Thread-color / palette model** | Intermediate users expect a thread chart (Madeira/Isacord-style) with per-block color assignment, not raw RGB. | Palette abstraction from day one; export maps to nearest machine-legal color index. |
+| **Windows-only rendering assumptions** | GDI+ vs. Direct2D vs. SkiaSharp changes hit-testing, DPI scaling, and print fidelity. | Rendering layer isolated behind an interface so the backend is testable headless. |
+
+**The strategic point:** the £5,000–£10,000 range is a *product* budget. What you need **right now** is a **de-risked architectural foundation and a working vertical slice** — the stitch engine, the file I/O, and the pattern-creation core — proven correct before you commit the full budget. That is exactly what this $250 milestone delivers.
+
+---
+
+## 2. Architecture &amp; Technical Plan
+
+### Target Stack (recommended, adjustable to your preference)
+
+- **Language:** C# (.NET 8) for the application shell and UI — best-in-class Windows tooling, mature vector/graphics libraries, fast iteration.
+- **Performance-critical core:** C++ (native, P/Invoke or C++/CLI bridge) for the stitch-generation and geometry kernel, where per-stitch throughput matters on dense fills.
+- **UI:** WPF or Avalonia (cross-compilable, testable, DPI-aware) with an MVVM separation so the engine is UI-agnostic.
+- **Rendering:** SkiaSharp or Direct2D behind an `IRenderSurface` interface.
+- **Testing:** xUnit + FsCheck (property-based) for the engine; golden-file byte comparisons for exporters.
+
+&gt; If you prefer Java or a pure-C++ stack, the architecture below is language-agnostic — only the binding layer changes. We will confirm the stack in Phase 1 before writing production code.
+
+---
+
+### Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)
+
+**Objective:** eliminate ambiguity and reproduce the exact target behavior before touching production code.
+
+1. **Requirements freeze.** Convert your brief into a numbered, testable feature list. Every ambiguous term (&quot;intricate,&quot; &quot;intermediate users&quot;) becomes a concrete acceptance criterion.
+2. **Reference artifact collection.** Obtain 3–5 known-good embroidery files (`.DST`, `.EXP`, `.PES`) that sew correctly on real hardware. These become our **golden corpus**.
+3. **Format specification lock.** Document the exact byte layout of the target export format(s): header, stitch records, color changes, end-of-design terminator, checksum.
+4. **Environment isolation.** Reproducible dev environment (pinned SDK versions, `global.json`, deterministic build). No &quot;works on my machine.&quot;
+5. **Vertical-slice spike.** Prove the riskiest path end-to-end: *load a reference file → parse → render → re-export → byte-compare.* If this passes, the project is de-risked. If it fails, we learn it on Day 1, not Week 6.
+
+**Exit criteria:** signed-off feature list, golden corpus in repo, format spec document, passing round-trip spike.
+
+---
+
+### Phase 2 — Implementation &amp; Automated Verification (Day 2–3)
+
+**Objective:** build the pattern-creation core and stitch engine with tests written alongside the code.
+
+**Core modules:**
+
+- **Geometry kernel** — paths, Bézier curves, offsetting, self-intersection resolution, region filling.
+- **Stitch generator** — satin, fill (tatami/step), running, and motif stitch types; configurable density, angle, and stitch length.
+- **Compensation layer** — pull compensation, underlay generation (center-run, edge-run, zig-zag), corner handling.
+- **Pattern-creation tools** — draw, node edit, shape primitives, text-to-path, auto-digitize from raster (scoped to the milestone).
+- **Thread &amp; color model** — per-block color assignment, thread-chart palette, color-change sequencing.
+- **Export/Import** — byte-exact writer and reader for the agreed format(s), validated against the golden corpus.
+- **UI shell** — MVVM canvas with zoom/pan, tool palette, layer/block list, property inspector.
+
+**Verification strategy:**
+
+- **Unit tests** for every geometry and stitch primitive.
+- **Property-based tests** — e.g., &quot;any closed path produces a stitch sequence whose endpoints lie within tolerance of the path.&quot;
+- **Golden-file tests** — export output compared byte-for-byte to reference files.
+- **Snapshot tests** for rendered output (deterministic rasterization).
+
+**Exit criteria:** all core modules implemented, test suite green, vertical slice extended to full pattern-creation workflow.
+
+---
+
+### Phase 3 — Hardening, Performance &amp; Handover (Day 3–4)
+
+**Objective:** make it fast, make it robust, make it yours.
+
+1. **Performance pass.** Profile dense-fill generation; target sub-second stitch computation for typical designs. Optimize hot loops in the C++ kernel; eliminate allocations in per-stitch paths.
+2. **Robustness pass.** Fuzz the importers with malformed files; ensure graceful failure, never a crash or silent corruption.
+3. **Edge-case matrix.** Zero-length paths, self-intersecting regions, degenerate satin columns, extreme zoom, DPI scaling, multi-monitor.
+4. **Documentation.** Architecture decision records (ADRs), format spec, build/run instructions, extension guide.
+5. **Handover.** Walkthrough session, repo transfer, CI configuration, and a prioritized backlog for the next milestone.
+
+**Exit criteria:** performance targets met, fuzz suite clean, docs complete, handover accepted.
+
+---
+
+## 3. Concrete Deliverables Checklist
+
+Upon completion you receive, in a Git repository you own:
+
+**Code**
+- [ ] Full source: C# application + C++ geometry/stitch kernel (or agreed stack)
+- [ ] `IRenderSurface` abstraction with at least one concrete backend
+- [ ] Stitch generator: satin, fill, running, motif
+- [ ] Compensation + underlay engine
+- [ ] Import/export for agreed format(s), byte-exact
+- [ ] Thread/color model with palette support
+- [ ] MVVM UI shell: canvas, tools, block list, property inspector
+
+**Tests**
+- [ ] Unit test suite (xUnit or equivalent)
+- [ ] Property-based test suite for geometry invariants
+- [ ] Golden-file byte-comparison tests against reference corpus
+- [ ] Render snapshot tests
+- [ ] Fuzz harness for importers
+
+**Build &amp; Environment**
+- [ ] `global.json` / pinned SDK versions
+- [ ] Deterministic build script (`build.ps1` / `Makefile`)
+- [ ] CI pipeline config (GitHub Actions or Azure Pipelines)
+- [ ] *(Optional)* Dockerfile for headless engine testing / CI parity
+
+**Documentation**
+- [ ] `README.md` — build, run, test
+- [ ] `ARCHITECTURE.md` — module map and data flow
+- [ ] `FORMAT_SPEC.md` — byte-level export/import specification
+- [ ] ADRs for key decisions (stack, units, compensation model)
+- [ ] `HANDOVER.md` — next-milestone backlog and extension guide
+
+---
+
+## 4. Regression Guardrails
+
+Zero-regression is an engineering discipline, not a promise. Our guardrails:
+
+1. **Golden corpus as contract.** The reference embroidery files are committed to the repo. Any change that alters their round-trip output fails CI immediately.
+2. **Byte-exact export tests.** Exporters are tested against frozen expected outputs. No &quot;close enough.&quot;
+3. **Property-based invariants.** Geometry and stitch invariants are asserted across thousands of generated inputs per run — catching regressions that hand-written tests miss.
+4. **Snapshot rendering.** Deterministic rasterization compared per-commit; visual regressions surface as diffs.
+5. **Fuzz regression suite.** Every malformed input that ever caused a crash becomes a permanent test case.
+6. **CI gate.** No merge without green tests. Branch protection enforced.
+7. **Semantic versioning of the format layer.** Any change to export behavior is a versioned, documented event — never a silent edit.
+8. **Isolated engine.** Because the engine is UI-agnostic and headless-testable, UI changes cannot regress stitch correctness, and vice versa.
+
+---
+
+## 5. Commercial Terms &amp; Direct CTA
+
+### Fixed-Price Milestone
+
+| Item | Detail |
+|---|---|
+| **Scope** | Phases 1–3 as defined above: architectural foundation, working vertical slice, stitch engine core, byte-exact file I/O, test suite, documentation, handover |
+| **Price** | **$250 USD — fixed, all-inclusive** |
+| **Timeline** | 3–4 working days from kickoff |
+| **Payment terms** | 100% on acceptance of deliverables, or 50% kickoff / 50% acceptance at your option |
+| **Revisions** | Included within the milestone scope until acceptance criteria are met |
+
+&gt; **Note on budget alignment:** Your posted range (£5,000–£10,000) reflects the full product build. This $250 milestone is deliberately scoped as the **de-risking foundation** — the architecture, engine, and proven vertical slice that make the remaining budget safe to spend. It is not a substitute for the full build; it is the thing that prevents you from wasting the full build.
+
+### Payout Channels
+
+- **PayPal:** `lamvukyo3001@gmail.com`
+- **USDC:** EVM or Solana (address provided on request)
+
+### Book Instantly
+
+**→ [Secure the milestone now — $250 USD via PayPal](https://www.paypal.com/paypalme/lamvukyo/250USD)**
+
+---
+
+### What Happens After You Click
+
+1. **Within hours:** I confirm scope and send the Phase 1 kickoff checklist.
+2. **Day 1:** Requirements freeze, golden corpus, format spec, passing round-trip spike — you see proof the riskiest path works.
+3. **Day 2–3:** Core engine and pattern-creation tools built with tests alongside.
+4. **Day 3–4:** Hardening, performance, docs, and handover walkthrough.
+5. **On acceptance:** Repo transfer, CI live, backlog for the next milestone delivered.
+
+You get a **working, tested, documented foundation** — not a slide deck. If the vertical slice doesn&#x27;t prove out on Day 1, you&#x27;ll know before you&#x27;ve spent the full budget.
+
+**Ready to start?** → **[Book the $250 milestone](https://www.paypal.com/paypalme/lamvukyo/250USD)**
+
+---
+
+*Prepared as a technical proposal and Statement of Work. Stack and format targets are recommendations and will be confirmed with you in Phase 1 before production code is written.*</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Verified Payment Rail (PayPal)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Instant milestone settlement via PayPal Business / Me:</p>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo" target="_blank" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-lg transition-colors mono">
+                        Pay via PayPal: lamvukyo3001@gmail.com
+                    </a>
+                </div>
+
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Web3 / Crypto Rail (USDC/USDT/ETH)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Direct zero-slippage settlement on Ethereum / Base / Arbitrum:</p>
+                    <div class="px-3 py-2 bg-slate-900 border border-slate-700/60 rounded text-xs mono text-emerald-400 select-all">
+                        0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-500 mono">
+            <span>Delivered by Antigravity Autonomous Engineering Fleet</span>
+            <span>Zero-Bloat Guarantee | Ponytail Standards</span>
+        </div>
+    </div>
+</body>
+</html>

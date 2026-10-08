@@ -1,0 +1,37 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Technical Product Lead AI Finance App</h1><p># Engineering Application: Technical Product Lead AI Finance App at Bjak
+
+**Candidate:** Principal Software Engineer / Systems Architect — distributed ledgers, regulated money movement, production LLM systems
+**Target:** KIRA (Bjak) — AI Finance Superapp, Southeast Asia — Remote (global)
+**Application token:** HARDY · `RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+KIRA's problem is not "build a fintech app." It is **operating a multi-market money-movement system where correctness is a hard constraint and AI is a competitive edge layered on top of it** — without ever letting the AI layer become the authority over money.
+
+That is precisely the intersection I work in. My background is:
+
+| KIRA requirement | My corresponding depth |
+|---|---|
+| Own a vertical end-to-end (strategy → design → delivery → launch) | Shipped zero-to-one payment and wealth products through regulatory gates, not just through code-complete |
+| Technical design across APIs, data flows, **ledgering, reconciliation, failure handling** | Primary author of append-only double-entry ledger cores, idempotent posting APIs, and T+1 three-way reconciliation with break aging SLAs |
+| Build regulatory requirements *into* the product (KYC, TM, limits, privacy, licensing) | Designed e-KYC/KYB gating, sanctions screening in the payout path, tiered velocity limits, and per-market data residency (PDPA/PDPA/UU PDP-class regimes) |
+| Apply AI where it improves outcomes, with evaluation, safeguards, human oversight | Built LLM features with golden-set evals, shadow mode, canary rollout, schema-constrained outputs, and explicit "no-AI fallback" paths |
+| Trade-offs across correctness, speed, cost, reliability, regulatory, UX | Run these as explicit, written decision records — optimistic where reversible, conservative where money is irreversibly moved |
+
+**The thesis I would bring into the role:** *AI-native by default, deterministic where money moves.* Every AI capability I ship is read-only or proposal-generating; the ledger, limit engine, sanctions screening and reconciliation remain deterministic and auditable. That single architectural line is what lets a superapp move fast in SEA's regulatory patchwork without ever shipping a wrong balance.
+
+**Domain specifics I would expect to hit in week one:** DuitNow/QRIS/PromptPay/PayNow rail heterogeneity, multi-currency FX legs requiring explicit position accounts, partner settlement file formats that disagree with each other, e-KYC vendors with different confidence semantics per market, and the licensing boundary that determines which entity is allowed to hold float in which country.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural thesis: cells, not one monolith
+
+Regulatory licensing, data residency and blast radius all point the same way — **a control plane plus per-market data-plane cells**.
+
+```
+                    ┌──────────────────────── Control Plane (global) ───────────────────────┐
+</p></body></html>

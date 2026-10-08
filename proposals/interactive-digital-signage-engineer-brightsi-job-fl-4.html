@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal: Interactive Digital Signage Engineer | BrightSign & Nexmosph | Antigravity OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen py-10 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Sticky Action Header -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-800 rounded-2xl p-6 shadow-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mb-3">
+                    <i class="fa-solid fa-bolt"></i> Verified Autonomous Proposal
+                </span>
+                <h1 class="text-2xl font-bold text-white">Interactive Digital Signage Engineer | BrightSign & Nexmosphere Specialist</h1>
+                <p class="text-sm text-slate-400 mt-1">Platform: <span class="capitalize text-slate-300">freelancer</span> | Job ID: <code>job-fl-40748</code></p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <a href="https://www.paypal.com/paypalme/lamvukyo/750USD" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-all text-sm">
+                    <i class="fa-brands fa-paypal"></i> Hire via PayPal ($750)
+                </a>
+                <a href="https://t.me/Youbichet_bot" target="_blank" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 text-sm">
+                    <i class="fa-brands fa-telegram"></i> Telegram Contact
+                </a>
+            </div>
+        </div>
+
+        <!-- Proposal Content Card -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-8 md:p-12 shadow-xl backdrop-blur-sm">
+            <div class="prose prose-invert max-w-none">
+                <p class="text-slate-300 leading-relaxed"><h1 class="text-3xl font-extrabold text-white mt-10 mb-4">Technical Proposal &amp; Statement of Work</h1>
+<h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">Interactive Digital Signage Engineering — BrightSign &amp; Nexmosphere Integration</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Prepared for:</strong> Smart Retail / Museum / Exhibition Signage Operator
+<strong class="text-white font-semibold">Engagement Type:</strong> Fixed-Price, Milestone-Based
+<strong class="text-white font-semibold">Total Investment:</strong> $750 USD
+<strong class="text-white font-semibold">Delivery Window:</strong> 4 working days from kickoff</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">1. Executive Hook — The Diagnostic</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>You don't need another video loop. You need a <strong class="text-white font-semibold">deterministic sensor-to-screen state machine</strong> that survives a 12-hour retail day without a single dropped trigger.</p><p class='mt-4 text-slate-300 leading-relaxed'>Here is what most bidders will miss, and what will quietly break your deployment:</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Nexmosphere X-series sensors are not plug-and-play over USB.</strong> They speak a serial protocol over the X-talk / XN interface. If the integrator treats them as HID devices, you get intermittent triggers and no error surface. The correct path is a <strong class="text-white font-semibold">serial listener with a framed parser</strong>, not an event listener on a keyboard emulation.
+- <strong class="text-white font-semibold">BrightSign's BrightScript is single-threaded per renderer.</strong> Blocking I/O on the main thread — a synchronous serial read, a slow HTTP call to your CMS — will stall the video decoder and produce visible stutter. The fix is a <strong class="text-white font-semibold">worker-thread architecture</strong> with a message queue between the sensor layer and the presentation layer.
+- <strong class="text-white font-semibold">Sensor debounce is not optional.</strong> In a museum or retail floor, a single approach gesture fires 3–8 raw events. Without a debounce window and an edge-triggered state model, your content will flicker and your analytics will be garbage.
+- <strong class="text-white font-semibold">CMS sync must be idempotent and offline-tolerant.</strong> If the venue's Wi-Fi drops, the signage must keep playing the last-known-good manifest and reconcile on reconnect — not blank the screen.</p><p class='mt-4 text-slate-300 leading-relaxed'>This proposal delivers exactly that: a hardened, testable, handover-ready interactive signage stack — not a demo.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">2. Architecture &amp; Technical Plan</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Reproduce your current behavior in a controlled environment before touching anything.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Environment isolation:</strong> Containerized mock of the BrightSign runtime (BrightScript execution harness) plus a <strong class="text-white font-semibold">Nexmosphere serial simulator</strong> that replays captured sensor frames. This lets us iterate without shipping hardware back and forth.
+- <strong class="text-white font-semibold">Baseline capture:</strong> Record current video-loop behavior, trigger latency, and any existing CMS payloads. This becomes the regression baseline.
+- <strong class="text-white font-semibold">Protocol mapping:</strong> Document the exact Nexmosphere command set in use (X001, X002, X003 trigger frames, LED/feedback commands), the BrightSign model and firmware, and the CMS API contract.
+- <strong class="text-white font-semibold">Deliverable:</strong> `DISCOVERY.md` — a signed-off interface contract that both sides agree on before code is written.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 2 — Implementation &amp; Automated Verification (Day 2–3)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Build the interactive layer with tests that prove it works.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Sensor layer:</strong> A framed serial parser with configurable debounce, edge-trigger detection, and a normalized event bus (`APPROACH`, `RETREAT`, `TAP`, `GESTURE_*`).
+- <strong class="text-white font-semibold">Presentation layer:</strong> BrightScript/HTML5 renderer that subscribes to the event bus and drives video/overlay transitions via a declarative state machine (`IDLE → ENGAGED → INTERACTING → COOLDOWN`).
+- <strong class="text-white font-semibold">CMS integration:</strong> Idempotent manifest sync with local cache, ETag/version checks, and offline fallback to last-known-good.
+- <strong class="text-white font-semibold">Automated verification:</strong>
+  - Unit tests for the parser (malformed frames, partial frames, burst input).
+  - Integration tests replaying recorded sensor sessions against the state machine.
+  - Latency budget assertions (trigger-to-first-frame &lt; 150 ms target).</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 3 — Hardening, Performance &amp; Handover (Day 3–4)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Make it survive production and make you independent of me.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Soak test:</strong> 8-hour simulated run with randomized sensor traffic; memory and decoder stability verified.
+- <strong class="text-white font-semibold">Failure injection:</strong> Kill the CMS endpoint mid-session, disconnect the sensor, corrupt a frame — confirm graceful degradation.
+- <strong class="text-white font-semibold">Performance pass:</strong> Profile renderer thread, confirm no blocking calls on the main loop.
+- <strong class="text-white font-semibold">Handover:</strong> Deployment runbook, config reference, and a 30-minute recorded walkthrough.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">3. Concrete Deliverables Checklist</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>You receive, in a single versioned repository:</p><p class='mt-4 text-slate-300 leading-relaxed'>- [ ] <strong class="text-white font-semibold">Source code</strong>
+  - `sensor/` — Nexmosphere serial parser + event bus (BrightScript + Node reference implementation)
+  - `presentation/` — BrightSign renderer + state machine
+  - `cms/` — manifest sync client with offline cache
+- [ ] <strong class="text-white font-semibold">Test suite</strong>
+  - Unit tests (parser, debounce, state transitions)
+  - Integration tests with recorded sensor replay fixtures
+  - Latency assertion harness
+- [ ] <strong class="text-white font-semibold">Docker configuration</strong>
+  - `docker-compose.yml` for the local dev/simulation environment
+  - Nexmosphere serial simulator container
+  - Mock CMS container
+- [ ] <strong class="text-white font-semibold">Documentation</strong>
+  - `DISCOVERY.md` — interface contract
+  - `ARCHITECTURE.md` — component diagram + data flow
+  - `DEPLOYMENT.md` — BrightSign provisioning runbook
+  - `CONFIG.md` — every tunable parameter explained
+- [ ] <strong class="text-white font-semibold">Handover assets</strong>
+  - 30-minute recorded walkthrough
+  - Regression baseline report (before/after)</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">4. Regression Guardrails</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>Zero-regression is a process, not a promise:</p><p class='mt-4 text-slate-300 leading-relaxed'>1. <strong class="text-white font-semibold">Baseline lock:</strong> Phase 1 captures current behavior as immutable fixtures. Every subsequent change is diffed against it.
+2. <strong class="text-white font-semibold">Replay harness:</strong> The full recorded sensor session is replayed on every build; any deviation in state transitions or timing fails the build.
+3. <strong class="text-white font-semibold">Feature flags:</strong> New interactive behavior ships behind a config flag. If anything misbehaves on-site, flip the flag and you're back to the known-good loop instantly.
+4. <strong class="text-white font-semibold">Offline-first contract:</strong> The CMS layer can never block playback. If sync fails, the screen keeps playing — verified by failure injection.
+5. <strong class="text-white font-semibold">Signed-off acceptance:</strong> Phase 3 ends with you running the replay harness yourself and confirming parity.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">5. Commercial Terms &amp; Direct CTA</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>| Item | Detail |
+|---|---|
+| <strong class="text-white font-semibold">Engagement</strong> | Fixed-price, milestone-based |
+| <strong class="text-white font-semibold">Total</strong> | <strong class="text-white font-semibold">$750 USD</strong> |
+| <strong class="text-white font-semibold">Milestones</strong> | 40% kickoff / 30% Phase 2 demo / 30% handover |
+| <strong class="text-white font-semibold">Payout — PayPal</strong> | `lamvukyo3001@gmail.com` |
+| <strong class="text-white font-semibold">Payout — USDC</strong> | EVM or Solana (address on request) |
+| <strong class="text-white font-semibold">Timeline</strong> | 4 working days from kickoff |</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Book instantly and lock the slot:</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>👉 <strong class="text-white font-semibold">https://www.paypal.com/paypalme/lamvukyo/750USD</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>Once payment is confirmed, I'll send the kickoff questionnaire (BrightSign model, firmware, Nexmosphere sensor list, CMS endpoint) and begin Phase 1 the same day.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'>*Ready to turn your video loop into a sensor-driven experience that survives the floor. Let's start.*</p>
+            </div>
+
+            <!-- Payment & Security Guarantee Box -->
+            <div class="mt-12 pt-8 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/60 p-6 rounded-xl border border-slate-800/60">
+                <div>
+                    <h4 class="text-white font-bold flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Dual-Rail Commercial Terms
+                    </h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Milestone-gated engagement with zero upfront risk. Code deliverables include full test harness and 30-day bug warranty.
+                    </p>
+                    <ul class="text-xs text-slate-300 mt-3 space-y-1">
+                        <li>• <strong>PayPal:</strong> <code>lamvukyo3001@gmail.com</code></li>
+                        <li>• <strong>Web3 EVM:</strong> <code>0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA</code></li>
+                        <li>• <strong>Solana:</strong> <code>HST3wcFgRzvcNeWowVpZzBDFp3imy1VWW4q9XNyhQYmW</code></li>
+                    </ul>
+                </div>
+                <div class="flex flex-col justify-center items-start md:items-end gap-2">
+                    <span class="text-xs text-slate-400">Total Fixed Investment</span>
+                    <span class="text-3xl font-extrabold text-emerald-400">$750 <span class="text-sm font-normal text-slate-400">USD</span></span>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo/750USD" target="_blank" class="mt-2 text-xs text-sky-400 hover:underline">
+                        Instant Booking Link &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

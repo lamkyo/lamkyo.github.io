@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Antigravity OS — AI-Native Growth Engine for Dicey (Magic Eden)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+          mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        },
+        colors: {
+          ink: {
+            950: '#07080d',
+            900: '#0b0d14',
+            850: '#0f121b',
+            800: '#151926',
+            700: '#1d2333',
+            600: '#2a3145',
+          },
+          brand: {
+            400: '#a78bfa',
+            500: '#8b5cf6',
+            600: '#7c3aed',
+          },
+        },
+        keyframes: {
+          pulseDot: {
+            '0%,100%': { opacity: '1', transform: 'scale(1)' },
+            '50%': { opacity: '.35', transform: 'scale(.75)' },
+          },
+          slideIn: {
+            '0%': { opacity: '0', transform: 'translateY(-6px)' },
+            '100%': { opacity: '1', transform: 'translateY(0)' },
+          },
+          flow: {
+            '0%': { left: '-10%' },
+            '100%': { left: '110%' },
+          },
+          shimmer: {
+            '0%': { backgroundPosition: '-200% 0' },
+            '100%': { backgroundPosition: '200% 0' },
+          },
+        },
+        animation: {
+          pulseDot: 'pulseDot 1.4s ease-in-out infinite',
+          slideIn: 'slideIn .28s ease-out',
+          shimmer: 'shimmer 2.4s linear infinite',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: #07080d; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0b0d14; }
+  ::-webkit-scrollbar-thumb { background: #262d3f; border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #39415a; }
+  .grid-bg {
+    background-image:
+      linear-gradient(to right, rgba(148,163,184,.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148,163,184,.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+  .glass { background: rgba(15,18,27,.72); backdrop-filter: blur(14px); }
+  .shimmer-text {
+    background: linear-gradient(90deg, #94a3b8 0%, #f8fafc 50%, #94a3b8 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 3.4s linear infinite;
+  }
+  .flow-dot {
+    position: absolute;
+    top: 50%;
+    width: 7px; height: 7px; margin-top: -3.5px;
+    border-radius: 99px;
+    background: #8b5cf6;
+    box-shadow: 0 0 10px 2px rgba(139,92,246,.75);
+    animation: flow 1.8s linear infinite;
+  }
+  tr.row-hover:hover { background: rgba(139,92,246,.06); }
+  .tab-active { background: rgba(139,92,246,.16); color: #ddd6fe; border-color: rgba(139,92,246,.45); }
+  .switch { width: 38px; height: 21px; border-radius: 99px; position: relative; transition: .22s; cursor: pointer; }
+  .switch::after {
+    content: ''; position: absolute; top: 2.5px; left: 2.5px;
+    width: 16px; height: 16px; border-radius: 99px; background: #ffface;
+    background: #e2e8f0; transition: .22s;
+  }
+  .switch.on { background: linear-gradient(90deg,#7c3aed,#4f46e5); }
+  .switch.on::after { left: 19.5px; background: #fff; }
+  .switch.off { background: #2a3145; }
+</style>
+</head>
+<body class="font-sans text-slate-300 antialiased selection:bg-violet-500/30">
+
+<!-- ══════════════════ STICKY HEADER (BANNER + NAV) ══════════════════ -->
+<div class="sticky top-0 z-50">
+  <!-- Notification banner -->
+  <div class="relative overflow-hidden border-b border-violet-500/25 bg-gradient-to-r from-violet-950/90 via-slate-950/95 to-indigo-950/90">
+    <div class="absolute inset-0 opacity-40 shimmer" style="background:linear-gradient(90deg,transparent,rgba(139,92,246,.18),transparent);background-size:200% 100%;"></div>
+    <div class="relative mx-auto flex max-w-[1600px] flex-col items-center justify-between gap-2 px-4 py-2 sm:flex-row sm:px-6">
+      <p class="flex items-center gap-2 text-center text-[12.5px] font-medium text-slate-200 sm:text-left">
+        <s

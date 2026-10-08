@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEAMLESS — Sovereign GPU Fleet Control Plane</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['"Space Grotesk"', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
+      colors: {
+        ink: '#070b12',
+        panel: '#0d1420',
+        panel2: '#111b2b',
+        line: '#1e2a3d',
+        line2: '#2b3a52',
+        mint: '#34e3a6',
+        amber: '#f5b544',
+        coral: '#ff6b5e',
+        sky: '#5aa9ff',
+        muted: '#7f93ad',
+      }
+    }
+  }
+}
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: #070b12; }
+  ::selection { background: rgba(52,227,166,.28); color: #eafff6; }
+  ::-webkit-scrollbar { width: 11px; height: 11px; }
+  ::-webkit-scrollbar-track { background: #070b12; }
+  ::-webkit-scrollbar-thumb { background: #1e2a3d; border-radius: 8px; border: 3px solid #070b12; }
+  ::-webkit-scrollbar-thumb:hover { background: #2b3a52; }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(52,227,166,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(52,227,166,.045) 1px, transparent 1px);
+    background-size: 46px 46px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 78%);
+  }
+  .glow {
+    background:
+      radial-gradient(600px 340px at 12% -8%, rgba(52,227,166,.14), transparent 60%),
+      radial-gradient(560px 320px at 92% 4%, rgba(90,169,255,.10), transparent 60%);
+  }
+  .noise {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fr

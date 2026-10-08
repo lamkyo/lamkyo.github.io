@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal: AI agent engineer | Antigravity OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen py-10 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Sticky Action Header -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-800 rounded-2xl p-6 shadow-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mb-3">
+                    <i class="fa-solid fa-bolt"></i> Verified Autonomous Proposal
+                </span>
+                <h1 class="text-2xl font-bold text-white">AI agent engineer</h1>
+                <p class="text-sm text-slate-400 mt-1">Platform: <span class="capitalize text-slate-300">remoteok</span> | Job ID: <code>ext-remoteok-remoteok-1137399</code></p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <a href="https://www.paypal.com/paypalme/lamvukyo/250USD" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-all text-sm">
+                    <i class="fa-brands fa-paypal"></i> Hire via PayPal ($250)
+                </a>
+                <a href="https://t.me/Youbichet_bot" target="_blank" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 text-sm">
+                    <i class="fa-brands fa-telegram"></i> Telegram Contact
+                </a>
+            </div>
+        </div>
+
+        <!-- Proposal Content Card -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-8 md:p-12 shadow-xl backdrop-blur-sm">
+            <div class="prose prose-invert max-w-none">
+                <p class="text-slate-300 leading-relaxed"><h1 class="text-3xl font-extrabold text-white mt-10 mb-4">Technical Proposal &amp; Statement of Work</h1>
+<h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">AI Agent Engineering — Sticker Mule</h2>
+<strong class="text-white font-semibold">Engagement type:</strong> Fixed-price pilot sprint (4 days)
+<strong class="text-white font-semibold">Prepared for:</strong> Sticker Mule Engineering &amp; Department Leads
+<strong class="text-white font-semibold">Bid:</strong> $250 USD</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">1. Executive Hook — What You Actually Need</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>Sticker Mule's moat is that software, manufacturing, and fulfillment live in one stack. That's also why a generic "AI agent team" hire is the most dangerous way to spend this budget. In a business where margin is earned per order and per press-hour, an agent that is 80% right isn't a productivity gain — it's a labor liability with a vendor bill attached.</p><p class='mt-4 text-slate-300 leading-relaxed'>Here is the diagnostic I'd bring on day one. The failure modes below are the ones bidders skip past, and all of them bite specifically harder at Sticker Mule than at a pure-SaaS company:</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">1. Your worst injection surface is customer-supplied, and it's in the middle of the workflow.</strong>
+Your agents will read free-text support tickets, order notes, and uploaded art filenames. Every one of those is an untrusted input channel pointed directly at tools that can issue refunds, re-run proofs, or modify orders. A prompt-injected `reprint_at_no_charge` call is a manufacturing loss, not a support incident. Most bids treat this as a prompt-engineering problem. It is an authorization-architecture problem, and it needs to be solved before the agent is connected to anything that costs money.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">2. Non-idempotent actions inside a retry loop.</strong>
+Agents retry. Networks fail. Without idempotency keys at the tool boundary, "the agent tried twice" becomes "the customer got two refunds" or "we queued a duplicate print run." This is a ten-line fix that is almost never in the first delivery.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">3. Unit economics are per-run, not per-seat.</strong>
+You're going to assess agent value against human cost. The right metric is <strong class="text-white font-semibold">cost per resolved outcome</strong>, including retries, long-context artwork passes, and human escalation. Without that instrumented from run #1, you cannot tell a winning agent from an expensive one — and in a manufacturing P&amp;L, that distinction is the whole project.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">4. Deflection is the wrong north star.</strong>
+An agent rewarded for closing tickets will close tickets badly. The eval set has to be built from <strong class="text-white font-semibold">resolutions</strong> (order correct, customer accepted, no reprint) — not from conversations ended.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">5. The agency problem: no evals, no team.</strong>
+"Build a team of agents" without a shared eval harness, shared tool contract, and shared observability layer produces N unrelated prototypes that cannot be operated. The first deliverable must be the platform, not the agents.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">What $250 honestly buys:</strong> one high-ROI agent, production-grade and fully instrumented, plus the harness and guardrails that make agents #2 through #10 cheap to add. I will recommend the specific first agent after discovery — my prior, based on your stack, is <strong class="text-white font-semibold">artwork preflight</strong> (DPI, bleed, cut-path, and color-mode triage before a human touches the file), because it sits upstream of manufacturing, has a clean ground truth (reprint/no-reprint), and its savings land directly in margin.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">2. Architecture &amp; Technical Plan</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Environment isolation.</strong> All work runs against a sandboxed staging namespace with read-only production credentials by default. No agent gets a write scope on day one.
+- <strong class="text-white font-semibold">Department lead interviews.</strong> 30 minutes each with Support, Manufacturing/Prepress, and Growth. Goal: capture the top three recurring workflows and their current cost in labor minutes and error dollars.
+- <strong class="text-white font-semibold">Agent Opportunity Matrix.</strong> Every candidate scored on: frequency, cost per occurrence, ground-truth availability, blast radius if wrong, tool availability. Deliverable: a ranked shortlist with the one we build now.
+- <strong class="text-white font-semibold">Baseline reproduction.</strong> Capture a frozen slice of real (redacted) inputs for the chosen workflow — target 100–300 cases — and record the current human outcome. This becomes the golden set. Without this artifact, no later claim of improvement is checkable.
+- <strong class="text-white font-semibold">Tool inventory.</strong> Map the required capabilities to concrete endpoints: commerce/admin API, order &amp; shipping status, artwork object storage, ticketing, Slack. Confirm auth model and rate limits.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Exit gate:</strong> signed-off Agent Opportunity Matrix + frozen eval set + confirmed tool list.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 2 — Implementation &amp; Automated Verification (Days 2–3)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Tool layer first.</strong> Typed tool adapters, each with a JSON schema, a scoped credential, a <strong class="text-white font-semibold">mandatory idempotency key</strong>, a hard timeout, and a dry-run mode. Tools are tested independently of the agent.
+- <strong class="text-white font-semibold">Guardrail middleware</strong> (the part most bids omit): untrusted content is tagged and never promoted to instruction context; tool calls are authorized against an explicit allowlist per agent role; high-blast-radius actions (refund, reprint, order mutation) require a human-approval interrupt rather than executing inline.
+- <strong class="text-white font-semibold">Agent implementation.</strong> Explicit state machine — plan → retrieve → act → verify → escalate — not an unbounded loop. Hard caps on steps, tokens, wall-clock, and dollars per run. Deterministic model settings where the task allows; temperature raised only where it measurably helps the eval score.
+- <strong class="text-white font-semibold">Eval harness.</strong> The frozen set is run on every commit. Reports per-case pass/fail, aggregate accuracy, mean cost per run, p50/p95 latency, and escalation rate. This is the artifact that keeps the work honest after I'm gone.
+- <strong class="text-white font-semibold">Shadow mode.</strong> Before any write access, the agent runs in parallel with the current human process on live traffic and its proposed actions are logged, not executed.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Exit gate:</strong> agent meets the agreed accuracy floor on the golden set, in shadow mode, at or below the agreed cost-per-run ceiling.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 3 — Hardening, Performance &amp; Handover (Days 3–4)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Adversarial pass.</strong> Deliberate prompt-injection corpus: instructions embedded in ticket bodies, order notes, and artwork filenames. Any successful tool-hijack is a blocker, not a backlog item.
+- <strong class="text-white font-semibold">Performance &amp; cost tuning.</strong> Prompt caching, context trimming, model right-sizing per step (cheap model for classification, strong model for judgment), batched retrieval. Target: documented cost reduction versus the naive implementation.
+- <strong class="text-white font-semibold">Canary rollout.</strong> Feature-flagged, percentage-based, with automatic rollback on error-rate or cost-per-run threshold breach.
+- <strong class="text-white font-semibold">Handover.</strong> Architecture diagram, ADRs for every irreversible decision, runbook, cost model, and a one-page "how to add agent #2" guide.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">3. Concrete Deliverables Checklist</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>| # | Artifact | Detail |
+|---|---|---|
+| 1 | `agent/` service | TypeScript or Python service with explicit state machine, step/token/time/cost caps |
+| 2 | `tools/` adapters | One module per capability; JSON schema, scoped creds, idempotency key, timeout, dry-run |
+| 3 | `guardrails/` middleware | Untrusted-content tagging, per-role tool allowlist, human-approval interrupt for money-touching actions |
+| 4 | `evals/` harness + golden set | 100–300 frozen cases, CLI runner, per-case diff, CI-ready exit code |
+| 5 | `evals/report.json` | Accuracy, cost/run, p50/p95 latency, escalation rate, regression delta vs. baseline |
+| 6 | `tests/` | Unit tests per tool adapter, contract tests against recorded fixtures, injection corpus as a test suite |
+| 7 | `Dockerfile` + `docker-compose.yml` | Reproducible local run: agent + Postgres + vector store + mock tool server |
+| 8 | `.env.example` | Every required secret, documented, no real values committed |
+| 9 | Observability | Structured JSON logs per run, OpenTelemetry traces, co</p>
+            </div>
+
+            <!-- Payment & Security Guarantee Box -->
+            <div class="mt-12 pt-8 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/60 p-6 rounded-xl border border-slate-800/60">
+                <div>
+                    <h4 class="text-white font-bold flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Dual-Rail Commercial Terms
+                    </h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Milestone-gated engagement with zero upfront risk. Code deliverables include full test harness and 30-day bug warranty.
+                    </p>
+                    <ul class="text-xs text-slate-300 mt-3 space-y-1">
+                        <li>• <strong>PayPal:</strong> <code>lamvukyo3001@gmail.com</code></li>
+                        <li>• <strong>Web3 EVM:</strong> <code>0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA</code></li>
+                        <li>• <strong>Solana:</strong> <code>HST3wcFgRzvcNeWowVpZzBDFp3imy1VWW4q9XNyhQYmW</code></li>
+                    </ul>
+                </div>
+                <div class="flex flex-col justify-center items-start md:items-end gap-2">
+                    <span class="text-xs text-slate-400">Total Fixed Investment</span>
+                    <span class="text-3xl font-extrabold text-emerald-400">$250 <span class="text-sm font-normal text-slate-400">USD</span></span>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo/250USD" target="_blank" class="mt-2 text-xs text-sky-400 hover:underline">
+                        Instant Booking Link &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

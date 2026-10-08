@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Crypto Exchange Monitor - Technical Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Inter", sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+        .mono { font-family: "JetBrains Mono", monospace; }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12">
+    <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 md:p-12 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-8">
+            <div>
+                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mono uppercase tracking-wider">Verified Proposal & Dossier</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mt-3">Real-Time Crypto Exchange Monitor</h1>
+                <p class="text-slate-400 text-sm mt-1 mono">Job ID: ext-freelancer-fl-40749758 | Milestone Value: $1,920.00 USD</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-emerald-400 mono">$1,920.00</div>
+                <div class="text-xs text-slate-500">Fixed Milestone Delivery</div>
+            </div>
+        </div>
+
+        <div class="prose prose-invert max-w-none text-slate-300 space-y-6">
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-6">
+                <h2 class="text-lg font-semibold text-white mb-3">Engineering Proposal & Solution Architecture</h2>
+                <div class="whitespace-pre-wrap text-sm leading-relaxed text-slate-300 font-normal"># Technical Proposal &amp; Statement of Work
+## Real-Time Multi-Exchange Crypto Market Monitor
+
+**Prepared for:** Prospective Client
+**Prepared by:** Principal Software Architect
+**Engagement Type:** Fixed-Price Build
+**Total Investment:** $1,920 USD
+
+---
+
+## 1. Executive Hook — What You Actually Need (And What Most Bidders Will Miss)
+
+You asked for a platform that &quot;watches Binance, Coinbase, Kraken and more simultaneously.&quot; That sentence hides the entire difficulty of this project. The hard part is **not** connecting to exchanges — every bidder will show you a WebSocket demo that ticks a price. The hard part is the three problems nobody puts in their proposal:
+
+**Pitfall #1 — The &quot;and more&quot; trap.** A naive build hardcodes three exchange integrations. The moment you want a fourth, you pay for a rewrite. The correct architecture is an **exchange adapter abstraction**: a single normalized internal schema (order book, trades, volume, open interest) that every venue maps into. Adding an exchange becomes a config file, not a sprint.
+
+**Pitfall #2 — Order-book integrity.** Live order books are not &quot;a list of prices.&quot; They are a **sequenced delta stream** that must be reconstructed against a REST snapshot with strict sequence-gap detection. Miss a sequence number and your book silently corrupts — you&#x27;ll see phantom liquidity and make decisions on data that never existed. Most bidders ship a UI that *looks* live but is quietly wrong. We treat gap detection and resync as a first-class feature, not an afterthought.
+
+**Pitfall #3 — Rate limits, reconnects, and clock skew.** Exchanges throttle, disconnect, and drift. A production monitor needs exponential backoff, heartbeat monitoring, and per-venue rate-limit budgeting — otherwise your dashboard freezes at the exact moment volatility spikes, which is the only moment you care about.
+
+**The real deliverable is trust.** You are not buying a dashboard. You are buying a system whose numbers you can act on. Every architectural decision below serves that single goal.
+
+---
+
+## 2. Architecture &amp; Technical Plan
+
+### High-Level Topology
+
+```
+[ Binance WS ]──┐
+[ Coinbase WS ]─┤──► [ Ingestion Workers ] ──► [ Normalizer ] ──► [ Redis Streams ]
+[ Kraken WS ]───┤        (per-venue)            (unified schema)         │
+[ +N adapters ]─┘                                                       ▼
+                                                          [ Aggregation Engine ]
+                                                          (volume, OI, spread, depth)
+                                                                        │
+                                                                        ▼
+                                              [ WebSocket Gateway ] ──► [ Browser UI ]
+                                              (auth-gated, throttled)    (live charts)
+```
+
+**Stack:** Node.js/TypeScript ingestion workers (native WS performance, shared types with frontend), Redis Streams as the internal bus, PostgreSQL for historical snapshots, a React + lightweight-charts frontend, all orchestrated with Docker Compose. PHP is available for any legacy integration you already run — the gateway exposes a clean REST/WS contract either way.
+
+### Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)
+
+- **Environment isolation:** dedicated Docker network; no shared state with any existing system you run. Your current tooling is untouched.
+- **Discovery:** confirm which venues, which instruments, which metrics (volume, open interest, funding, spread, depth) matter most, and your latency tolerance.
+- **Baseline reproduction:** stand up the three primary adapters (Binance, Coinbase, Kraken), capture a raw message sample from each, and document the exact schema differences. This becomes the contract every future adapter must satisfy.
+- **Deliverable at end of Day 1:** a running ingestion skeleton streaming real data into Redis, plus a written adapter spec.
+
+### Phase 2 — Implementation &amp; Automated Verification (Day 2–3)
+
+- **Normalizer:** unified schema across all venues — `{venue, symbol, bids[], asks[], last, volume, openInterest, ts}`.
+- **Order-book reconstruction:** snapshot + delta replay with **sequence-gap detection and automatic resync**.
+- **Aggregation engine:** rolling volume, open-interest tracking, spread and depth metrics, cross-venue comparison.
+- **Auth-gated WebSocket gateway:** secure login, per-session throttling, backpressure handling so a slow client never stalls ingestion.
+- **Frontend:** live order-book ladder, multi-venue price overlay, volume/OI charts, venue health indicators.
+- **Automated tests:** unit tests for the normalizer and book reconstruction; integration tests replaying recorded exchange fixtures (including a deliberately corrupted sequence stream to prove resync works).
+
+### Phase 3 — Hardening, Performance &amp; Handover (Day 3–4)
+
+- **Resilience:** exponential backoff, heartbeat/liveness monitoring, per-venue rate-limit budgeting, graceful degradation when one venue drops.
+- **Performance:** latency profiling end-to-end (exchange timestamp → browser paint), memory-leak checks on long-running streams, load test with simulated client fan-out.
+- **Security pass:** credential handling via environment secrets, TLS, input validation on the gateway, no exchange keys ever exposed to the browser.
+- **Handover:** architecture doc, runbook, adapter-authoring guide, and a recorded walkthrough.
+
+---
+
+## 3. Concrete Deliverables Checklist
+
+You receive, in a private Git repository:
+
+- [ ] **Source code** — TypeScript ingestion workers, normalizer, aggregation engine, WS gateway, React frontend
+- [ ] **Exchange adapter SDK** — documented interface + 3 working adapters (Binance, Coinbase, Kraken) + template for adding more
+- [ ] **Order-book reconstruction module** with sequence-gap detection and resync
+- [ ] **Automated test suite** — unit + integration tests with recorded exchange fixtures
+- [ ] **Docker Compose configuration** — one-command local bring-up (`docker compose up`)
+- [ ] **`.env.example`** with every required secret documented (no live keys committed)
+- [ ] **Architecture document** — topology, data flow, schema reference
+- [ ] **Runbook** — how to start, monitor, and recover the system
+- [ ] **Adapter-authoring guide** — how to add exchange #4, #5, #N without touching core code
+- [ ] **Recorded handover walkthrough**
+
+---
+
+## 4. Regression Guardrails
+
+Zero-regression is a design constraint, not a promise:
+
+1. **Full isolation.** The entire system runs in its own Docker network. Nothing touches your existing services, databases, or credentials.
+2. **Fixture-based integration tests.** Every adapter is tested against recorded real exchange messages. If a change breaks parsing, the test fails before it reaches you.
+3. **Corrupted-stream test.** A dedicated test feeds a deliberately broken sequence stream and asserts the system detects the gap and resyncs — proving the integrity guarantee holds under failure.
+4. **Contract tests on the normalized schema.** Any adapter that violates the unified schema fails CI. This is what makes &quot;and more&quot; exchanges safe to add later.
+5. **CI gate.** No merge without green tests. You get the pipeline config, so you can verify this yourself.
+6. **Versioned releases.** Each phase is tagged, so any regression can be bisected to a single commit.
+
+---
+
+## 5. Commercial Terms &amp; Direct CTA
+
+| Item | Detail |
+|---|---|
+| **Scope** | Full multi-exchange real-time monitor as specified above |
+| **Price** | **$1,920 USD — fixed price, no surprises** |
+| **Timeline** | 4 working days |
+| **Payment structure** | Milestone-based: Phase 1 sign-off → Phase 2 sign-off → final handover |
+| **Payout channels** | **PayPal:** lamvukyo3001@gmail.com · **USDC:** EVM or Solana |
+| **Booking** | Instant direct booking below |
+
+### Book This Engagement Now
+
+**→ [Secure the build — $1,920 USD via PayPal](https://www.paypal.com/paypalme/lamvukyo/1920USD)**
+
+Prefer USDC (EVM/Solana)? Message me and I&#x27;ll send the wallet address immediately.
+
+---
+
+**Why me:** I build streaming market-data systems where correctness under failure is the whole point. You&#x27;re not getting a price ticker — you&#x27;re getting an auditable, extensible, sequence-safe market monitor you can trust when it matters most.
+
+*Ready to start Day 1 today.*</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Verified Payment Rail (PayPal)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Instant milestone settlement via PayPal Business / Me:</p>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo" target="_blank" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-lg transition-colors mono">
+                        Pay via PayPal: lamvukyo3001@gmail.com
+                    </a>
+                </div>
+
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Web3 / Crypto Rail (USDC/USDT/ETH)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Direct zero-slippage settlement on Ethereum / Base / Arbitrum:</p>
+                    <div class="px-3 py-2 bg-slate-900 border border-slate-700/60 rounded text-xs mono text-emerald-400 select-all">
+                        0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-500 mono">
+            <span>Delivered by Antigravity Autonomous Engineering Fleet</span>
+            <span>Zero-Bloat Guarantee | Ponytail Standards</span>
+        </div>
+    </div>
+</body>
+</html>

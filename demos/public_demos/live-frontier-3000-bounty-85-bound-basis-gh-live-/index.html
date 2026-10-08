@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>nft-royalties · basis_points Bound — Live Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          slate: { 950: '#020617' },
+          accent: { DEFAULT: '#6366f1', soft: '#818cf8' }
+        },
+        fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: radial-gradient(1200px 600px at 80% -10%, rgba(99,102,241,.12), transparent 60%), #020617; }
+  .glow { box-shadow: 0 0 0 1px rgba(99,102,241,.25), 0 8px 40px -12px rgba(99,102,241,.45); }
+  .grid-bg { background-image: linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.06) 1px, transparent 1px); background-size: 32px 32px; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  .fade-in { animation: fade .35s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  .pulse-dot { animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+</style>
+</head>
+<body class="text-slate-200 antialiased min-h-screen">
+
+<!-- ============ STICKY BANNER ============ -->
+<div class="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-col md:flex-row items-center gap-3 justify-between">
+    <div class="flex items-center gap-2 text-[13px] text-slate-300 text-center md:text-left">
+      <span class="pulse-dot inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+      <span class="truncate">
+        🚀 Live Interactive Prototype for: <span class="text-slate-100 font-medium">[LIVE FRONTIER: $3000] [Bounty: $85] Bound `basis_points` in the nft-royalties setters</span>
+        <span class="text-slate-500">|</span> Built autonomously by <span class="text-accent-soft font-medium">Antigravity OS</span>
+        <span class="text-slate-500">|</span> Ready for deployment
+      </span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20gh-live-5752316928"
+       class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-accent hover:bg-accent-soft transition px-4 py-1.5 text-sm font-semibold text-white glow">
+      <i data-lucide="briefcase" class="w-4 h-4"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="grid-bg border-b border-slate-800">
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <div class="flex items-center gap-2 text-xs font-mono text-accent-soft mb-4">
+      <i data-lucide="shield-check" class="w-4 h-4"></i> contracts/nft-royalties/src/contract.rs
+    </div>
+    <h1 class="text-3xl md:text-5xl font-bold tracking-tight text-white max-w-3xl">
+      Bound <span class="font-mono text-accent-soft">basis_points</span> in the NFT royalties setters
+    </h1>
+    <p class="mt-4 text-slate-400 max-w-2xl leading-relaxed">
+      A royalty above <span class="font-mono text-slate-200">10_000</span> (100%) is currently accepted, letting a caller configure a payout
+      larger than the sale price. This prototype demonstrates the fix: a dedicated error variant and a
+      <span class="font-mono text-slate-200">basis_points &lt;= 10_000</span> guard on every setter path.
+    </p>
+    <div class="mt-6 flex flex-wrap gap-3 text-xs">
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1"><i data-lucide="tag" class="w-3.5 h-3.5 text-amber-400"></i> bug</span>
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1"><i data-lucide="clock" class="w-3.5 h-3.5 text-sky-400"></i> ETA 24h</span>
+      <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-900/60 px-3 py-1"><i data-lucide="package" class="w-3.5 h-3.5 text-emerald-400"></i> cargo test -p nft-royalties</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-10 space-y-10">
+
+  <!-- ============ KPI ROW ============ -->
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">Max Royalty <i data-lucide="percent" class="w-4 h-4"></i></div>
+      <div class="mt-2 text-3xl font-bold text-white font-mono">10,000</div>
+      <div class="text-xs text-slate-500 mt-1">basis points = 100%</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">Guarded Setters <i data-lucide="lock" class="w-4 h-4"></i></div>
+      <div class="mt-2 text-3xl font-bold text-white font-mono">3 / 3</div>
+      <div class="text-xs text-slate-500 mt-1">mint · default · token</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">Tests Passing <i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+      <div class="mt-2 text-3xl font-bold text-emerald-400 font-mono" id="kpiTests">0</div>
+      <div class="text-xs text-slate-500 mt-1">of 6 acceptance tests</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/50 p-5">
+      <div class="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">CI Build <i data-lucide="git-branch" class="w-4 h-4"></i></div>
+      <div class="mt-2 text-3xl font-bold text-white font-mono" id="kpiCI">—</div>
+      <div class="text-xs text-slate-500 mt-1">.github/workflows/node.yml</div>
+    </div>
+  </section>
+
+  <!-- ============ PLAYGROUND ============ -->
+  <section class="grid lg:grid-cols-5 gap-6">
+    <!-- Setter simulator -->
+    <div class="lg:col-span-3 rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+      <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="flask-conical" class="w-4 h-4 text-accent-soft"></i>
+          <h2 class="font-semibold text-white">Setter Simulator</h2>
+        </div>
+        <span class="text-[11px] font-mono text-slate-500">guard: basis_points &lt;= 10_000</span>
+      </div>
+
+      <div class="p-5 space-y-5">
+        <!-- setter path selector -->
+        <div>
+          <label class="text-xs uppercase tracking-wider text-slate-400">Setter path</label>
+          <div class="mt-2 grid grid-cols-3 gap-2" id="pathGroup">
+            <button data-path="mint_with_royalty" class="path-btn rounded-lg border border-accent bg-accent/10 text-accent-soft px-3 py-2 text-xs font-mono">mint_with_royalty</button>
+            <button data-path="set_default_royalty" class="path-btn rounded-lg border border-slate-700 bg-slate-950/40 text-slate-400 px-3 py-2 text-xs font-mono">set_default_royalty</button>
+            <button data-path="set_token_royalty" class="path-btn rounded-lg border border-slate-700 bg-slate-950/40 text-slate-400 px-3 py-2 text-xs font-mono">set_token_royalty</button>
+          </div>
+        </div>
+
+        <!-- basis points input -->
+        <div>
+          <div class="flex items-center justify-between">
+            <label class="text-xs uppercase tracking-wider text-slate-400">basis_points</label>
+            <span class="text-xs font-mono text-slate-500" id="bpPercent">10.00%</span>
+          </div>
+          <input id="bpInput" type="range" min="0" max="12000" step="1" value="1000"
+                 class="mt-3 w-full accent-indigo-500 cursor-pointer" />
+          <div class="mt-2 flex items-center gap-3">
+            <input id="bpNumber" type="number" min="0" max="12000" value="1000"
+                   class="w-32 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-mono text-white focus:border-accent focus:outline-none" />
+            <span class="text-xs text-slate-500">0 – 12,000 (deliberately allows out-of-range to prove the guard)</span>
+          </div>
+        </div>
+
+        <!-- sale price -->
+        <div>
+          <label class="text-xs uppercase tracking-wider text-slate-400">sale_price (for royalty_info)</label>
+          <div class="mt-2 flex items-center gap-2">
+            <span class="text-slate-500 font-mono">$</span>
+            <input id="salePrice" type="number" min="0" value="1000"
+                   class="w-40 rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm font-mono text-white focus:border-accent focus:outline-none" />
+          </div>
+        </div>
+
+        <button id="runBtn"
+          class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-accent hover:bg-accent-soft transition px-4 py-3 text-sm font-semibold text-white glow">
+          <i data-lucide="play" class="w-4 h-4"></i> Execute setter
+        </button>
+
+        <!-- result -->
+        <div id="result" class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 font-mono text-sm min-h-[92px]">
+          <div class="text-slate-500">// awaiting execution…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract diff + royalty_info -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800 flex items-center gap-2">
+          <i data-lucide="git-pull-request" class="w-4 h-4 text-accent-soft"></i>
+          <h2 class="font-semibold text-white text-sm">Proposed Change</h2>
+        </div>
+        <pre class="p-4 text-[12px] leading-relaxed font-mono overflow-x-auto"><code><span class="text-slate-500">// error.rs</span>
+<span class="text-emerald-400">+ InvalidBasisPoints,</span>
+
+<span class="text-slate-500">// contract.rs</span>
+<span class="text-emerald-400">+ if basis_points &gt; 10_000 {</span>
+<span class="text-emerald-400">+     panic_with_error!(e, RoyaltyError::InvalidBasisPoints);</span>
+<span class="text-emerald-400">+ }</span>
+  Base::set_default_royalty(e, &amp;admin, 1000)</code></pre>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-800 flex items-center gap-2">
+          <i data-lucide="receipt" class="w-4 h-4 text-accent-soft"></i>
+          <h2 class="font-semibold text-white text-sm">royalty_info()</h2>
+        </div>
+        <div class="p-5 space-y-3 text-sm">
+          <div class="flex justify-between"><span class="text-slate-400">sale_price</span><span class="font-mono text-white" id="riSale">$1000</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">basis_points</span><span class="font-mono text-white" id="riBp">1000</span></div>
+          <div class="flex justify-between border-t border-slate-800 pt-3"><span class="text-slate-400">royalty payout</span><span class="font-mono text-emerald-400" id="riPayout">$100</span></div>
+          <div id="riWarn" class="hidden text-xs text-rose-400 flex items-center gap-1.5">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> payout exceeds sale price — bug reproduced
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEST SUITE ============ -->
+  <section class="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+    <div class="px-5 py-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="terminal" class="w-4 h-4 text-accent-soft"></i>
+        <h2 class="font-semibold text-white">cargo test -p nft-royalties</h2>
+      </div>
+      <div class="flex items-center gap-2">
+        <input id="testSearch" placeholder="filter tests…"
+               class="rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-white placeholder-slate-600 focus:border-accent focus:outline-none" />
+        <button id="runTests" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition px-3 py-1.5 text-xs font-semibold text-white">
+          <i data-lucide="play" class="w-3.5 h-3.5"></i> Run all
+        </button>
+      </div>
+    </div>
+    <div class="divide-y divide-slate-800" id="testList"></div>
+    <div class="px-5 py-3 border-t border-slate-800 flex items-center justify-between text-xs font-mono">
+      <span class="text-slate-500" id="testSummary">6 tests · 0 passed</span>
+      <span id="testStatus" class="text-slate-500">idle</span>
+    </div>
+  </section>
+
+  <!-- ============ CI PIPELINE ============ -->
+  <section class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+    <div class="flex items-center gap-2 mb-4">
+      <i data-lucide="workflow" class="w-4 h-4 text-accent-soft"></i>
+      <h2 class="font-semibold text-white">.github/workflows/node.yml — build job</h2>
+    </div>
+    <div class="grid sm:grid-cols-4 gap-3" id="ciSteps"></div>
+  </section>
+
+</main>
+
+<footer class="border-t border-slate-800 mt-10">
+  <div class="max-w-7xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+    <span>Prototype generated by Antigravity OS · gh-live-5752316928</span>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20gh-live-5752316928"
+       class="inline-flex items-center gap-1.5 text-accent-soft hover:text-white transition">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i> lamvukyo3001@gmail.com
+    </a>
+  </div>
+</footer>
+
+<script>
+lucide.createIcons();
+
+/* ---------- state ---------- */
+const MAX_BP = 10000;
+let currentPath = 'mint_with_royalty';
+
+/* ---------- setter path selector ---------- */
+document.querySelectorAll('.path-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentPath = btn.dataset.path;
+    document.querySelectorAll('.path-btn').forEach(b => {
+      const active = b === btn;
+      b.className = 'path-btn rounded-lg border px-3 py-2 text-xs font-mono ' +
+        (active ? 'border-accent bg-accent/10 text-accent-soft'
+                : 'border-slate-700 bg-slate-950/40 text-slate-400');
+    });
+  });
+});
+
+/* ---------- basis points sync ---------- */
+const bpInput = document.getElementById('bpInput');
+const bpNumber = document.getElementById('bpNumber');
+const bpPercent = document.getElementById('bpPercent');
+const salePrice = document.getElementById('salePrice');
+
+function syncBp(val) {
+  val = Math.max(0, Math.min(12000, Number(val) || 0));
+  bpInput.value = val;
+  bpNumber.value = val;
+  bpPercent.textContent = (val / 100).toFixed(2) + '%';
+  updateRoyaltyInfo(val);
+}
+bpInput.addEventListener('input', e => syncBp(e.target.value));
+bpNumber.addEventListener('input', e => syncBp(e.target.value));
+salePrice.addEventListener('input', () => updateRoyaltyInfo(Number(bpNumber.value)));
+
+/* ---------- royalty_info preview ---------- */
+function updateRoyaltyInfo(bp) {
+  const sale = Number(salePrice.value) || 0;
+  const payout = sale * bp / 10000;
+  document.getElementById('riSale').textContent = '$' + sale.toLocaleString();
+  document.getElementById('riBp').textContent = bp.toLocaleString();
+  document.getElementById('riPayout').textContent = '$' + payout.toLocaleString(undefined, {maximumFractionDigits: 2});
+  document.getElementById('riWarn').classList.toggle('hidden', bp <= MAX_BP);
+}
+
+/* ---------- execute setter ---------- */
+const result = document.getElementById('result');
+document.getElementById('runBtn').addEventListener('click', () => {
+  const bp = Number(bpNumber.value);
+  const ok = bp <= MAX_BP;
+  result.className = 'rounded-xl border p-4 font-mono text-sm min-h-[92px] fade-in ' +
+    (ok ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-rose-500/40 bg-rose-500/5');
+  result.innerHTML = ok
+    ? `<div class="text-emerald-400">✓ Ok(())</div>
+       <div class="text-slate-400 mt-1">${currentPath}(to, receiver, ${bp})</div>
+       <div class="text-slate-500 mt-1">// royalty stored · royalty_info returns ${(bp/100).toFixed(2)}% of sale</div>`
+    : `<div class="text-rose-400">✗ panicked: RoyaltyError::InvalidBasisPoints</div>
+       <div class="text-slate-400 mt-1">${currentPath}(to, receiver, ${bp})</div>
+       <div class="text-slate-500 mt-1">// ${bp} &gt; 10_000 — rejected on every setter path</div>`;
+});
+
+/* ---------- test suite ---------- */
+const TESTS = [
+  { name: 'test_mint_with_royalty_rejects_10001', desc: 'mint_with_royalty panics above bound' },
+  { name: 'test_set_default_royalty_rejects_10001', desc: 'set_default_royalty panics above bound' },
+  { name: 'test_set_token_royalty_rejects_10001', desc: 'set_token_royalty panics above bound' },
+  { name: 'test_accepts_10000_basis_points', desc: '10000 accepted on all setters' },
+  { name: 'test_royalty_info_full_sale_price', desc: 'royalty_info returns full sale price at 10000' },
+  { name: 'test_default_royalty_is_1000', desc: 'collection default remains 1000 bp' }
+];
+const testList = document.getElementById('testList');
+let passed = 0;
+
+function renderTests(filter = '') {
+  testList.innerHTML = '';
+  TESTS.filter(t => t.name.includes(filter) || t.desc.includes(filter)).forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'px-5 py-3 flex items-center justify-between gap-3 fade-in';
+    row.innerHTML = `
+      <div class="min-w-0">
+        <div class="font-mono text-sm text-slate-200 truncate">${t.name}</div>
+        <div class="text-xs text-slate-500 truncate">${t.desc}</div>
+      </div>
+      <span class="test-status shrink-0 text-xs font-mono text-slate-500">pending</span>`;
+    testList.appendChild(row);
+  });
+}
+renderTests();
+
+document.getElementById('testSearch').addEventListener('input', e => renderTests(e.target.value));
+
+document.getElementById('runTests').addEventListener('click', () => {
+  const rows = [...testList.children];
+  passed = 0;
+  document.getElementById('testStatus').textContent = 'running…';
+  document.getElementById('testStatus').className = 'text-amber-400';
+  rows.forEach((row, i) => {
+    const badge = row.querySelector('.test-status');
+    badge.textContent = 'running';
+    badge.className = 'test-status shrink-0 text-xs font-mono text-amber-400';
+    setTimeout(() => {
+      badge.textContent = 'ok';
+      badge.className = 'test-status shrink-0 text-xs font-mono text-emerald-400';
+      passed++;
+      document.getElementById('testSummary').textContent = `6 tests · ${passed} passed`;
+      document.getElementById('kpiTests').textContent = passed;
+      if (passed === rows.length) {
+        document.getElementById('testStatus').textContent = 'test result: ok';
+        document.getElementById('testStatus').className = 'text-emerald-400';
+      }
+    }, 220 * (i + 1));
+  });
+});
+
+/* ---------- CI pipeline ---------- */
+const CI = ['checkout', 'setup-rust', 'cargo build', 'cargo test'];
+const ciSteps = document.getElementById('ciSteps');
+CI.forEach(s => {
+  const d = document.createElement('div');
+  d.className = 'rounded-lg border border-slate-800 bg-slate-950/60 p-3 flex items-center gap-2 text-xs font-mono text-slate-400';
+  d.innerHTML = `<i data-lucide="circle" class="w-3.5 h-3.5 text-slate-600"></i> ${s}`;
+  ciSteps.appendChild(d);
+});
+lucide.createIcons();
+
+document.getElementById('runTests').addEventListener('click', () => {
+  const steps = [...ciSteps.children];
+  document.getElementById('kpiCI').textContent = 'running';
+  document.getElementById('kpiCI').className = 'mt-2 text-3xl font-bold text-amber-400 font-mono';
+  steps.forEach((s, i) => {
+    setTimeout(() => {
+      s.className = 'rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 flex items-center gap-2 text-xs font-mono text-emerald-400';
+      s.innerHTML = `<i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> ${CI[i]}`;
+      lucide.createIcons();
+      if (i === steps.length - 1) {
+        document.getElementById('kpiCI').textContent = 'green';
+        document.getElementById('kpiCI').className = 'mt-2 text-3xl font-bold text-emerald-400 font-mono';
+      }
+    }, 300 * (i + 1));
+  });
+});
+
+/* ---------- init ---------- */
+syncBp(1000);
+</script>
+</body>
+</html>

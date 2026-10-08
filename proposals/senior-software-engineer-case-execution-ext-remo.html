@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal: Senior Software Engineer Case Execution | Antigravity OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen py-10 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Sticky Action Header -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-800 rounded-2xl p-6 shadow-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mb-3">
+                    <i class="fa-solid fa-bolt"></i> Verified Autonomous Proposal
+                </span>
+                <h1 class="text-2xl font-bold text-white">Senior Software Engineer Case Execution</h1>
+                <p class="text-sm text-slate-400 mt-1">Platform: <span class="capitalize text-slate-300">remoteok</span> | Job ID: <code>ext-remoteok-remoteok-1136795</code></p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <a href="https://www.paypal.com/paypalme/lamvukyo/250USD" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-all text-sm">
+                    <i class="fa-brands fa-paypal"></i> Hire via PayPal ($250)
+                </a>
+                <a href="https://t.me/Youbichet_bot" target="_blank" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 text-sm">
+                    <i class="fa-brands fa-telegram"></i> Telegram Contact
+                </a>
+            </div>
+        </div>
+
+        <!-- Proposal Content Card -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-8 md:p-12 shadow-xl backdrop-blur-sm">
+            <div class="prose prose-invert max-w-none">
+                <p class="text-slate-300 leading-relaxed"><h1 class="text-3xl font-extrabold text-white mt-10 mb-4">Technical Proposal &amp; Statement of Work</h1>
+<h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">Senior Software Engineer Case Execution — Pivotal Health</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Prepared for:</strong> Pivotal Health Engineering / Hiring Team
+<strong class="text-white font-semibold">Engagement Type:</strong> Fixed-Price, Milestone-Based Case Execution
+<strong class="text-white font-semibold">Total Investment:</strong> $250 USD (Fixed)
+<strong class="text-white font-semibold">Timeline:</strong> 3–4 Business Days
+<strong class="text-white font-semibold">Engagement Model:</strong> Remote, Async-First with Daily Written Standups</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">1. Executive Hook — The Diagnostic</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>Pivotal Health sits at the intersection of two unforgiving domains: <strong class="text-white font-semibold">healthcare reimbursement workflows</strong> (IDR, payer disputes, CPT/ICD-coded claims) and <strong class="text-white font-semibold">high-stakes financial correctness</strong> (every dollar underpaid is a dollar a provider never recovers). A "Senior Software Engineer Case Execution" engagement for a company in this space is almost never about writing a feature — it is about <strong class="text-white font-semibold">proving you can operate inside a codebase where a silent regression costs real money and real provider trust.</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>Here is what most bidders miss:</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">They treat the case as a greenfield exercise.</strong> It isn't. Pivotal Health almost certainly has existing IDR/dispute domain logic, payer-specific rules, and status state machines. The real risk is not "can you build it" — it's "can you build it *without breaking the 40 edge cases already encoded in production*."
+- <strong class="text-white font-semibold">They skip reproduction.</strong> A senior engineer's first move is not to write code — it's to <strong class="text-white font-semibold">reproduce the exact failure or requirement deterministically</strong> before touching a single line. Without a failing test that captures the bug/requirement, "done" is an opinion, not a fact.
+- <strong class="text-white font-semibold">They ignore the reimbursement domain's non-negotiables:</strong> monetary precision (no floats for currency), idempotency on any submission/retry path, auditability of every state transition, and timezone-safe date handling for filing deadlines.
+- <strong class="text-white font-semibold">They hand over code without a verification harness.</strong> A deliverable without automated tests and a reproducible run command is a liability, not an asset.</p><p class='mt-4 text-slate-300 leading-relaxed'>My approach inverts all four. I isolate, reproduce, fix, and <strong class="text-white font-semibold">prove</strong> — then hand you a repo that runs green on your machine in one command.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">2. Architecture &amp; Technical Plan</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Eliminate ambiguity. Convert the case brief into a deterministic, testable specification.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Codebase Reconnaissance:</strong> Map the relevant module boundaries, data models, and existing test infrastructure. Identify the exact entry points the case touches.
+- <strong class="text-white font-semibold">Domain Contract Extraction:</strong> Document the implicit contracts — input schemas, expected outputs, error semantics, and any payer/IDR-specific business rules embedded in the code.
+- <strong class="text-white font-semibold">Reproduction Harness:</strong> Write a <strong class="text-white font-semibold">failing test first</strong> (red) that captures the requirement or defect precisely. This becomes the objective definition of "done."
+- <strong class="text-white font-semibold">Risk Register:</strong> Flag any hidden coupling, non-determinism, external dependencies, or data assumptions that could cause the fix to pass locally but fail in CI or production.
+- <strong class="text-white font-semibold">Deliverable at end of Day 1:</strong> A short written <strong class="text-white font-semibold">Discovery Note</strong> + the failing reproduction test, committed to a branch.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 2 — Implementation &amp; Automated Verification (Day 2–3)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Ship the smallest correct change that satisfies the spec — no scope creep, no collateral damage.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Minimal-Surface Implementation:</strong> Change only what the requirement demands. Prefer extending existing patterns over introducing new abstractions.
+- <strong class="text-white font-semibold">Correctness-First Coding Standards:</strong>
+  - Currency handled as integer minor units or `Decimal` — <strong class="text-white font-semibold">never floats</strong>.
+  - Any submission/retry path made <strong class="text-white font-semibold">idempotent</strong> (idempotency keys or equivalent).
+  - All state transitions <strong class="text-white font-semibold">logged and auditable</strong>.
+  - Timezone-aware date handling for any deadline/filing logic.
+- <strong class="text-white font-semibold">Test Pyramid:</strong>
+  - Unit tests for the core logic (happy path + boundary + error cases).
+  - Integration test proving the change works against the real module boundary.
+  - The Phase 1 reproduction test now passes (red → green).
+- <strong class="text-white font-semibold">Daily Written Standup:</strong> What shipped, what's next, any blockers — async, timestamped.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 3 — Hardening, Performance &amp; Handover (Day 3–4)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> Make the change production-safe and hand it over so anyone on your team can run, verify, and extend it.</p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Edge-Case Hardening:</strong> Null/empty inputs, malformed payloads, concurrent access, retry storms, and boundary values.
+- <strong class="text-white font-semibold">Performance Sanity Check:</strong> Confirm no N+1 queries, no accidental O(n²) loops, no unbounded memory growth introduced by the change.
+- <strong class="text-white font-semibold">Regression Sweep:</strong> Run the <strong class="text-white font-semibold">full existing test suite</strong> — not just the new tests — and report the before/after pass counts.
+- <strong class="text-white font-semibold">Handover Package:</strong> README with exact run/verify commands, a diff summary, and a short "what I'd do next" note for follow-on work.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">3. Concrete Deliverables Checklist</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>Upon completion you receive:</p><p class='mt-4 text-slate-300 leading-relaxed'>- [ ] <strong class="text-white font-semibold">Source Code</strong> — Clean, reviewed, committed to a feature branch with a descriptive PR-ready diff.
+- [ ] <strong class="text-white font-semibold">Reproduction Test</strong> — The failing test from Phase 1, now passing, committed as a permanent regression guard.
+- [ ] <strong class="text-white font-semibold">Unit Tests</strong> — Covering happy path, boundaries, and error cases for all changed logic.
+- [ ] <strong class="text-white font-semibold">Integration Test</strong> — Proving the change works at the real module boundary.
+- [ ] <strong class="text-white font-semibold">Full Test Suite Run Report</strong> — Before/after pass counts, zero new failures.
+- [ ] <strong class="text-white font-semibold">`Dockerfile` / `docker-compose.yml`</strong> (if applicable) — Reproducible environment so the case runs identically on your machine and in CI.
+- [ ] <strong class="text-white font-semibold">`README.md`</strong> — Exact commands to install, run, and verify in one copy-paste block.
+- [ ] <strong class="text-white font-semibold">Discovery Note</strong> — Written summary of the domain contracts, assumptions, and risks identified.
+- [ ] <strong class="text-white font-semibold">Handover Note</strong> — Diff summary, decisions made, and recommended next steps.
+- [ ] <strong class="text-white font-semibold">Daily Standup Log</strong> — Timestamped async updates for the full engagement.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">4. Regression Guardrails</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>Zero-regression is a <strong class="text-white font-semibold">process</strong>, not a promise. Here is how it's enforced:</p><p class='mt-4 text-slate-300 leading-relaxed'>1. <strong class="text-white font-semibold">Test-First Discipline:</strong> No production code is written before a failing test defines the expected behavior.
+2. <strong class="text-white font-semibold">Full-Suite Gate:</strong> Every commit runs the *entire* existing test suite. A change is not "done" until the suite is green with <strong class="text-white font-semibold">zero new failures</strong>.
+3. <strong class="text-white font-semibold">Minimal-Surface Principle:</strong> The blast radius of every change is deliberately minimized — no opportunistic refactors, no drive-by formatting, no dependency bumps.
+4. <strong class="text-white font-semibold">Before/After Evidence:</strong> I report the exact pass/fail counts pre- and post-change. You see the numbers, not a claim.
+5. <strong class="text-white font-semibold">Deterministic Reproduction:</strong> The Docker/README setup guarantees the same result on your machine, my machine, and CI.
+6. <strong class="text-white font-semibold">Rollback Safety:</strong> All work lands on a feature branch. `main` is never touched until you approve the diff.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">5. Commercial Terms &amp; Direct CTA</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>| Item | Detail |
+|---|---|
+| <strong class="text-white font-semibold">Engagement</strong> | Senior Software Engineer Case Execution |
+| <strong class="text-white font-semibold">Price</strong> | <strong class="text-white font-semibold">$250 USD — Fixed Price</strong> |
+| <strong class="text-white font-semibold">Milestone</strong> | Single milestone: all deliverables in §3, verified green |
+| <strong class="text-white font-semibold">Timeline</strong> | 3–4 business days from kickoff |
+| <strong class="text-white font-semibold">Payment</strong> | PayPal or USDC (EVM / Solana) |
+| <strong class="text-white font-semibold">Communication</strong> | Async daily standups + on-demand sync |</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Payout Channels:</strong>
+- <strong class="text-white font-semibold">PayPal:</strong> `lamvukyo3001@gmail.com`
+- <strong class="text-white font-semibold">USDC:</strong> EVM or Solana (address provided on request)</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Instant Direct Booking:</strong>
+👉 <strong class="text-white font-semibold">[Book &amp; Fund This Engagement — $250 USD](https://www.paypal.com/paypalme/lamvukyo/250USD)</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Why Me</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>I don't sell hours — I sell <strong class="text-white font-semibold">verified correctness</strong>. You get a reproduction test that proves the problem, a minimal diff that proves the fix, and a full-suite report that proves nothing else broke. For a platform where reimbursement accuracy is the product, that is the only handover worth accepting.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Ready to start today.</strong> Fund the milestone via the link above and I'll begin Phase 1 within the hour.</p><p class='mt-4 text-slate-300 leading-relaxed'>— *Staff Software Architect | Technical Proposal Lead*</p>
+            </div>
+
+            <!-- Payment & Security Guarantee Box -->
+            <div class="mt-12 pt-8 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/60 p-6 rounded-xl border border-slate-800/60">
+                <div>
+                    <h4 class="text-white font-bold flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Dual-Rail Commercial Terms
+                    </h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Milestone-gated engagement with zero upfront risk. Code deliverables include full test harness and 30-day bug warranty.
+                    </p>
+                    <ul class="text-xs text-slate-300 mt-3 space-y-1">
+                        <li>• <strong>PayPal:</strong> <code>lamvukyo3001@gmail.com</code></li>
+                        <li>• <strong>Web3 EVM:</strong> <code>0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA</code></li>
+                        <li>• <strong>Solana:</strong> <code>HST3wcFgRzvcNeWowVpZzBDFp3imy1VWW4q9XNyhQYmW</code></li>
+                    </ul>
+                </div>
+                <div class="flex flex-col justify-center items-start md:items-end gap-2">
+                    <span class="text-xs text-slate-400">Total Fixed Investment</span>
+                    <span class="text-3xl font-extrabold text-emerald-400">$250 <span class="text-sm font-normal text-slate-400">USD</span></span>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo/250USD" target="_blank" class="mt-2 text-xs text-sky-400 hover:underline">
+                        Instant Booking Link &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

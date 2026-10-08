@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SRE Networks Console — Interactive Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        slate: { 950: '#0a0e14' },
+        accent: { DEFAULT: '#6366f1', soft: '#818cf8' }
+      },
+      fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  .glow { box-shadow: 0 0 20px rgba(99,102,241,0.15); }
+  .pulse-dot { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+  .fade-in { animation: fadeIn .4s ease-out; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(4px) } to { opacity:1; transform:none } }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 min-h-screen antialiased">
+
+<!-- Sticky Banner -->
+<div class="sticky top-0 z-50 bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-950 border-b border-indigo-500/30 backdrop-blur">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2 text-sm">
+      <span class="pulse-dot inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+      <span class="text-slate-300">🚀 Live Interactive Prototype for: <span class="font-semibold text-white">Senior SRE - Networks</span> <span class="text-slate-500 hidden sm:inline">| Built autonomously by Antigravity OS | Ready for deployment</span></span>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-24582a92"
+       class="text-xs font-semibold bg-indigo-500 hover:bg-indigo-400 text-white px-3 py-1.5 rounded-md transition flex items-center gap-1.5">
+      <i data-lucide="briefcase" class="w-3.5 h-3.5"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="border-b border-slate-800/60 bg-slate-900/40">
+  <div class="max-w-7xl mx-auto px-4 py-6 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center glow">
+        <i data-lucide="network" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <h1 class="text-lg font-semibold text-white">Edge Network Operations Console</h1>
+        <p class="text-xs text-slate-500">Anycast POP health · BGP session monitoring · Flow telemetry</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-xs">
+      <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+        <span class="pulse-dot w-1.5 h-1.5 rounded-full bg-emerald-400"></span> All systems nominal
+      </span>
+      <span class="px-2.5 py-1 rounded-md bg-slate-800 text-slate-400 border border-slate-700 font-mono" id="clock">--:--:--</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+  <!-- KPI Row -->
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="kpis"></section>
+
+  <!-- Controls -->
+  <section class="flex flex-wrap items-center gap-3 bg-slate-900/50 border border-slate-800 rounded-xl p-3">
+    <div class="relative flex-1 min-w-[200px]">
+      <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+      <input id="search" type="text" placeholder="Filter POPs by code or region…"
+        class="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-sm placeholder-slate-600 focus:outline-none focus:border-indigo-500/60">
+    </div>
+    <div class="flex gap-1 bg-slate-950 border border-slate-800 rounded-lg p-1" id="regionFilter">
+      <button data-region="all" class="filter-btn px-3 py-1.5 text-xs rounded-md bg-indigo-500 text-white">All</button>
+      <button data-region="NA" class="filter-btn px-3 py-1.5 text-xs rounded-md text-slate-400 hover:text-white">NA</button>
+      <button data-region="EU" class="filter-btn px-3 py-1.5 text-xs rounded-md text-slate-400 hover:text-white">EU</button>
+      <button data-region="APAC" class="filter-btn px-3 py-1.5 text-xs rounded-md text-slate-400 hover:text-white">APAC</button>
+    </div>
+    <button id="refreshBtn" class="px-3 py-2 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center gap-1.5 transition">
+      <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+    </button>
+  </section>
+
+  <!-- Main Grid -->
+  <section class="grid lg:grid-cols-3 gap-6">
+
+    <!-- POP Table -->
+    <div class="lg:col-span-2 bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+          <i data-lucide="server" class="w-4 h-4 text-indigo-400"></i> Anycast POP Health
+        </h2>
+        <span class="text-xs text-slate-500" id="popCount">—</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-950/60 text-slate-500 text-xs uppercase tracking-wider">
+            <tr>
+              <th class="text-left px-4 py-2.5 font-medium">POP</th>
+              <th class="text-left px-4 py-2.5 font-medium">Region</th>
+              <th class="text-left px-4 py-2.5 font-medium">BGP</th>
+              <th class="text-right px-4 py-2.5 font-medium">Latency</th>
+              <th class="text-right px-4 py-2.5 font-medium">Loss</th>
+              <th class="text-right px-4 py-2.5 font-medium">Load</th>
+            </tr>
+          </thead>
+          <tbody id="popTable" class="divide-y divide-slate-800/60"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Side Panel -->
+    <div class="space-y-6">
+      <!-- BGP Sessions -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-800">
+          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+            <i data-lucide="git-branch" class="w-4 h-4 text-indigo-400"></i> BGP Peering Sessions
+          </h2>
+        </div>
+        <div id="bgpList" class="p-3 space-y-2 max-h-64 overflow-y-auto"></div>
+      </div>
+
+      <!-- Flow Telemetry -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+          <i data-lucide="activity" class="w-4 h-4 text-indigo-400"></i> sFlow / IPFIX Ingest
+        </h2>
+        <div class="space-y-3" id="flowBars"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Incident Timeline -->
+  <section class="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
+    <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+      <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-indigo-400"></i> Incident Command Timeline
+      </h2>
+      <button id="simulateBtn" class="text-xs px-3 py-1.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/30 hover:bg-rose-500/20 transition flex items-center gap-1.5">
+        <i data-lucide="zap" class="w-3.5 h-3.5"></i> Simulate Failover
+      </button>
+    </div>
+    <div id="timeline" class="p-4 space-y-3 max-h-72 overflow-y-auto"></div>
+  </section>
+
+  <footer class="text-center text-xs text-slate-600 py-6 border-t border-slate-800/60">
+    Prototype · Antigravity OS · <span class="font-mono">wwr-24582a92</span> · Data is simulated for demonstration
+  </footer>
+</main>
+
+<script>
+// ---------- Mock Data ----------
+const POPS = [
+  { code:'SJC', region:'NA', city:'San Jose', bgp:'Established', latency:8, loss:0.0, load:42 },
+  { code:'IAD', region:'NA', city:'Ashburn', bgp:'Established', latency:11, loss:0.0, load:55 },
+  { code:'DFW', region:'NA', city:'Dallas', bgp:'Established', latency:14, loss:0.1, load:38 },
+  { code:'LHR', region:'EU', city:'London', bgp:'Established', latency:19, loss:0.0, load:61 },
+  { code:'FRA', region:'EU', city:'Frankfurt', bgp:'Established', latency:22, loss:0.0, load:47 },
+  { code:'AMS', region:'EU', city:'Amsterdam', bgp:'Idle', latency:24, loss:0.3, load:29 },
+  { code:'NRT', region:'APAC', city:'Tokyo', bgp:'Established', latency:31, loss:0.0, load:52 },
+  { code:'SIN', region:'APAC', city:'Singapore', bgp:'Established', latency:35, loss:0.1, load:44 },
+  { code:'SYD', region:'APAC', city:'Sydney', bgp:'Established', latency:48, loss:0.2, load:33 },
+];
+
+const BGP = [
+  { peer:'AS54113 · 203.0.113.1', state:'Established', uptime:'42d 6h', prefixes:1842 },
+  { peer:'AS20940 · 198.51.100.7', state:'Established', uptime:'18d 2h', prefixes:920 },
+  { peer:'AS15169 · 192.0.2.44', state:'Established', uptime:'7d 11h', prefixes:3310 },
+  { peer:'AS13335 · 203.0.113.88', state:'Idle', uptime:'—', prefixes:0 },
+  { peer:'AS16509 · 198.51.100.19', state:'Established', uptime:'31d 4h', prefixes:1204 },
+];
+
+const FLOWS = [
+  { label:'Ingress (Gbps)', value: 78, color:'bg-indigo-500' },
+  { label:'Egress (Gbps)', value: 64, color:'bg-emerald-500' },
+  { label:'DDoS scrubbed (Mpps)', value: 12, color:'bg-rose-500' },
+  { label:'Cache hit ratio', value: 91, color:'bg-amber-500' },
+];
+
+let timelineEvents = [
+  { t:'09:14:02', msg:'Anycast route withdrawn from AMS — BGP session Idle', level:'warn' },
+  { t:'09:14:05', msg:'Traffic re-converged to FRA + LHR within 3.2s', level:'ok' },
+  { t:'09:14:08', msg:'Health probe confirmed 0% loss across EU region', level:'ok' },
+];
+
+// ---------- Render ----------
+const $ = (s) => document.querySelector(s);
+
+function renderKPIs() {
+  const healthy = POPS.filter(p => p.bgp === 'Established').length;
+  const avgLat = (POPS.reduce((a,p)=>a+p.latency,0)/POPS.length).toFixed(1);
+  const kpis = [
+    { label:'Healthy POPs', value:`${healthy}/${POPS.length}`, icon:'server', tone:'emerald' },
+    { label:'Avg Latency', value:`${avgLat} ms`, icon:'gauge', tone:'indigo' },
+    { label:'BGP Sessions', value:`${BGP.filter(b=>b.state==='Established').length}/${BGP.length}`, icon:'git-branch', tone:'indigo' },
+    { label:'Active Incidents', value:'0', icon:'shield-check', tone:'emerald' },
+  ];
+  $('#kpis').innerHTML = kpis.map(k => `
+    <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-4 fade-in">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-slate-500">${k.label}</span>
+        <i data-lucide="${k.icon}" class="w-4 h-4 text-${k.tone}-400"></i>
+      </div>
+      <div class="text-2xl font-semibold text-white font-mono">${k.value}</div>
+    </div>`).join('');
+  lucide.createIcons();
+}
+
+function bgpBadge(state) {
+  return state === 'Established'
+    ? '<span class="px-2 py-0.5 rounded text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Established</span>'
+    : '<span class="px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20">Idle</span>';
+}
+
+function renderTable() {
+  const q = $('#search').value.toLowerCase();
+  const region = document.querySelector('.filter-btn.bg-indigo-500')?.dataset.region || 'all';
+  const rows = POPS.filter(p =>
+    (region === 'all' || p.region === region) &&
+    (p.code.toLowerCase().includes(q) || p.city.toLowerCase().includes(q))
+  );
+  $('#popCount').textContent = `${rows.length} POP${rows.length!==1?'s':''}`;
+  $('#popTable').innerHTML = rows.map(p => `
+    <tr class="hover:bg-slate-800/30 transition fade-in">
+      <td class="px-4 py-3">
+        <div class="font-mono font-semibold text-white">${p.code}</div>
+        <div class="text-xs text-slate-500">${p.city}</div>
+      </td>
+      <td class="px-4 py-3 text-slate-400">${p.region}</td>
+      <td class="px-4 py-3">${bgpBadge(p.bgp)}</td>
+      <td class="px-4 py-3 text-right font-mono ${p.latency>40?'text-amber-400':'text-slate-300'}">${p.latency} ms</td>
+      <td class="px-4 py-3 text-right font-mono ${p.loss>0.15?'text-rose-400':'text-slate-300'}">${p.loss.toFixed(1)}%</td>
+      <td class="px-4 py-3 text-right">
+        <div class="flex items-center justify-end gap-2">
+          <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div class="h-full ${p.load>70?'bg-rose-500':p.load>50?'bg-amber-500':'bg-emerald-500'}" style="width:${p.load}%"></div>
+          </div>
+          <span class="font-mono text-xs text-slate-400 w-8">${p.load}%</span>
+        </div>
+      </td>
+    </tr>`).join('') || `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500 text-sm">No POPs match your filter.</td></tr>`;
+}
+
+function renderBGP() {
+  $('#bgpList').innerHTML = BGP.map(b => `
+    <div class="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/60 fade-in">
+      <div class="min-w-0">
+        <div class="font-mono text-xs text-slate-300 truncate">${b.peer}</div>
+        <div class="text-xs text-slate-500 mt-0.5">${b.state==='Established'?`up ${b.uptime} · ${b.prefixes} prefixes`:'session down'}</div>
+      </div>
+      ${bgpBadge(b.state)}
+    </div>`).join('');
+}
+
+function renderFlows() {
+  $('#flowBars').innerHTML = FLOWS.map(f => `
+    <div>
+      <div class="flex justify-between text-xs mb-1">
+        <span class="text-slate-400">${f.label}</span>
+        <span class="font-mono text-slate-300">${f.value}${f.label.includes('ratio')?'%':''}</span>
+      </div>
+      <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div class="${f.color} h-full transition-all duration-700" style="width:${f.value}%"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTimeline() {
+  const colors = { warn:'text-amber-400 border-amber-500/30 bg-amber-500/5', ok:'text-emerald-400 border-emerald-500/30 bg-emerald-500/5', info:'text-indigo-400 border-indigo-500/30 bg-indigo-500/5' };
+  $('#timeline').innerHTML = timelineEvents.map(e => `
+    <div class="flex gap-3 items-start p-3 rounded-lg border ${colors[e.level]} fade-in">
+      <span class="font-mono text-xs text-slate-500 pt-0.5">${e.t}</span>
+      <span class="text-sm">${e.msg}</span>
+    </div>`).join('');
+}
+
+// ---------- Interactions ----------
+$('#search').addEventListener('input', renderTable);
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('bg-indigo-500','text-white');
+      b.classList.add('text-slate-400');
+    });
+    btn.classList.add('bg-indigo-500','text-white');
+    btn.classList.remove('text-slate-400');
+    renderTable();
+  });
+});
+
+$('#refreshBtn').addEventListener('click', () => {
+  POPS.forEach(p => {
+    p.latency = Math.max(5, Math.round(p.latency + (Math.random()*6-3)));
+    p.load = Math.min(99, Math.max(10, Math.round(p.load + (Math.random()*10-5))));
+    p.loss = Math.max(0, +(p.loss + (Math.random()*0.2-0.1)).toFixed(1));
+  });
+  FLOWS.forEach(f => f.value = Math.min(99, Math.max(5, Math.round(f.value + (Math.random()*8-4)))));
+  renderKPIs(); renderTable(); renderFlows();
+});
+
+$('#simulateBtn').addEventListener('click', () => {
+  const now = new Date().toTimeString().slice(0,8);
+  const target = POPS[Math.floor(Math.random()*POPS.length)];
+  timelineEvents.unshift({ t:now, msg:`Simulated route withdrawal at ${target.code} — traffic re-converged in ${(Math.random()*3+1).toFixed(1)}s`, level:'warn' });
+  timelineEvents = timelineEvents.slice(0, 12);
+  renderTimeline();
+});
+
+// ---------- Clock ----------
+setInterval(() => {
+  $('#clock').textContent = new Date().toTimeString().slice(0,8) + ' UTC';
+}, 1000);
+
+// ---------- Init ----------
+renderKPIs(); renderTable(); renderBGP(); renderFlows(); renderTimeline();
+lucide.createIcons();
+</script>
+</body>
+</html>

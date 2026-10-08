@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pivotal Health – Senior Software Engineer Case Execution Prototype</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Enable class‑based dark mode
+    tailwind.config = { darkMode: 'class' };
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased">
+
+  <!-- Sticky Header Banner -->
+  <header class="sticky top-0 z-50 bg-slate-800 border-b border-slate-700">
+    <div class="max-w-7xl mx-auto flex items-center justify-between p-3">
+      <div class="flex items-center space-x-2 text-sm">
+        <span>🚀 Live Interactive Prototype for: Senior Software Engineer Case Execution | Built autonomously by Antigravity OS | Ready for deployment</span>
+      </div>
+      <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20ext-remoteok-remoteok-1136795"
+         class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md text-sm font-medium transition">
+        Hire Team ($150 - $500)
+      </a>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto py-8 px-4 space-y-8">
+    <!-- Dashboard Header -->
+    <section class="flex items-center justify-between">
+      <h1 class="text-3xl font-bold">Case Execution Dashboard</h1>
+      <button id="darkToggle" class="flex items-center space-x-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded-md text-sm transition">
+        <i data-lucide="moon"></i><span>Toggle Dark</span>
+      </button>
+    </section>
+
+    <!-- Filters & Search -->
+    <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="flex space-x-2">
+        <button data-status="All" class="filter-btn active px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-md transition">All</button>
+        <button data-status="Pending" class="filter-btn px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md transition">Pending</button>
+        <button data-status="In Review" class="filter-btn px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md transition">In Review</button>
+        <button data-status="Resolved" class="filter-btn px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-md transition">Resolved</button>
+      </div>
+      <div class="relative w-full md:w-64">
+        <input type="text" id="searchInput" placeholder="Search provider…" class="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+      </div>
+    </section>
+
+    <!-- Chart -->
+    <section class="bg-slate-800 p-6 rounded-lg shadow-lg">
+      <h2 class="text-xl font-semibold mb-4">Monthly Reimbursement Trend</h2>
+      <canvas id="reimburseChart" class="w-full h-64"></canvas>
+    </section>
+
+    <!-- Cases Table -->
+    <section class="bg-slate-800 rounded-lg shadow-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-slate-700">
+        <thead class="bg-slate-700">
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-medium">Case ID</th>
+            <th class="px-4 py-2 text-left text-sm font-medium">Provider</th>
+            <th class="px-4 py-2 text-left text-sm font-medium">Status</th>
+            <th class="px-4 py-2 text-right text-sm font-medium">Amount ($)</th>
+            <th class="px-4 py-2 text-left text-sm font-medium">Progress</th>
+          </tr>
+        </thead>
+        <tbody id="casesBody" class="divide-y divide-slate-700">
+          <!-- Rows will be injected by JS -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    // Initialize icons
+    lucide.createIcons();
+
+    // Dark mode toggle
+    const darkToggle = document.getElementById('darkToggle');
+    darkToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+
+    // Mock case data
+    const cases = [
+      { id: 'C-1023', provider: 'Sunrise Health', status: 'Pending', amount: 12450, progress: 20 },
+      { id: 'C-1045', provider: 'River Valley Clinic', status: 'In Review', amount: 8750, progress: 45 },
+      { id: 'C-1089', provider: 'Mountainview Hospital', status: 'Resolved', amount: 20300, progress: 100 },
+      { id: 'C-1102', provider: 'Lakeside Medical', status: 'Pending', amount: 5600, progress: 10 },
+      { id: 'C-1120', provider: 'Pioneer Health Group', status: 'In Review', amount: 14780, progress: 60 },
+      { id: 'C-1133', provider: 'Harbor Wellness', status: 'Resolved', amount: 9800, progress: 100 },
+    ];
+
+    // Render table rows
+    const tbody = document.getElementById('casesBody');
+    function renderRows(filterStatus = 'All', searchTerm = '') {
+      tbody.innerHTML = '';
+      const filtered = cases.filter(c => {
+        const matchesStatus = filterStatus === 'All' || c.status === filterStatus;
+        const matchesSearch = c.provider.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesStatus && matchesSearch;
+      });
+      filtered.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.inner

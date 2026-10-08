@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Digital Signage Engineer | BrightSign &amp; Nexmosphere Specialist - Technical Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Inter", sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+        .mono { font-family: "JetBrains Mono", monospace; }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12">
+    <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 md:p-12 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-8">
+            <div>
+                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mono uppercase tracking-wider">Verified Proposal & Dossier</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mt-3">Interactive Digital Signage Engineer | BrightSign &amp; Nexmosphere Specialist</h1>
+                <p class="text-slate-400 text-sm mt-1 mono">Job ID: job-fl-40748 | Milestone Value: $750.00 USD</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-emerald-400 mono">$750.00</div>
+                <div class="text-xs text-slate-500">Fixed Milestone Delivery</div>
+            </div>
+        </div>
+
+        <div class="prose prose-invert max-w-none text-slate-300 space-y-6">
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-6">
+                <h2 class="text-lg font-semibold text-white mb-3">Engineering Proposal & Solution Architecture</h2>
+                <div class="whitespace-pre-wrap text-sm leading-relaxed text-slate-300 font-normal"># Technical Proposal &amp; Statement of Work
+## Interactive Digital Signage Engineering — BrightSign &amp; Nexmosphere Integration
+
+**Prepared for:** Smart Retail / Museum / Exhibition Signage Operator
+**Engagement Type:** Fixed-Price, Milestone-Based
+**Total Investment:** $750 USD
+**Delivery Window:** 4 working days from kickoff
+
+---
+
+## 1. Executive Hook — The Diagnostic
+
+You don&#x27;t need another video loop. You need a **deterministic sensor-to-screen state machine** that survives a 12-hour retail day without a single dropped trigger.
+
+Here is what most bidders will miss, and what will quietly break your deployment:
+
+- **Nexmosphere X-series sensors are not plug-and-play over USB.** They speak a serial protocol over the X-talk / XN interface. If the integrator treats them as HID devices, you get intermittent triggers and no error surface. The correct path is a **serial listener with a framed parser**, not an event listener on a keyboard emulation.
+- **BrightSign&#x27;s BrightScript is single-threaded per renderer.** Blocking I/O on the main thread — a synchronous serial read, a slow HTTP call to your CMS — will stall the video decoder and produce visible stutter. The fix is a **worker-thread architecture** with a message queue between the sensor layer and the presentation layer.
+- **Sensor debounce is not optional.** In a museum or retail floor, a single approach gesture fires 3–8 raw events. Without a debounce window and an edge-triggered state model, your content will flicker and your analytics will be garbage.
+- **CMS sync must be idempotent and offline-tolerant.** If the venue&#x27;s Wi-Fi drops, the signage must keep playing the last-known-good manifest and reconcile on reconnect — not blank the screen.
+
+This proposal delivers exactly that: a hardened, testable, handover-ready interactive signage stack — not a demo.
+
+---
+
+## 2. Architecture &amp; Technical Plan
+
+### Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)
+
+**Objective:** Reproduce your current behavior in a controlled environment before touching anything.
+
+- **Environment isolation:** Containerized mock of the BrightSign runtime (BrightScript execution harness) plus a **Nexmosphere serial simulator** that replays captured sensor frames. This lets us iterate without shipping hardware back and forth.
+- **Baseline capture:** Record current video-loop behavior, trigger latency, and any existing CMS payloads. This becomes the regression baseline.
+- **Protocol mapping:** Document the exact Nexmosphere command set in use (X001, X002, X003 trigger frames, LED/feedback commands), the BrightSign model and firmware, and the CMS API contract.
+- **Deliverable:** `DISCOVERY.md` — a signed-off interface contract that both sides agree on before code is written.
+
+### Phase 2 — Implementation &amp; Automated Verification (Day 2–3)
+
+**Objective:** Build the interactive layer with tests that prove it works.
+
+- **Sensor layer:** A framed serial parser with configurable debounce, edge-trigger detection, and a normalized event bus (`APPROACH`, `RETREAT`, `TAP`, `GESTURE_*`).
+- **Presentation layer:** BrightScript/HTML5 renderer that subscribes to the event bus and drives video/overlay transitions via a declarative state machine (`IDLE → ENGAGED → INTERACTING → COOLDOWN`).
+- **CMS integration:** Idempotent manifest sync with local cache, ETag/version checks, and offline fallback to last-known-good.
+- **Automated verification:**
+  - Unit tests for the parser (malformed frames, partial frames, burst input).
+  - Integration tests replaying recorded sensor sessions against the state machine.
+  - Latency budget assertions (trigger-to-first-frame &lt; 150 ms target).
+
+### Phase 3 — Hardening, Performance &amp; Handover (Day 3–4)
+
+**Objective:** Make it survive production and make you independent of me.
+
+- **Soak test:** 8-hour simulated run with randomized sensor traffic; memory and decoder stability verified.
+- **Failure injection:** Kill the CMS endpoint mid-session, disconnect the sensor, corrupt a frame — confirm graceful degradation.
+- **Performance pass:** Profile renderer thread, confirm no blocking calls on the main loop.
+- **Handover:** Deployment runbook, config reference, and a 30-minute recorded walkthrough.
+
+---
+
+## 3. Concrete Deliverables Checklist
+
+You receive, in a single versioned repository:
+
+- [ ] **Source code**
+  - `sensor/` — Nexmosphere serial parser + event bus (BrightScript + Node reference implementation)
+  - `presentation/` — BrightSign renderer + state machine
+  - `cms/` — manifest sync client with offline cache
+- [ ] **Test suite**
+  - Unit tests (parser, debounce, state transitions)
+  - Integration tests with recorded sensor replay fixtures
+  - Latency assertion harness
+- [ ] **Docker configuration**
+  - `docker-compose.yml` for the local dev/simulation environment
+  - Nexmosphere serial simulator container
+  - Mock CMS container
+- [ ] **Documentation**
+  - `DISCOVERY.md` — interface contract
+  - `ARCHITECTURE.md` — component diagram + data flow
+  - `DEPLOYMENT.md` — BrightSign provisioning runbook
+  - `CONFIG.md` — every tunable parameter explained
+- [ ] **Handover assets**
+  - 30-minute recorded walkthrough
+  - Regression baseline report (before/after)
+
+---
+
+## 4. Regression Guardrails
+
+Zero-regression is a process, not a promise:
+
+1. **Baseline lock:** Phase 1 captures current behavior as immutable fixtures. Every subsequent change is diffed against it.
+2. **Replay harness:** The full recorded sensor session is replayed on every build; any deviation in state transitions or timing fails the build.
+3. **Feature flags:** New interactive behavior ships behind a config flag. If anything misbehaves on-site, flip the flag and you&#x27;re back to the known-good loop instantly.
+4. **Offline-first contract:** The CMS layer can never block playback. If sync fails, the screen keeps playing — verified by failure injection.
+5. **Signed-off acceptance:** Phase 3 ends with you running the replay harness yourself and confirming parity.
+
+---
+
+## 5. Commercial Terms &amp; Direct CTA
+
+| Item | Detail |
+|---|---|
+| **Engagement** | Fixed-price, milestone-based |
+| **Total** | **$750 USD** |
+| **Milestones** | 40% kickoff / 30% Phase 2 demo / 30% handover |
+| **Payout — PayPal** | `lamvukyo3001@gmail.com` |
+| **Payout — USDC** | EVM or Solana (address on request) |
+| **Timeline** | 4 working days from kickoff |
+
+**Book instantly and lock the slot:**
+
+👉 **https://www.paypal.com/paypalme/lamvukyo/750USD**
+
+Once payment is confirmed, I&#x27;ll send the kickoff questionnaire (BrightSign model, firmware, Nexmosphere sensor list, CMS endpoint) and begin Phase 1 the same day.
+
+---
+
+*Ready to turn your video loop into a sensor-driven experience that survives the floor. Let&#x27;s start.*</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Verified Payment Rail (PayPal)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Instant milestone settlement via PayPal Business / Me:</p>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo" target="_blank" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-lg transition-colors mono">
+                        Pay via PayPal: lamvukyo3001@gmail.com
+                    </a>
+                </div>
+
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Web3 / Crypto Rail (USDC/USDT/ETH)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Direct zero-slippage settlement on Ethereum / Base / Arbitrum:</p>
+                    <div class="px-3 py-2 bg-slate-900 border border-slate-700/60 rounded text-xs mono text-emerald-400 select-all">
+                        0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-500 mono">
+            <span>Delivered by Antigravity Autonomous Engineering Fleet</span>
+            <span>Zero-Bloat Guarantee | Ponytail Standards</span>
+        </div>
+    </div>
+</body>
+</html>

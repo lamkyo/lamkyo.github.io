@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stacker Stocks — Weekly Close Contest</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .glow { box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 20px 60px -20px rgba(16,185,129,.35); }
+  .tick { animation: tick .4s ease-out; }
+  @keyframes tick { from { transform: translateY(-4px); opacity: .4 } to { transform: none; opacity: 1 } }
+  .bar-fill { transition: width .6s cubic-bezier(.4,0,.2,1); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased">
+
+<!-- ══ STICKY BANNER ══ -->
+<div class="sticky top-0 z-50 border-b border-emerald-500/20 bg-slate-900/80 backdrop-blur-xl">
+  <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <p class="flex items-center gap-2 text-[13px] leading-snug text-slate-300">
+      <span class="text-base">🚀</span>
+      <span>Live Interactive Prototype for: <span class="font-semibold text-emerald-400">[LIVE FRONTIER: $3000] [radar] SN open bounty 2026</span>
+      <span class="hidden text-slate-500 sm:inline">|</span>
+      <span class="hidden text-slate-400 sm:inline">Built autonomously by Antigravity OS | Ready for deployment</span></span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20gh-live-5703396001"
+       class="shrink-0 rounded-lg bg-emerald-500 px-4 py-2 text-center text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 active:scale-95">
+      Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<header class="border-b border-slate-800/70 bg-slate-950/60">
+  <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+    <div class="flex items-center gap-3">
+      <div class="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-slate-950">
+        <i data-lucide="trending-up" class="h-5 w-5"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold tracking-tight text-white">Stacker_Stocks</h1>
+        <p class="text-[11px] text-slate-500">SN Open Bounty · Daily Stock Discussion</p>
+      </div>
+    </div>
+    <nav class="hidden items-center gap-6 text-sm text-slate-400 md:flex">
+      <a href="#contest" class="transition hover:text-white">Contest</a>
+      <a href="#leaderboard" class="transition hover:text-white">Leaderboard</a>
+      <a href="#feed" class="transition hover:text-white">Discussion</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <span class="hidden items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-400 sm:flex">
+        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400"></span> LIVE
+      </span>
+      <button id="connectBtn" class="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-slate-600 hover:bg-slate-800">
+        Connect Wallet
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-7xl px-4 py-8">
+
+  <!-- ══ HERO / CONTEST ══ -->
+  <section id="contest" class="grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-6 glow">
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p class="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Sunday's Weekly Close Contest</p>
+          <h2 class="mt-1 text-2xl font-bold tracking-tight text-white sm:text-3xl">🟥 or 🟩 — Call the close, win 20k sats</h2>
+          <p class="mt-2 max-w-xl text-sm text-slate-400">Pick red or green for the weekly candle. Correct calls split the prize pool. Ties roll over to next week.</p>
+        </div>
+        <div class="rounded-xl border border-slate-800 bg-slate-900/70 px-4 py-3 text-right">
+          <p class="text-[11px] uppercase tracking-wider text-slate-500">Prize Pool</p>
+          <p id="prizePool" class="text-2xl font-bold text-emerald-400">20,000 <span class="text-sm font-medium text-slate-400">sats</span></p>
+        </div>
+      </div>
+
+      <!-- Vote buttons -->
+      <div class="mt-6 grid gap-3 sm:grid-cols-2">
+        <button data-vote="red" class="vote group flex items-center justify-between rounded-xl border border-rose-500/30 bg-rose-500/5 px-5 py-4 text-left transition hover:border-rose-500/60 hover:bg-rose-500/10 active:scale-[.98]">
+          <span class="flex items-center gap-3">
+            <span class="grid h-10 w-10 place-items-center rounded-lg bg-rose-500/15 text-xl">🟥</span>
+            <span>
+              <span class="block text-sm font-semibold text-white">RED Week</span>
+              <span class="block text-xs text-slate-400">Close below open</span>
+            </span>
+          </span>
+          <span class="text-right">
+            <span class="block text-lg font-bold text-rose-400" data-count="red">0</span>
+            <span class="block text-[10px] uppercase tracking-wider text-slate-500">votes</span>
+          </span>
+        </button>
+
+        <button data-vote="green" class="vote group flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/5 px-5 py-4 text-left transition hover:border-emerald-500/60 hover:bg-emerald-500/10 active:scale-[.98]">
+          <span class="flex items-center gap-3">
+            <span class="grid h-10 w-10 place-items-center rounded-lg bg-emerald-500/15 text-xl">🟩</span>
+            <span>
+              <span class="block text-sm font-semibold text-white">GREEN Week</span>
+              <span class="block text-xs text-slate-400">Close above open</span>
+            </span>
+          </span>
+          <span class="text-right">
+            <span class="block text-lg font-bold text-emerald-400" data-count="green">0</span>
+            <span class="block text-[10px] uppercase tracking-wider text-slate-500">votes</span>
+          </span>
+        </button>
+      </div>
+
+      <!-- Split bar -->
+      <div class="mt-5">
+        <div class="mb-2 flex justify-between text-[11px] font-medium text-slate-400">
+          <span id="redPct">— % RED</span>
+          <span id="greenPct">— % GREEN</span>
+        </div>
+        <div class="flex h-3 overflow-hidden rounded-full bg-slate-800">
+          <div id="redBar" class="bar-fill h-full bg-gradient-to-r from-rose-600 to-rose-400" style="width:50%"></div>
+          <div id="greenBar" class="bar-fill h-full bg-gradient-to-r from-emerald-400 to-emerald-600" style="width:50%"></div>
+        </div>
+        <p id="voteMsg" class="mt-3 text-xs text-slate-500">Cast your call to enter the pool.</p>
+      </div>
+    </div>
+
+    <!-- Live ticker card -->
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6">
+      <div class="flex items-center justify-between">
+        <p class="text-[11px] font-semibold uppercase tracking-widest text-slate-500">Live Index</p>
+        <i data-lucide="activity" class="h-4 w-4 text-emerald-400"></i>
+      </div>
+      <p id="indexPrice" class="mt-3 text-3xl font-bold tabular-nums text-white">$—</p>
+      <p id="indexDelta" class="mt-1 text-sm font-medium text-slate-400">—</p>
+      <svg id="spark" viewBox="0 0 300 80" class="mt-4 h-20 w-full" preserveAspectRatio="none">
+        <polyline id="sparkLine" fill="none" stroke="#34d399" stroke-width="2" points=""></polyline>
+      </svg>
+      <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-lg bg-slate-800/50 py-2">
+          <p class="text-[10px] uppercase text-slate-500">Players</p>
+          <p id="statPlayers" class="text-sm font-bold text-white">0</p>
+        </div>
+        <div class="rounded-lg bg-slate-800/50 py-2">
+          <p class="text-[10px] uppercase text-slate-500">Streak</p>
+          <p id="statStreak" class="text-sm font-bold text-white">0</p>
+        </div>
+        <div class="rounded-lg bg-slate-800/50 py-2">
+          <p class="text-[10px] uppercase text-slate-500">Closes</p>
+          <p id="statCloses" class="text-sm font-bold text-white">0</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ LEADERBOARD ══ -->
+  <section id="leaderboard" class="mt-10">
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h3 class="text-lg font-bold tracking-tight text-white">Leaderboard</h3>
+        <p class="text-xs text-slate-500">Top callers by accuracy this season</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="relative">
+          <i data-lucide="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"></i>
+          <input id="search" type="text" placeholder="Search stacker…"
+                 class="w-44 rounded-lg border border-slate-800 bg-slate-900 py-2 pl-9 pr-3 text-sm text-slate-200 placeholder-slate-500 outline-none transition focus:border-emerald-500/60 sm:w-56" />
+        </div>
+        <div class="flex rounded-lg border border-slate-800 bg-slate-900 p-1 text-xs">
+          <button data-sort="acc" class="sortBtn rounded-md px-3 py-1.5 font-medium text-slate-950 bg-emerald-500">Accuracy</button>
+          <button data-sort="streak" class="sortBtn rounded-md px-3 py-1.5 font-medium text-slate-400">Streak</button>
+          <button data-sort="sats" class="sortBtn rounded-md px-3 py-1.5 font-medium text-slate-400">Sats</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40">
+      <table class="w-full text-left text-sm">
+        <thead class="border-b border-slate-800 bg-slate-900/70 text-[11px] uppercase tracking-wider text-slate-500">
+          <tr>
+            <th class="px-4 py-3 font-semibold">#</th>
+            <th class="px-4 py-3 font-semibold">Stacker</th>
+            <th class="px-4 py-3 font-semibold">Last Call</th>
+            <th class="px-4 py-3 text-right font-semibold">Accuracy</th>
+            <th class="px-4 py-3 text-right font-semibold">Streak</th>
+            <th class="px-4 py-3 text-right font-semibold">Sats Won</th>
+          </tr>
+        </thead>
+        <tbody id="lbBody" class="divide-y divide-slate-800/70"></tbody>
+      </table>
+      <p id="emptyRow" class="hidden px-4 py-8 text-center text-sm text-slate-500">No stackers match that search.</p>
+    </div>
+  </section>
+
+  <!-- ══ FEED ══ -->
+  <section id="feed" class="mt-10 grid gap-6 lg:grid-cols-3">
+    <div class="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 class="text-lg font-bold tracking-tight text-white">Daily Discussion</h3>
+        <span class="flex items-center gap-1.5 text-[11px] text-slate-500">
+          <i data-lucide="radio" class="h-3.5 w-3.5 text-emerald-400"></i> auto-refresh
+        </span>
+      </div>
+      <div id="feedList" class="space-y-3"></div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <h3 class="text-sm font-bold tracking-tight text-white">Season Progress</h3>
+      <p class="mt-1 text-xs text-slate-500">Week 41 of 52 · ends in <span id="countdown" class="font-semibold text-emerald-400">--:--:--</span></p>
+      <div class="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-800">
+        <div id="seasonBar" class="bar-fill h-full bg-gradient-to-r from-emerald-500 to-teal-400" style="width:0%"></div>
+      </div>
+      <div class="mt-6 space-y-3 text-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">Total votes this week</span>
+          <span id="totalVotes" class="font-semibold text-white">0</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">Prize rollover</span>
+          <span id="rollover" class="font-semibold text-white">0 sats</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">Payout status</span>
+          <span class="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">Pending close</span>
+        </div>
+      </div>
+      <button id="claimBtn" class="mt-6 w-full rounded-lg bg-emerald-500 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-emerald-400 active:scale-[.98]">
+        Claim Winnings
+      </button>
+      <p id="claimMsg" class="mt-2 text-center text-xs text-slate-500"></p>
+    </div>
+  </section>
+
+  <footer class="mt-12 border-t border-slate-800 pt-6 pb-10 text-center text-xs text-slate-600">
+    Prototype · Stacker_Stocks SN Open Bounty · Built autonomously by Antigravity OS
+  </footer>
+</main>
+
+<script>
+/* ─────────── DATA ─────────── */
+const stackers = [
+  { name: "Stacker_Stocks", acc: 92, streak: 11, sats: 28181, last: "green" },
+  { name: "satoshi_sam",    acc: 88, streak: 7,  sats: 19400, last: "red"   },
+  { name: "btc_bella",      acc: 85, streak: 9,  sats: 17250, last: "green" },
+  { name: "hodl_hank",      acc: 81, streak: 4,  sats: 14100, last: "green" },
+  { name: "moon_mike",      acc: 78, streak: 6,  sats: 12800, last: "red"   },
+  { name: "candle_cara",    acc: 74, streak: 3,  sats: 9600,  last: "green" },
+  { name: "dip_dan",        acc: 69, streak: 2,  sats: 7400,  last: "red"   },
+  { name: "alpha_ana",      acc: 65, streak: 5,  sats: 6100,  last: "green" },
+  { name: "vol_vic",        acc: 61, streak: 1,  sats: 4300,  last: "red"   },
+  { name: "new_nate",       acc: 54, streak: 2,  sats: 2100,  last: "green" }
+];
+
+const feedSeed = [
+  { u: "Stacker_Stocks", t: "Weekly close is looking spicy. 🟩 or 🟥? Drop your call.", tag: "OP" },
+  { u: "btc_bella", t: "Volume divergence on the 4H — leaning red into Sunday.", tag: null },
+  { u: "hodl_hank", t: "Green. Funding rates reset, we grind up into the close.", tag: null },
+  { u: "moon_mike", t: "20k sats on the line and I'm still 50/50 😅", tag: null },
+  { u: "candle_cara", t: "Last 3 Sundays closed green. Trend is your friend.", tag: null }
+];
+
+/* ─────────── STATE ─────────── */
+let votes = { red: 281, green: 314 };
+let userVote = null;
+let sortKey = "acc";
+let query = "";
+
+/* ─────────── HELPERS ─────────── */
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => n.toLocaleString("en-US");
+
+/* ─────────── LEADERBOARD ─────────── */
+function renderLeaderboard() {
+  const body = $("#lbBody");
+  const rows = stackers
+    .filter(s => s.name.toLowerCase().includes(query))
+    .sort((a, b) => b[sortKey] - a[sortKey]);
+
+  $("#emptyRow").classList.toggle("hidden", rows.length > 0);
+
+  body.innerHTML = rows.map((s, i) => {
+    const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1);
+    const call = s.last === "green"
+      ? '<span class="rounded-md bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-400">🟩 GREEN</span>'
+      : '<span class="rounded-md bg-rose-500/10 px-2 py-0.5 text-xs font-medium text-rose-400">🟥 RED</span>';
+    return `<tr class="transition hover:bg-slate-800/40">
+      <td class="px-4 py-3 text-slate-500">${medal}</td>
+      <td class="px-4 py-3 font-medium text-white">${s.name}</td>
+      <td class="px-4 py-3">${call}</td>
+      <td class="px-4 py-3 text-right font-semibold text-slate-200">${s.acc}%</td>
+      <td class="px-4 py-3 text-right text-slate-300">${s.streak}🔥</td>
+      <td class="px-4 py-3 text-right font-semibold text-emerald-400">${fmt(s.sats)}</td>
+    </tr>`;
+  }).join("");
+}
+
+/* ─────────── VOTES ─────────── */
+function renderVotes() {
+  const total = votes.red + votes.green;
+  const rp = Math.round((votes.red / total) * 100);
+  const gp = 100 - rp;
+
+  document.querySelectorAll("[data-count]").forEach(el => {
+    el.textContent = fmt(votes[el.dataset.count]);
+  });
+  $("#redPct").textContent = rp + "% RED";
+  $("#greenPct").textContent = gp + "% GREEN";
+  $("#redBar").style.width = rp + "%";
+  $("#greenBar").style.width = gp + "%";
+  $("#totalVotes").textContent = fmt(total);
+  $("#statPlayers").textContent = fmt(total);
+}
+
+document.querySelectorAll(".vote").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const pick = btn.dataset.vote;
+    if (userVote === pick) return;
+    if (userVote) votes[userVote]--;
+    votes[pick]++;
+    userVote = pick;
+    renderVotes();
+    const el = document.querySelector(`[data-count="${pick}"]`);
+    el.classList.remove("tick"); void el.offsetWidth; el.classList.add("tick");
+    $("#voteMsg").innerHTML = `✅ You called <span class="font-semibold ${pick === 'green' ? 'text-emerald-400' : 'text-rose-400'}">${pick.toUpperCase()}</span> — you're in the pool.`;
+  });
+});
+
+/* ─────────── FEED ─────────── */
+function renderFeed() {
+  $("#feedList").innerHTML = feedSeed.map(f => `
+    <div class="flex gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-slate-700 to-slate-800 text-xs font-bold text-slate-300">
+        ${f.u.slice(0, 2).toUpperCase()}
+      </div>
+      <div class="min-w-0">
+        <p class="flex items-center gap-2 text-sm font-semibold text-white">
+          ${f.u}
+          ${f.tag ? `<span class="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">${f.tag}</span>` : ""}
+        </p>
+        <p class="mt-0.5 text-sm text-slate-400">${f.t}</p>
+      </div>
+    </div>`).join("");
+}
+
+/* ─────────── LIVE INDEX ─────────── */
+let price = 68420;
+const hist = Array.from({ length: 40 }, () => price);
+let openPrice = price;
+
+function drawSpark() {
+  const min = Math.min(...hist), max = Math.max(...hist);
+  const range = max - min || 1;
+  const pts = hist.map((v, i) => {
+    const x = (i / (hist.length - 1)) * 300;
+    const y = 78 - ((v - min) / range) * 72;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  $("#sparkLine").setAttribute("points", pts);
+  const up = price >= openPrice;
+  $("#sparkLine").setAttribute("stroke", up ? "#34d399" : "#fb7185");
+}
+
+function tickPrice() {
+  const drift = (Math.random() - 0.48) * 180;
+  price = Math.max(1000, price + drift);
+  hist.push(price); hist.shift();
+
+  const delta = price - openPrice;
+  const pct = (delta / openPrice) * 100;
+  $("#indexPrice").textContent = "$" + price.toLocaleString("en-US", { maximumFractionDigits: 0 });
+  $("#indexDelta").innerHTML = `${delta >= 0 ? "▲" : "▼"} ${Math.abs(delta).toFixed(0)} (${pct.toFixed(2)}%) this week`;
+  $("#indexDelta").className = `mt-1 text-sm font-medium ${delta >= 0 ? "text-emerald-400" : "text-rose-400"}`;
+  drawSpark();
+}
+
+/* ─────────── SEASON / COUNTDOWN ─────────── */
+const seasonStart = Date.now();
+const seasonLen = 7 * 24 * 3600 * 1000;
+const weekEnd = Date.now() + (2 * 24 + 14) * 3600 * 1000;
+
+function tickSeason() {
+  const elapsed = Date.now() - seasonStart;
+  const pct = Math.min(100, (elapsed / seasonLen) * 100);
+  $("#seasonBar").style.width = pct.toFixed(1) + "%";
+
+  let diff = Math.max(0, weekEnd - Date.now());
+  const d = Math.floor(diff / 86400000); diff %= 86400000;
+  const h = Math.floor(diff / 3600000); diff %= 3600000;
+  const m = Math.floor(diff / 60000); diff %= 60000;
+  const s = Math.floor(diff / 1000);
+  $("#countdown").textContent = `${d}d ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+/* ─────────── CONTROLS ─────────── */
+$("#search").addEventListener("input", (e) => {
+  query = e.target.value.trim().toLowerCase();
+  renderLeaderboard();
+});
+
+document.querySelectorAll(".sortBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    sortKey = btn.dataset.sort;
+    document.querySelectorAll(".sortBtn").forEach(b => {
+      b.className = "sortBtn rounded-md px-3 py-1.5 font-medium text-slate-400";
+    });
+    btn.className = "sortBtn rounded-md px-3 py-1.5 font-medium text-slate-950 bg-emerald-500";
+    renderLeaderboard();
+  });
+});
+
+$("#connectBtn").addEventListener("click", (e) => {
+  const b = e.currentTarget;
+  b.textContent = "Connecting…";
+  b.disabled = true;
+  setTimeout(() => {
+    b.textContent = "0x7f…3a91";
+    b.className = "rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-400";
+  }, 900);
+});
+
+$("#claimBtn").addEventListener("click", () => {
+  const msg = $("#claimMsg");
+  if (!userVote) { msg.textContent = "Cast a call first to be eligible."; return; }
+  msg.textContent = "Processing payout…";
+  setTimeout(() => { msg.innerHTML = '<span class="text-emerald-400">Payout queued — settles at weekly close.</span>'; }, 1100);
+});
+
+/* ─────────── SIMULATED LIVE ACTIVITY ─────────── */
+setInterval(() => {
+  const pick = Math.random() > 0.5 ? "green" : "red";
+  votes[pick]++;
+  renderVotes();
+}, 2600);
+
+setInterval(() => {
+  const pool = 20000 + Math.floor(Math.random() * 4000);
+  $("#prizePool").innerHTML = `${fmt(pool)} <span class="text-sm font-medium text-slate-400">sats</span>`;
+  $("#rollover").textContent = fmt(Math.floor(Math.random() * 3000)) + " sats";
+}, 5000);
+
+setInterval(() => {
+  $("#statStreak").textContent = 11 + Math.floor(Math.random() * 3);
+  $("#statCloses").textContent = 40 + Math.floor(Math.random() * 3);
+}, 4000);
+
+/* ─────────── INIT ─────────── */
+renderLeaderboard();
+renderVotes();
+renderFeed();
+drawSpark();
+tickPrice();
+tickSeason();
+setInterval(tickPrice, 1800);
+setInterval(tickSeason, 1000);
+lucide.createIcons();
+</script>
+</body>
+</html>

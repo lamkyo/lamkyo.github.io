@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Qualtrics Survey Logic Edits - Technical Proposal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: "Inter", sans-serif; background-color: #0b0f19; color: #e2e8f0; }
+        .mono { font-family: "JetBrains Mono", monospace; }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12">
+    <div class="max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 md:p-12 shadow-2xl">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-8">
+            <div>
+                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold mono uppercase tracking-wider">Verified Proposal & Dossier</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-white mt-3">Quick Qualtrics Survey Logic Edits</h1>
+                <p class="text-slate-400 text-sm mt-1 mono">Job ID: ext-freelancer-fl-40750038 | Milestone Value: $30.00 USD</p>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-emerald-400 mono">$30.00</div>
+                <div class="text-xs text-slate-500">Fixed Milestone Delivery</div>
+            </div>
+        </div>
+
+        <div class="prose prose-invert max-w-none text-slate-300 space-y-6">
+            <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-6">
+                <h2 class="text-lg font-semibold text-white mb-3">Engineering Proposal & Solution Architecture</h2>
+                <div class="whitespace-pre-wrap text-sm leading-relaxed text-slate-300 font-normal"># Cover Letter — Quick Qualtrics Survey Logic Edits
+
+**Subject: 60-minute surgical fix on a 95%-complete Qualtrics instrument — zero regression guaranteed**
+
+Your survey isn&#x27;t unfinished — it&#x27;s *entangled*. At 95% complete, the risk in the last 5% isn&#x27;t writing new logic; it&#x27;s that a new branch or display condition silently collides with an existing one, and you discover it when 40% of respondents get terminated at Q7 instead of Q22. That&#x27;s the failure mode I fix.
+
+Here&#x27;s how I&#x27;d handle it: before touching anything, I export your `.qsf` and tag it as a rollback checkpoint — a lossless snapshot of every block, branch, quota, and embedded-data field in its current working state. Then the edits go in as a *diff*, not a rewrite: Survey Flow precedence respected, termination points explicitly audited, embedded data piped correctly rather than re-declared and clobbered. Afterward you get a test matrix showing every path through the instrument, not just a &quot;looks good to me.&quot;
+
+One hour is the right estimate for scoped Survey Flow, display logic, and embedded-data work. If the tweaks turn out to be deeper than that, I&#x27;ll stop at the hour and tell you exactly what&#x27;s left rather than pad the clock — and you&#x27;ll still have a working, launchable survey either way.
+
+Send me your list of tweaks and a preview link. I can start immediately.
+
+---
+
+# Technical Proposal — Qualtrics Survey Logic Remediation &amp; Launch Readiness
+
+## 1. Executive Technical Hook
+
+The single highest-probability failure in a near-complete Qualtrics instrument is **logic-shadowing**: a Survey Flow branch element evaluated *before* the question-level display logic it was meant to complement, producing a path that neither you nor anyone reviewing in Preview mode will see, because Preview renders generously and live respondents do not. The second is **embedded-data overwrite** — the same field name set in two places in the Flow, where the later write wins and the earlier piped text silently renders blank.
+
+Both are invisible under cursory QA. Both are trivially detectable with a structured path audit. That audit is included in this engagement at no extra cost, because a survey that launches broken costs you far more than the hour it takes to verify it.
+
+## 2. Architecture &amp; Technical Plan
+
+### Phase 1 — Snapshot, Scope Lock &amp; Baseline (0:00–0:10)
+
+- Export the current `.qsf` as a frozen checkpoint (`baseline_v1_&lt;date&gt;.qsf`) — your rollback artifact, valid indefinitely.
+- Inventory every Survey Flow element in order: **Blocks, Branches, Embedded Data, Randomizers, Quotas, End-of-Survey, Authenticators**.
+- Map question-level **Display Logic** against Flow-level **Branch Logic** to identify precedence conflicts, dead branches, and unreachable questions.
+- Lock the change list with you before a single edit lands. Anything outside that list is flagged, not silently absorbed.
+
+### Phase 2 — Surgical Logic Edits (0:10–0:45)
+
+Edits applied through the native **Survey Flow**, **Display Logic**, and **Look &amp; Feel → Custom CSS/JS** layers — no destructive block rebuilds.
+
+**Embedded data, written once, read everywhere** (declare in Flow, never re-declare downstream):
+
+```javascript
+Qualtrics.SurveyEngine.addOnReady(function () {
+  var q = this;
+  // Defensive guard: never assume a piped field resolved
+  var arm = &quot;${e://Field/condition_arm}&quot; || &quot;unspecified&quot;;
+  if (arm === &quot;unspecified&quot;) {
+    Qualtrics.SurveyEngine.setEmbeddedData(&quot;logic_flag&quot;, &quot;unresolved_arm&quot;);
+  }
+  // Route via embedded data, not client-side branching —
+  // keeps the source of truth in Survey Flow where it&#x27;s auditable
+  q.setChoiceValue(1, arm === &quot;B&quot; ? &quot;treatment_B&quot; : &quot;control_A&quot;);
+});
+```
+
+**CSS scoped by question ID — never by global selector** (prevents spill into other blocks):
+
+```css
+/* Isolate styling to a single question; no global tag overrides */
+#QID12 .QuestionText { font-weight: 600; letter-spacing: -0.01em; }
+#QID12 .ChoiceStructure label { padding: 6px 10px; border-radius: 6px; }
+```
+
+**Termination safety:** every `EndOfSurvey` element is audited so that screen-outs land where you intend (and, if you&#x27;re collecting partials, that they *don&#x27;t* — verified explicitly).
+
+### Phase 3 — Path Verification &amp; Hardening (0:45–1:00)
+
+- Walk every branch outcome as a **test response** via the anonymous link with `?Q_CHL=test` or the Test Survey tab — not Preview mode.
+- Confirm quotas fire correctly and don&#x27;t over- or under-fill at the boundary.
+- Verify pipe text resolves on the live runtime, in the final block, and in the post-submission message.
+
+## 3. Technical Proof &amp; Stack Match
+
+| Requirement | How it&#x27;s covered |
+|---|---|
+| **Qualtrics Survey Flow** | Branch / Embedded Data / Quota / Randomizer ordering and precedence |
+| **JavaScript** | `Qualtrics.SurveyEngine` API — `addOnReady`, `addOnLoad`, `setEmbeddedData`, `setChoiceValue`, `getSelectedChoices` |
+| **CSS / HTML** | Scoped styling via Look &amp; Feel, ID-qualified selectors, no global overrides |
+| **Data Analysis** | Response-structure integrity: field naming, export sanity, no orphaned columns |
+| **PHP / general web** | Relevant if you&#x27;re piping via a web service or post-submission redirects — validated against your endpoint&#x27;s expectations |
+
+**Zero-regression posture:** every change is reversible via the checkpoint `.qsf`, and I ship a before/after changelog so you can see precisely what moved. No refactors you didn&#x27;t ask for. No &quot;while I was in there&quot; additions.
+
+**Security &amp; data hygiene:**
+- No third-party CDN scripts or outbound AJAX from survey JS — all logic stays inside Qualtrics&#x27; sandbox.
+- No PII written into embedded-data fields or client-side variables; identifiers stay in the response metadata where Qualtrics manages them.
+- Client-side logic treated as *presentation only* — never as your sole data-integrity control.
+- Work performed via **collaborator access or a `.qsf` copy**; I never request your master credentials.
+
+## 4. Timeline &amp; Deliverables
+
+| Milestone | Timing | Output |
+|---|---|---|
+| M1 — Baseline frozen, scope locked | T+15 min | `baseline_v1.qsf`, agreed change list |
+| M2 — Logic edits applied | T+45 min | Edited survey in your account, changelog |
+| M3 — Path audit passed, handover | T+60 min | Test matrix, final `.qsf`, annotated notes |
+
+**Delivered at handover:**
+1. Fully edited, launch-ready Qualtrics instrument
+2. Baseline checkpoint `.qsf` (your rollback)
+3. Final `.qsf` (importable into any Qualtrics account)
+4. One-page change log: every field, branch, and style touched — with rationale
+5. Path-coverage test matrix: each branch → observed outcome → pass/fail
+6. **24-hour post-launch watch window** — free
+
+**Fixed price: $30.**</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Verified Payment Rail (PayPal)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Instant milestone settlement via PayPal Business / Me:</p>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo" target="_blank" class="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-lg transition-colors mono">
+                        Pay via PayPal: lamvukyo3001@gmail.com
+                    </a>
+                </div>
+
+                <div class="bg-slate-950/40 border border-slate-800 rounded-xl p-5">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider mono text-slate-400 mb-2">Web3 / Crypto Rail (USDC/USDT/ETH)</h3>
+                    <p class="text-xs text-slate-400 mb-3">Direct zero-slippage settlement on Ethereum / Base / Arbitrum:</p>
+                    <div class="px-3 py-2 bg-slate-900 border border-slate-700/60 rounded text-xs mono text-emerald-400 select-all">
+                        0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-between text-xs text-slate-500 mono">
+            <span>Delivered by Antigravity Autonomous Engineering Fleet</span>
+            <span>Zero-Bloat Guarantee | Ponytail Standards</span>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Software Developer AI Coding</h1><p># Engineering Application: Software Developer AI Coding at STEUART NUTRITION
+
+> **Note on this document:** The technical blueprint, architecture, and code below are complete and directly usable. Bracketed fields `[…]` mark facts only you can attest to (years of experience, employers, metrics) — fill those with your real history before sending. I won't invent a résumé for you; everything that isn't bracketed is engineering substance you can stand behind.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### Why this problem is a natural fit
+
+The Steuart Nutrition role is deceptively hard to fill. It reads like "customize an LMS," but the actual job is narrower and more interesting: **build a training system that produces defensible compliance evidence inside a GMP-certified dietary-supplement contract manufacturer, while shipping fast enough that plant and office teams don't route around it.**
+
+Those two forces pull in opposite directions:
+
+| Force | What it demands |
+|---|---|
+| GMP / 21 CFR Part 111 | Immutable, attributable, time-stamped training records; qualified-personnel evidence; re-training triggered by deviations and CAPAs |
+| "Extreme Ownership, fast turnaround" | Low-ceremony iteration; solutions shipped in days, not quarters; onboarding of new customers (and their SKUs) without engineering bottlenecks |
+
+Most candidates optimize for one and quietly break the other. A vanilla LMS implementation gives you screens, not auditability. A heavyweight QMS integration gives you auditability and a two-week change-request cycle. The value I bring is **an architecture that makes the compliance artifact a byproduct of the workflow rather than a separate process** — so the plant supervisor's 30-second action is simultaneously the training event, the qualification record, and the audit-trail entry.
+
+### Direct alignment with the stack and domain
+
+- **AI-assisted development as a discipline, not a novelty.** The posting lists Claude, Cursor, Copilot, and Grok. I treat these as a heterogeneous toolchain with different failure modes, and I have a working method for each: spec-first prompting, generated-code review checklists, test-harness-first scaffolding, and explicit verification gates. More on this in §2.4 — it is the single most load-bearing skill in this role and most applicants hand-wave it.
+- **Fast platform absorption.** The job requires learning a third-party platform's codebase well enough to extend it safely. My approach is mechanical and repeatable: map the data model and the extension seams before touching a line of code, then write a throwaway spike proving the seam holds. That process is spelled out in §2.2.
+- **Regulated-manufacturing literacy.** I understand why a contract manufacturer cares about electronic records and signatures, why "the tablet lost Wi-Fi mid-module" is a compliance incident and not a bug report, and why batch-record and change-control systems are the integrations that actually matter. That is what turns a generic</p></body></html>

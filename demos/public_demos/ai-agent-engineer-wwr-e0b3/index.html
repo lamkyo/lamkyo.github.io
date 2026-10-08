@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticker Mule | AI Agent Mesh Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { slate: { 850: '#1e2025' } } } } }
+    </script>
+    <style>
+        body { background-color: #0f1115; color: #e2e8f0; }
+        .glass { background: rgba(30, 32, 37, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Sticky Header -->
+    <div class="sticky top-0 z-50 glass px-4 py-2 flex items-center justify-between border-b border-white/10">
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-mono text-emerald-400">● LIVE PROTOTYPE</span>
+            <span class="text-sm font-medium">AI Agent Mesh Engine</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="hidden md:inline text-xs text-slate-400 italic">Built by Antigravity OS</span>
+            <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-e0b3cdfc" 
+               class="bg-white text-black text-xs font-bold px-4 py-1.5 rounded-full hover:bg-slate-200 transition">
+               Hire Team ($150 - $500)
+            </a>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-lg font-semibold mb-4">Active Agent Nodes</h2>
+                <div id="agent-list" class="space-y-3">
+                    <!-- Agent Items -->
+                </div>
+            </div>
+            
+            <div class="glass p-6 rounded-2xl">
+                <h2 class="text-lg font-semibold mb-4">System Metrics</h2>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1"><span>Throughput</span><span>98.2%</span></div>
+                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-blue-500 w-[98%]" id="bar-1"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1"><span>LLM Latency</span><span>42ms</span></div>
+                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 w-[20%]" id="bar-2"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="lg:col-span-2 glass p-6 rounded-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Execution Stream</h2>
+                <button onclick="addLog()" class="text-xs border border-white/20 px-3 py-1 rounded hover:bg-white/5">Inject Task</button>
+            </div>
+            <div id="log-container" class="h-96 overflow-y-auto font-mono text-xs space-y-2 bg-black/30 p-4 rounded-xl border border-white/5">
+                <div class="text-slate-500">> System initialized...</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const agents = [
+            { name: "Manufacturing-Opt-01", status: "Active", color: "text-emerald-400" },
+            { name: "Supply-Chain-Sync", status: "Idle", color: "text-blue-400" },
+            { name: "Quality-Control-Agent", status: "Error", color: "text-rose-400" }
+        ];
+
+        function renderAgents() {
+            const container = document.getElementById('agent-list');
+            container.innerHTML = agents.map(a => `
+                <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-4 h-4 text-slate-400"></i>
+                        <span class="text-sm">${a.name}</span>
+                    </div>
+                    <span class="${a.color} text-[10px] font-bold uppercase">${a.status}</span>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function addLog() {
+            const logs = document.getElementById('log-container');
+            const entry = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            entry.className = "text-emerald-300";
+            entry.textContent = `[${time}] Task dispatched: Optimization batch #${Math.floor(Math.random()*9000)}`;
+            logs.prepend(entry);
+        }
+
+        // Pulse metrics
+        setInterval(() => {
+            const b = document.getElementById('bar-1');
+            b.style.width = (90 + Math.random() * 10) + '%';
+            if(Math.random() > 0.8) addLog();
+        }, 2000);
+
+        renderAgents();
+    </script>
+</body>
+</html>

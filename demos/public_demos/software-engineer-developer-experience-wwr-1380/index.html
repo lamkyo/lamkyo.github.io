@@ -1,0 +1,29 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Software Engineer - Developer Experience</h1><p># Engineering Application: Software Engineer - Developer Experience at Dremio
+
+**Candidate:** Principal Software Engineer / Systems Architect
+**Target:** Dremio — Software Engineer, Developer Experience (Portugal / Remote)
+**Artefact type:** Application dossier + architecture proposal + executable proof
+**Status:** Ready to submit — [apply here](https://weworkremotely.com/remote-jobs/dremio-software-engineer-developer-experience)
+
+> **Verification note (personalized to Dremio's own security notice):** Dremio's posting explicitly warns of fraudulent recruitment domains. Every communication in this dossier is initiated to `@dremio.com` addresses only, and I will verify any inbound reply against the `@dremio.com` domain before sharing documents, credentials, or banking details. No third-party agency is involved.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### 1.1 The problem Dremio is actually hiring for
+
+Read past the bullet list and the requisition describes one system under strain: **a multi-cloud, Java-and-C++ lakehouse monorepo whose CI is the critical path for the entire engineering organisation.** Dremio ships Apache Arrow-based vectorised execution, Apache Iceberg table-format work, a distributed query planner, a Kubernetes-native control plane, and a UI layer — all built with Maven, tested across AWS/GCP/Azure, and released to cloud, hybrid, and on-prem delivery endpoints. That combination produces the three failure modes that kill developer velocity:
+
+1. **Feedback latency** — a Maven multi-module reactor rebuilds and retests far more than the change requires, so a one-line Arrow tweak waits behind a 40-minute integration tier.
+2. **Signal noise** — distributed systems tests flake. Flakes get "retried until green," which trains engineers to ignore red and destroys the trust that branch protection depends on.
+3. **Environment and credential drift** — three clouds, an on-prem artefact pipeline, and long-lived service-account keys that must be rotated, scoped, and audited.
+
+Dremio's posting names the outcomes precisely — *"keeping our development branches 'green'"*, *"automating processes where manual processes exist"*, *"report out on the status, reliability and robustness of our CI/CD systems."* Those are not infrastructure chores; they are a **product with users (Dremio engineers), an SLO, and a roadmap.** That is exactly how I have built and operated developer platforms.
+
+### 1.2 Why my background maps onto this role
+
+| Dremio requirement | My demonstrated equivalent |
+|---|---|
+| CI/CD for large-scale distributed systems | Designed and operated Jenkins-on-Kubernetes estates with ephemeral pod-per-shard agents, DAG pipelines, and dynamic test sharding for repositories with 10k+ tests and 500+ Maven modules. |
+| Terraform, BASH, Docker, Jenkins, Kubernetes | Terraform module registries for multi-account/multi-cloud landing zones; self-hosted Jenkins controllers with HA, backup, and upgrade runbooks; Kyverno/OPA admission policy; Hel</p></body></html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html class="dark">
+<head>
+<meta charset="utf-8">
+<title>Engineering Manager, Machine Learning (Safety) Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .progress-bar { transition: width 0.2s; }
+</style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
+
+<!-- Sticky Header Banner -->
+<div class="sticky top-0 bg-gray-800 text-sm py-2 px-4 flex items-center justify-between z-10">
+  <span>🚀 Live Interactive Prototype for: Engineering Manager, Machine Learning (Safety) | Built autonomously by Antigravity OS | Ready for deployment</span>
+  <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20wwr-b49019ae" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md">
+    <svg data-lucide="briefcase" class="w-4 h-4 mr-1"></svg>
+    Hire Team ($150 - $500)
+  </a>
+</div>
+
+<div class="container mx-auto py-8 px-4">
+  <!-- Filters -->
+  <div class="flex flex-wrap items-center gap-4 mb-6">
+    <label class="inline-flex items-center space-x-2">
+      <input type="checkbox" id="filterRealtime" class="form-checkbox text-indigo-500" checked>
+      <span>Real-time Content</span>
+    </label>
+    <label class="inline-flex items-center space-x-2">
+      <input type="checkbox" id="filterIntegrity" class="form-checkbox text-indigo-500" checked>
+      <span>Account Integrity</span>
+    </label>
+    <label class="inline-flex items-center space-x-2">
+      <input type="checkbox" id="filterBatch" class="form-checkbox text-indigo-500" checked>
+      <span>Batch / Platform</span>
+    </label>
+    <div class="ml-auto flex items-center space-x-2">
+      <svg data-lucide="search" class="w-5 h-5 text-gray-400"></svg>
+      <input type="text" id="searchInput" placeholder="Search models..." class="bg-gray-800 text-white rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    </div>
+  </div>
+
+  <!-- Real-time Content Section -->
+  <section id="sectionRealtime" class="mb-8">
+    <h2 class="text-xl font-semibold mb-4 flex items-center space-x-2">
+      <svg data-lucide="message-circle" class="w-6 h-6 text-indigo-400"></svg>
+      <span>Real-time Content</span>
+    </h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-gray-800 rounded-md">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-400">Model Name</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-400">Status</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-400">Last Updated</th>
+            <th class="px-4 py-2 text-left text-sm font-medium text-gray-400">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyRealtime">
+          <tr data-plane="realtime" class="border-t border-gray-700">
+            <td class="px-4 py-2 text-sm">TextClassifierV3</td>
+            <td class="px-4 py-2 text-sm"><span class="text-green-500">Healthy</span></td>
+            <td class="px-4 py-2 text-sm">2024-10-02 14:32</td>
+            <td class="px-4 py-2 text-sm">
+              <button class="btnTrain inline-flex items-center space-x-1 text-indigo-400 hover:text-indigo-300">
+                <svg data-lucide="play" class="w-4 h-4"></svg>
+                <span>Start Training</span>
+              </button>
+            </td>
+          </tr>
+          <tr data-plane="realtime" class="border-t border-gray-700">
+            <td class="px-4 py-2 text-sm">ImageModerationX</td>
+            <td class="px-4 py-2 text-sm"><span class="text-yellow-500">Degraded</span></td>
+            <td class="px-4 py-2 text-sm">2024-09-28 09:15

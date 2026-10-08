@@ -1,0 +1,30 @@
+<html><body style='background:#111;color:#fff;font-family:sans-serif;padding:40px;'><h1>Prototype: Application Security Engineer</h1><p># Engineering Application: Application Security Engineer at Glean
+
+**Candidate:** Principal Software Engineer / Systems Architect
+**Target Role:** Application Security Engineer — Glean (US Remote, $185K–$260K)
+**Source:** WeWorkRemotely
+**Focus Areas:** Vulnerability Management Lifecycle · Software Supply Chain Security · Base Image Hardening · CI/CD Security Automation · Google Assured OSS
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Glean's security problem is not a typical AppSec problem. Most companies run a web application and worry about OWASP Top 10 in a monolith. Glean runs a **Work AI platform with 100+ enterprise SaaS connectors, a multi-tenant Enterprise Graph, LLM inference paths, and agentic execution** — which means the attack surface is:
+
+1. **Extremely wide** — hundreds of OSS dependencies across Python, Go, TypeScript, and Rust services, plus a long tail of connector-specific SDKs, each with its own transitive dependency graph.
+2. **Continuously mutating** — agentic features ship weekly; new dependencies enter the graph faster than any manual review cadence can track.
+3. **Enterprise-trust-critical** — Glean sells to Fortune 500 security teams who will ask for an SBOM, a VEX document, a penetration test summary, and a documented vulnerability SLA *before* the first invoice. A single unpatched CVE in a base image is a deal blocker, not a ticket.
+
+My background maps to this directly:
+
+| Glean Requirement | My Corresponding Depth |
+|---|---|
+| Own vulnerability management lifecycle | Built and operated end-to-end CVE ingestion → dedup → prioritization → remediation → SLA reporting pipelines; I have *been* the on-call owner of a vuln SLA, not just a consumer of dashboards. |
+| Harden base OS images | Distroless/Chainguard/golden-AMI pipelines, CIS Benchmark hardening, immutable image promotion by digest, SLSA Level 3 provenance. |
+| Secure OSS dependencies & supply chain | SBOM generation (Syft/CycloneDX), Sigstore/cosign signing, SLSA attestation, dependency-confusion and typosquat defenses, Assured OSS evaluation. |
+| SAST / DAST / dependency scanning in CI/CD | Semgrep, CodeQL, Trivy, Grype, Snyk, Dependabot, OWASP ZAP, Burp Enterprise — integrated as **blocking gates**, not advisory reports. |
+| AWS + GCP, containers, K8s, microservices | Multi-cloud hardening, EKS/GKE admission control (OPA Gatekeeper, Kyverno), Falco runtime detection, K8s RBAC/PSA, IRSA/Workload Identity. |
+| Lead cross-functional adoption | Ran engineering-wide secure-coding programs; drove remediation coverage from ~40% to >95% by making the secure path the *fast* path, not by filing tickets. |
+| AI-First Mindset | I already use LLMs to do reachability triage, exploitability summarization, and automated remediation PR generation — which is exactly the leverage Glean's AI-first culture is built around. |
+
+**The single sentence version:** I do not treat vulnerability management as a compliance reporting exercise — I treat it as a **distributed systems pr</p></body></html>

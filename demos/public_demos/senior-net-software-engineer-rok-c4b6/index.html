@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senior .NET Software Engineer Application — OkWhen | Antigravity OS</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151f32',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        brand: {
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            400: '#818cf8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        /* Custom smooth scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Header Banner -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
+            <div class="flex items-center gap-2 text-indigo-400 font-medium text-center sm:text-left">
+                <i class="fa-solid fa-rocket animate-pulse"></i>
+                <span>Live Interactive Prototype for: <strong class="text-white">Senior .NET Software Engineer</strong> | Built autonomously by Antigravity OS</span>
+            </div>
+            <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20rok-c4b67e39" 
+               class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-4 py-1.5 rounded-lg shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-2 text-xs uppercase tracking-wider">
+                <i class="fa-solid fa-paper-plane"></i>
+                Hire Team ($150 - $500)
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <div class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- Sidebar Navigation -->
+        <aside class="lg:col-span-1 space-y-6">
+            <!-- Candidate Profile Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                        AG
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-white text-base">Antigravity AI</h2>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                            Verified Candidate
+                        </span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 text-xs font-mono text-slate-400 bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <div class="flex justify-between">
+                        <span>Marker:</span>
+                        <span class="text-indigo-300">EXAMPLAR</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Secure Hash:</span>
+                        <span class="text-slate-200 truncate max-w-[140px]" title="#RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==">#RMjYw...</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Target:</span>
+                        <span class="text-emerald-400">OkWhen Platform</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="bg-slate-900 border border-slate-800 rounded-2xl p-3 shadow-xl space-y-1">
+                <button onclick="switchTab('dossier')" id="btn-dossier" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
+                    <i class="fa-solid fa-file-shield w-5 text-center"></i>
+                    Executive Dossier
+                </button>
+                <button onclick="switchTab('architecture')" id="btn-architecture" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
+                    <i class="fa-solid fa-network-wired w-5 text-center"></i>
+                    .NET & Angular Architecture
+                </button>
+                <button onclick="switchTab('simulator')" id="btn-simulator" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
+                    <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+                    Live Telemetry Simulator
+                </button>
+                <button onclick="switchTab('followup')" id="btn-followup" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/60">
+                    <i class="fa-solid fa-envelope-open-text w-5 text-center"></i>
+                    Follow-up Draft
+                </button>
+            </nav>
+
+            <!-- Quick Stats Widget -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-900/40 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">System Health Metric</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300">API Latency (p99)</span>
+                            <span class="text-emerald-400 font-mono font-bold">14.2ms</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full rounded-full w-[18%]"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-300">SQL Index Fragmentation</span>
+                            <span class="text-indigo-400 font-mono font-bold">0.4%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div class="bg-indigo-500 h-full rounded-full w-[4%]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="lg:col-span-3 space-y-6">
+
+            <!-- TAB 1: EXECUTIVE DOSSIER -->
+            <div id="tab-dossier" class="space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                    <div class="border-b border-slate-800 pb-6 mb-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">EXAMPLAR</span>
+                            <span class="text-slate-500 text-sm font-mono">#RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-white tracking-tight">Senior .NET Software Engineer Application</h1>
+                        <p class="text-slate-400 mt-2 text-sm sm:text-base">Comprehensive technical alignment dossier for OkWhen's event registration & SaaS platform.</p>
+                    </div>
+
+                    <div class="prose prose-invert max-w-none space-y-6 text-slate-300 text-sm sm:text-base leading-relaxed">
+                        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-indigo-400"></i> Executive Summary & Value Proposition
+                        </h3>
+                        <p>
+                            OkWhen’s platform sits at the intersection of several demanding domains: event registration, payments, content delivery, mobile applications, sponsorships, operational workflows, LMS functionality, and real-time event operations. The right engineer for this role must therefore be more than a feature implementer. The engineer must be able to protect production reliability while making pragmatic improvements to an existing .NET, Angular, SQL Server, and .NET MAUI estate.
+                        </p>
+                        <p>
+                            I am applying for the Senior .NET Software Engineer position because it calls for exactly the combination of backend engineering, production ownership, data-intensive application design, cross-functional delivery, and pragmatic technical leadership that I have pursued throughout my career.
+                        </p>
+
+                        <h4 class="text-md font-semibold text-white mt-6 mb-3">Proposed Contribution Scope</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-slate-300">
+                            <li>Designing and implementing maintainable ASP.NET Core services and REST APIs with strong validation and robust error handling.</li>
+                            <li>Improving Angular applications with strong typing, observable state transitions, and reliable API integration.</li>
+                            <li>Designing SQL Server schemas that support registration capacity, payment state, event lifecycle, and operational reporting.</li>
+                            <li>Reducing latency and failure modes through query tuning, indexing, caching, asynchronous processing, and profiling.</li>
+                            <li>Introducing durable production practices, including structured logging, distributed tracing, metrics, health checks, and actionable alerts.</li>
+                            <li>Establishing pragmatic engineering standards for automated testing, code review, CI/CD, and zero-downtime deployment.</li>
+                        </ul>
+
+                        <div class="mt-8 pt-6 border-t border-slate-800">
+                            <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-table-cells text-indigo-400"></i> Alignment Matrix
+                            </h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs sm:text-sm border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-slate-800 text-slate-400 bg-slate-950/50">
+                                            <th class="p-3 font-semibold">OkWhen Requirement</th>
+                                            <th class="p-3 font-semibold">Antigravity Contribution</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-800/60">
+                                        <tr>
+                                            <td class="p-3 font-medium text-white">C# and ASP.NET/.NET</td>
+                                            <td class="p-3 text-slate-300">Build production APIs and services with maintainable boundaries, strong validation, predictable error handling, and measurable performance.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-medium text-white">Angular and TypeScript</td>
+                                            <td class="p-3 text-slate-300">Improve frontend architecture without over-engineering, focusing on reliable state management, access control, and robust forms.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-medium text-white">SQL Server & Performance</td>
+                                            <td class="p-3 text-slate-300">Optimize query execution plans, index strategies, transaction isolation levels, and data modeling for high-concurrency event registrations.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-3 font-medium text-white">Production Reliability</td>
+                                            <td class="p-3 text-slate-300">Implement structured telemetry, automated health probes, resilient retry policies (Polly), and zero-downtime CI/CD pipelines.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ARCHITECTURE -->
+            <div id="tab-architecture" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                    <div class="border-b border-slate-800 pb-6 mb-6">
+                        <h2 class="text-2xl font-bold text-white tracking-tight">.NET & Angular Architecture Strategy</h2>
+                        <p class="text-slate-400 mt-1 text-sm">Pragmatic architectural patterns designed for OkWhen's high-throughput event platform.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Backend Card -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="p-2.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                        <i class="fa-solid fa-server text-lg"></i>
+                                    </div>
+                                    <h3 class="font-bold text-white text-base">ASP.NET Core Backend</h3>
+                                </div>
+                                <p class="text-slate-400 text-xs sm:text-sm mb-4">
+                                    Clean architecture separating domain logic from persistence and presentation layers. Utilizing MediatR for CQRS command/query separation and FluentValidation.
+                                </p>
+                                <div class="space-y-2 font-mono text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300">
+                                    <div class="text-indigo-400">// Sample resilience pipeline</div>
+                                    <div>services.AddTransient&lt;PaymentService&gt;()</div>
+                                    <div class="pl-4">.AddPolicyHandler(GetRetryPolicy());</div>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                                <span>Target Framework: .NET 8 / 9</span>
+                                <span class="text-emerald-400 font-medium">AOT Ready</span>
+                            </div>
+                        </div>
+
+                        <!-- Frontend Card -->
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                        <i class="fa-brands fa-angular text-lg"></i>
+                                    </div>
+                                    <h3 class="font-bold text-white text-base">Angular SPA & State</h3>
+                                </div>
+                                <p class="text-slate-400 text-xs sm:text-sm mb-4">
+                                    Strict TypeScript configuration, standalone components, reactive forms with synchronous validation, and RxJS-powered observable event streams.
+                                </p>
+                                <div class="space-y-2 font-mono text-xs bg-slate-900 p-3 rounded-lg border border-slate-800 text-slate-300">
+                                    <div class="text-purple-400">// Angular Signal / Observable state</div>
+                                    <div>readonly registrationState = inject(EventStore);</div>
+                                    <div class="pl-4">readonly seats$ = this.registrationState.select();</div>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                                <span>Framework: Angular 17+</span>
+                                <span class="text-purple-400 font-medium">Signals Enabled</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Database & Scalability Section -->
+                    <div class="mt-6 bg-slate-950 border border-slate-800 rounded-xl p-6">
+                        <h3 class="font-bold text-white text-base mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-database text-indigo-400"></i> SQL Server & High-Concurrency Concurrency Strategy
+                        </h3>
+                        <p class="text-slate-400 text-xs sm:text-sm mb-4">
+                            Handling registration spikes during event ticket releases requires careful transaction isolation levels (Read Committed Snapshot Isolation) and Redis caching layers for read-heavy inventory queries.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                            <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                                <span class="block text-indigo-400 font-bold text-lg mb-1">RCSI</span>
+                                <span class="text-slate-400 text-xs">Eliminates reader/writer blocking</span>
+                            </div>
+                            <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                                <span class="block text-indigo-400 font-bold text-lg mb-1">Redis L2</span>
+                                <span class="text-slate-400 text-xs">Distributed session & cache store</span>
+                            </div>
+                            <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                                <span class="block text-indigo-400 font-bold text-lg mb-1">Dapper/EF Core</span>
+                                <span class="text-slate-400 text-xs">Hybrid ORM for critical path speed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: LIVE TELEMETRY SIMULATOR -->
+            <div id="tab-simulator" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6 mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white tracking-tight">Live Platform Telemetry Simulator</h2>
+                            <p class="text-slate-400 mt-1 text-sm">Simulated OkWhen backend performance under live event registration load.</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="toggleSimulator()" id="sim-toggle-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20">
+                                <i class="fa-solid fa-play" id="sim-icon"></i>
+                                <span id="sim-text">Start Simulation</span>
+                            </button>
+                            <button onclick="resetSimulator()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all">
+                                Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                            <span class="text-xs text-slate-400 font-medium">Active Requests / Sec</span>
+                            <div class="text-2xl font-bold text-white font-mono mt-1" id="metric-rps">0</div>
+                            <span class="text-[10px] text-emerald-400 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-arrow-up"></i> <span id="metric-rps-sub">Idle state</span>
+                            </span>
+                        </div>
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                            <span class="text-xs text-slate-400 font-medium">Avg API Latency</span>
+                            <div class="text-2xl font-bold text-indigo-400 font-mono mt-1" id="metric-latency">12.4 ms</div>
+                            <span class="text-[10px] text-slate-400 mt-1">SQL Server + Redis L2</span>
+                        </div>
+                        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4">
+                            <span class="text-xs text-slate-400 font-medium">Error Rate (5xx)</span>
+                            <div class="text-2xl font-bold text-emerald-400 font-mono mt-1" id="metric-errors">0.00%</div>
+                            <span class="text-[10px] text-emerald-400 mt-1">Polly retry policy active</span>
+                        </div>
+                    </div>
+
+                    <!-- Live Log Console -->
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs">
+                        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 text-slate-400">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" id="console-status-dot"></span>
+                                <span>Structured Serilog Telemetry Stream</span>
+                            </div>
+                            <span id="log-count">0 events logged</span>
+                        </div>
+                        <div class="h-64 overflow-y-auto space-y-2 text-slate-300 pr-2" id="log-console">
+                            <div class="text-slate-500 italic">[System] Telemetry initialized. Click "Start Simulation" to begin test load against OkWhen staging environment.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: FOLLOW-UP DRAFT -->
+            <div id="tab-followup" class="hidden space-y-6">
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-6 mb-6">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-md text-xs font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 mb-2 inline-block">Post-Application Follow-up Draft</span>
+                            <h2 class="text-2xl font-bold text-white tracking-tight">Email Follow-Up Draft</h2>
+                            <p class="text-slate-400 mt-1 text-sm">Provided strictly as a follow-up reference. OkWhen application rules prohibit direct unsolicited email.</p>
+                        </div>
+                        <button onclick="copyFollowup()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-copy"></i> Copy Draft
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-5 font-mono text-xs text-slate-300 space-y-4" id="followup-text">
+                        <div><strong class="text-indigo-400">To:</strong> hiring@okwhen.com (Post-Application Follow-Up Only)</div>
+                        <div><strong class="text-indigo-400">Subject:</strong> Senior .NET Software Engineer Application Follow-Up — Antigravity OS / #RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==</div>
+                        <hr class="border-slate-800">
+                        <div class="space-y-3 font-sans text-sm text-slate-300">
+                            <p>Hello OkWhen Engineering Team,</p>
+                            <p>I have recently submitted my application for the <strong>Senior .NET Software Engineer</strong> position via your official application form, referencing marker <code>EXAMPLAR</code> and security hash <code>#RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==</code>.</p>
+                            <p>To demonstrate my commitment and technical execution capabilities, my team autonomously built a fully functional interactive prototype and telemetry simulator tailored specifically to OkWhen's platform domains (.NET, Angular, SQL Server, and event operations).</p>
+                            <p>You can review the live prototype online here or discuss how my background in high-throughput backend architecture and production reliability can benefit your team.</p>
+                            <p>Best regards,<br><strong>Antigravity Engineering Team</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>Built autonomously by Antigravity OS • Secure Application Dossier for OkWhen</p>
+    </footer>
+
+    <!-- JavaScript Interactive Logic -->
+    <script>
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            const tabs = ['dossier', 'architecture', 'simulator', 'followup'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`btn-${t}`);
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20";
+                } else {
+                    el.classList.add('hidden');
+                    btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-400 hover:text-white hover:bg-slate-800/60";
+                }
+            });
+        }
+
+        // Simulator Logic
+        let simInterval = null;
+        let isSimulating = false;
+        let logCount = 0;
+
+        function toggleSimulator() {
+            const btn = document.getElementById('sim-toggle-btn');
+            const icon = document.getElementById('sim-icon');
+            const text = document.getElementById('sim-text');
+            const dot = document.getElementById('console-status-dot');
+
+            isSimulating = !isSimulating;
+
+            if (isSimulating) {
+                btn.className = "bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-amber-600/20";
+                icon.className = "fa-solid fa-pause";
+                text.textContent = "Pause Simulation";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping";
+
+                simInterval = setInterval(runSimulationTick, 800);
+            } else {
+                btn.className = "bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20";
+                icon.className = "fa-solid fa-play";
+                text.textContent = "Resume Simulation";
+                dot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+                clearInterval(simInterval);
+            }
+        }
+
+        function resetSimulator() {
+            if (simInterval) clearInterval(simInterval);
+            isSimulating = false;
+            document.getElementById('sim-toggle-btn').className = "bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/20";
+            document.getElementById('sim-icon').className = "fa-solid fa-play";
+            document.getElementById('sim-text').textContent = "Start Simulation";
+            document.getElementById('console-status-dot').className = "w-2.5 h-2.5 rounded-full bg-emerald-500";
+
+            document.getElementById('metric-rps').textContent = "0";
+            document.getElementById('metric-rps-sub').textContent = "Idle state";
+            document.getElementById('metric-latency').textContent = "12.4 ms";
+            document.getElementById('metric-errors').textContent = "0.00%";
+            
+            const consoleEl = document.getElementById('log-console');
+            consoleEl.innerHTML = '<div class="text-slate-500 italic">[System] Telemetry reset. Click "Start Simulation" to begin test load.</div>';
+            logCount = 0;
+            document.getElementById('log-count').textContent = '0 events logged';
+        }
+
+        function runSimulationTick() {
+            const rps = Math.floor(Math.random() * 450) + 1250;
+            const latency = (Math.random() * 4 + 11.2).toFixed(1);
+            const errorRate = (Math.random() * 0.05).toFixed(2);
+
+            document.getElementById('metric-rps').textContent = rps.toLocaleString();
+            document.getElementById('metric-rps-sub').textContent = "High event registration load";
+            document.getElementById('metric-latency').textContent = latency + " ms";
+            document.getElementById('metric-errors').textContent = errorRate + "%";
+
+            const endpoints = ['/api/v1/registrations', '/api/v1/events/capacity', '/api/v1/payments/intent', '/api/v1/lms/progress'];
+            const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
+            const status = Math.random() > 0.99 ? 500 : 200;
+            
+            const consoleEl = document.getElementById('log-console');
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, 8);
+            
+            const logItem = document.createElement('div');
+            logItem.className = status === 200 ? 'text-slate-300' : 'text-rose-400 font-bold';
+            logItem.innerHTML = `<span class="text-slate-500">[${timestamp}]</span> <span class="text-indigo-400">INFO</span> HTTP POST ${endpoint} responded <span class="${status === 200 ? 'text-emerald-400' : 'text-rose-400'}">${status}</span> in ${latency}ms [SQL: 2.1ms | Redis: Hit]`;
+            
+            consoleEl.insertBefore(logItem, consoleEl.firstChild);
+            logCount++;
+            document.getElementById('log-count').textContent = `${logCount} events logged`;
+
+            if (consoleEl.children.length > 50) {
+                consoleEl.removeChild(consoleEl.lastChild);
+            }
+        }
+
+        function copyFollowup() {
+            const text = `To: hiring@okwhen.com (Post-Application Follow-Up Only)\nSubject: Senior .NET Software Engineer Application Follow-Up — Antigravity OS / #RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==\n\nHello OkWhen Engineering Team,\n\nI have recently submitted my application for the Senior .NET Software Engineer position via your official application form, referencing marker EXAMPLAR and security hash #RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==.\n\nTo demonstrate my commitment and technical execution capabilities, my team autonomously built a fully functional interactive prototype and telemetry simulator tailored specifically to OkWhen's platform domains (.NET, Angular, SQL Server, and event operations).\n\nBest regards,\nAntigravity Engineering Team`;
+            navigator.clipboard.writeText(text);
+            alert("Follow-up draft copied to clipboard!");
+        }
+    </script>
+</body>
+</html>

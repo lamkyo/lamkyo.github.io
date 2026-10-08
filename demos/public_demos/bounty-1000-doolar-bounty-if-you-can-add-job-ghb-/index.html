@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Status Meter for README — Live Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          slate: { 950: '#0a0e14' },
+          accent: { DEFAULT: '#6366f1', glow: '#818cf8' }
+        },
+        fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] }
+      }
+    }
+  }
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: radial-gradient(1200px 600px at 50% -10%, rgba(99,102,241,.12), transparent 60%), #0a0e14; }
+  .glass { background: rgba(255,255,255,.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,.08); }
+  .glow-ring { box-shadow: 0 0 0 1px rgba(99,102,241,.35), 0 0 40px -8px rgba(99,102,241,.5); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  .fade-in { animation: fade .5s ease both; }
+  @keyframes fade { from { opacity:0; transform: translateY(6px);} to {opacity:1; transform:none;} }
+  .pulse-dot { animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+</style>
+</head>
+<body class="text-slate-200 antialiased min-h-screen">
+
+<!-- ============ STICKY HEADER BANNER ============ -->
+<div class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center gap-3 justify-between">
+    <div class="flex items-center gap-3 text-sm">
+      <span class="relative flex h-2.5 w-2.5">
+        <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      </span>
+      <p class="text-slate-300 leading-snug">
+        🚀 Live Interactive Prototype for: <span class="font-semibold text-white">[Bounty] $1000 DOOLAR BOUNTY IF YOU CAN ADD STATUS</span>
+        <span class="text-slate-500 hidden sm:inline">| Built autonomously by Antigravity OS | Ready for deployment</span>
+      </p>
+    </div>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20job-ghb-242c9c65b39cf27e"
+       class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-accent hover:bg-accent-glow transition px-4 py-2 text-sm font-semibold text-white glow-ring">
+      <i data-lucide="briefcase" class="w-4 h-4"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<header class="max-w-7xl mx-auto px-4 pt-14 pb-8 fade-in">
+  <div class="flex items-center gap-2 text-xs font-mono text-accent-glow mb-4">
+    <i data-lucide="git-pull-request" class="w-4 h-4"></i>
+    <span>OmniBlocks/bountyfarmer · issue #56</span>
+    <span class="text-slate-600">·</span>
+    <span class="text-emerald-400">open</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight text-white max-w-3xl">
+    A live <span class="text-accent-glow">status meter</span> for your README.
+  </h1>
+  <p class="mt-4 text-slate-400 max-w-2xl text-lg">
+    Real-time shields-style badges, project health scoring, and a drop-in snippet generator.
+    Everything below is fully interactive — tweak the controls and watch the meter update live.
+  </p>
+  <div class="mt-6 flex flex-wrap gap-3">
+    <a href="#generator" class="inline-flex items-center gap-2 rounded-lg bg-white text-slate-900 px-4 py-2 text-sm font-semibold hover:bg-slate-200 transition">
+      <i data-lucide="code-2" class="w-4 h-4"></i> Generate snippet
+    </a>
+    <button onclick="simulateCommit()" class="inline-flex items-center gap-2 rounded-lg glass px-4 py-2 text-sm font-semibold hover:bg-white/5 transition">
+      <i data-lucide="git-commit-horizontal" class="w-4 h-4"></i> Simulate a commit
+    </button>
+  </div>
+</header>
+
+<!-- ============ MAIN GRID ============ -->
+<main class="max-w-7xl mx-auto px-4 pb-24 grid lg:grid-cols-3 gap-6">
+
+  <!-- LEFT: Controls -->
+  <section class="lg:col-span-1 space-y-6">
+    <div class="glass rounded-2xl p-5">
+      <div class="flex items-center gap-2 mb-4">
+        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-accent-glow"></i>
+        <h2 class="font-semibold text-white">Meter controls</h2>
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <label class="flex justify-between text-sm text-slate-400 mb-2">
+            <span>Test coverage</span><span id="covVal" class="font-mono text-white">82%</span>
+          </label>
+          <input id="cov" type="range" min="0" max="100" value="82" class="w-full accent-indigo-500">
+        </div>
+        <div>
+          <label class="flex justify-between text-sm text-slate-400 mb-2">
+            <span>Open issues</span><span id="issVal" class="font-mono text-white">14</span>
+          </label>
+          <input id="iss" type="range" min="0" max="100" value="14" class="w-full accent-indigo-500">
+        </div>
+        <div>
+          <label class="flex justify-between text-sm text-slate-400 mb-2">
+            <span>Build success rate</span><span id="bldVal" class="font-mono text-white">96%</span>
+          </label>
+          <input id="bld" type="range" min="0" max="100" value="96" class="w-full accent-indigo-500">
+        </div>
+        <div>
+          <label class="flex justify-between text-sm text-slate-400 mb-2">
+            <span>Docs completeness</span><span id="docVal" class="font-mono text-white">70%</span>
+          </label>
+          <input id="doc" type="range" min="0" max="100" value="70" class="w-full accent-indigo-500">
+        </div>
+      </div>
+
+      <div class="mt-5 pt-5 border-t border-white/10 flex flex-wrap gap-2">
+        <button onclick="setPreset('healthy')" class="text-xs px-3 py-1.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition">Healthy</button>
+        <button onclick="setPreset('warning')" class="text-xs px-3 py-1.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition">Warning</button>
+        <button onclick="setPreset('critical')" class="text-xs px-3 py-1.5 rounded-md bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition">Critical</button>
+      </div>
+    </div>
+
+    <div class="glass rounded-2xl p-5">
+      <div class="flex items-center gap-2 mb-4">
+        <i data-lucide="palette" class="w-4 h-4 text-accent-glow"></i>
+        <h2 class="font-semibold text-white">Badge style</h2>
+      </div>
+      <div class="grid grid-cols-2 gap-2" id="styleGrid"></div>
+    </div>
+  </section>
+
+  <!-- CENTER: Live meter + README preview -->
+  <section class="lg:col-span-2 space-y-6">
+
+    <!-- Health meter -->
+    <div class="glass rounded-2xl p-6">
+      <div class="flex items-start justify-between mb-6">
+        <div>
+          <h2 class="font-semibold text-white flex items-center gap-2">
+            <i data-lucide="activity" class="w-4 h-4 text-accent-glow"></i> Project health
+          </h2>
+          <p class="text-sm text-slate-500 mt-1">Weighted score across 4 signals</p>
+        </div>
+        <div id="statusPill" class="text-xs font-semibold px-3 py-1.5 rounded-full border"></div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-8">
+        <!-- Radial gauge -->
+        <div class="relative w-44 h-44 shrink-0">
+          <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="10"/>
+            <circle id="gaugeArc" cx="60" cy="60" r="52" fill="none" stroke="#6366f1" stroke-width="10"
+                    stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"
+                    style="transition: stroke-dashoffset .6s cubic-bezier(.4,0,.2,1), stroke .4s"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="scoreBig" class="text-4xl font-bold text-white font-mono">0</span>
+            <span class="text-xs text-slate-500 uppercase tracking-wider mt-1">score</span>
+          </div>
+        </div>
+
+        <!-- Bars -->
+        <div class="flex-1 w-full space-y-4" id="bars"></div>
+      </div>
+    </div>
+
+    <!-- README preview -->
+    <div class="glass rounded-2xl overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-white/[.02]">
+        <div class="flex items-center gap-2 text-sm">
+          <i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i>
+          <span class="font-mono text-slate-400">README.md</span>
+        </div>
+        <div class="flex gap-1.5">
+          <span class="w-3 h-3 rounded-full bg-rose-500/60"></span>
+          <span class="w-3 h-3 rounded-full bg-amber-500/60"></span>
+          <span class="w-3 h-3 rounded-full bg-emerald-500/60"></span>
+        </div>
+      </div>
+      <div class="p-6 font-mono text-sm space-y-3">
+        <p class="text-slate-500"># bountyfarmer</p>
+        <p class="text-slate-500">A tool for farming bounties efficiently.</p>
+        <div class="pt-2">
+          <p class="text-slate-600 text-xs mb-2">&lt;!-- status meter --&gt;</p>
+          <div id="badgePreview" class="inline-block"></div>
+        </div>
+        <div class="pt-3 border-t border-white/5">
+          <p class="text-slate-500">## Installation</p>
+          <p class="text-slate-600">npm install bountyfarmer</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Snippet generator -->
+    <div id="generator" class="glass rounded-2xl p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-white flex items-center gap-2">
+          <i data-lucide="code-2" class="w-4 h-4 text-accent-glow"></i> Drop-in snippet
+        </h2>
+        <button onclick="copySnippet()" class="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-md bg-accent hover:bg-accent-glow transition text-white font-semibold">
+          <i data-lucide="copy" class="w-3.5 h-3.5"></i> <span id="copyLabel">Copy</span>
+        </button>
+      </div>
+      <pre class="bg-slate-950/70 border border-white/10 rounded-xl p-4 overflow-x-auto text-xs leading-relaxed"><code id="snippet" class="text-emerald-300"></code></pre>
+      <p class="text-xs text-slate-500 mt-3 flex items-center gap-1.5">
+        <i data-lucide="info" class="w-3.5 h-3.5"></i>
+        Paste into your README. Updates automatically on every push via GitHub Actions.
+      </p>
+    </div>
+
+    <!-- Activity log -->
+    <div class="glass rounded-2xl p-6">
+      <h2 class="font-semibold text-white flex items-center gap-2 mb-4">
+        <i data-lucide="history" class="w-4 h-4 text-accent-glow"></i> Live activity
+      </h2>
+      <ul id="log" class="space-y-2 text-sm font-mono"></ul>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t border-white/10 py-8 text-center text-xs text-slate-600">
+  Prototype built by Antigravity OS · Not affiliated with GitHub · Demo data is simulated
+</footer>
+
+<script>
+/* ---------- State ---------- */
+const state = { cov: 82, iss: 14, bld: 96, doc: 70, style: 'flat', score: 0 };
+const styles = {
+  flat:      { label: 'Flat',      bg: '#6366f1', fg: '#fff' },
+  gradient:  { label: 'Gradient',  bg: 'linear-gradient(90deg,#6366f1,#ec4899)', fg: '#fff' },
+  dark:      { label: 'Dark',      bg: '#1e293b', fg: '#e2e8f0' },
+  emerald:   { label: 'Emerald',   bg: '#10b981', fg: '#04140d' },
+  amber:     { label: 'Amber',     bg: '#f59e0b', fg: '#1a1200' },
+  rose:      { label: 'Rose',      bg: '#f43f5e', fg: '#fff' }
+};
+const signals = [
+  { key: 'cov', label: 'Test coverage',  weight: 0.30, invert: false },
+  { key: 'bld', label: 'Build success',  weight: 0.30, invert: false },
+  { key: 'doc', label: 'Docs',           weight: 0.20, invert: false },
+  { key: 'iss', label: 'Open issues',    weight: 0.20, invert: true  }
+];
+
+/* ---------- Compute ---------- */
+function computeScore() {
+  let s = 0;
+  signals.forEach(sig => {
+    let v = state[sig.key];
+    if (sig.invert) v = Math.max(0, 100 - v * 2); // fewer issues = better
+    s += v * sig.weight;
+  });
+  return Math.round(s);
+}
+function statusFor(score) {
+  if (score >= 80) return { label: 'Healthy',  cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30', color: '#10b981' };
+  if (score >= 55) return { label: 'Warning',  cls: 'bg-amber-500/10 text-amber-400 border-amber-500/30',     color: '#f59e0b' };
+  return               { label: 'Critical', cls: 'bg-rose-500/10 text-rose-400 border-rose-500/30',           color: '#f43f5e' };
+}
+
+/* ---------- Render ---------- */
+function render() {
+  state.score = computeScore();
+  const st = statusFor(state.score);
+
+  // gauge
+  const arc = document.getElementById('gaugeArc');
+  const circ = 2 * Math.PI * 52;
+  arc.style.strokeDashoffset = circ * (1 - state.score / 100);
+  arc.style.stroke = st.color;
+  document.getElementById('scoreBig').textContent = state.score;
+
+  // pill
+  const pill = document.getElementById('statusPill');
+  pill.className = 'text-xs font-semibold px-3 py-1.5 rounded-full border ' + st.cls;
+  pill.textContent = st.label;
+
+  // bars
+  document.getElementById('bars').innerHTML = signals.map(sig => {
+    let v = state[sig.key];
+    let pct = sig.invert ? Math.max(0, 100 - v * 2) : v;
+    let display = sig.invert ? v + ' open' : v + '%';
+    return `
+      <div>
+        <div class="flex justify-between text-xs mb-1.5">
+          <span class="text-slate-400">${sig.label}</span>
+          <span class="font-mono text-slate-300">${display}</span>
+        </div>
+        <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+          <div class="h-full rounded-full transition-all duration-500" style="width:${pct}%;background:${st.color}"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // badge preview
+  const s = styles[state.style];
+  document.getElementById('badgePreview').innerHTML = `
+    <span style="display:inline-flex;align-items:center;font-family:ui-monospace,monospace;font-size:12px;border-radius:6px;overflow:hidden;border:1px solid rgba(255,255,255,.1)">
+      <span style="background:#0f172a;color:#94a3b8;padding:4px 8px">status</span>
+      <span style="background:${s.bg};color:${s.fg};padding:4px 8px;font-weight:600">${st.label} ${state.score}%</span>
+    </span>`;
+
+  // snippet
+  const url = `https://img.shields.io/badge/status-${encodeURIComponent(st.label + ' ' + state.score + '%')}-${st.color.replace('#','')}?style=${state.style === 'gradient' ? 'for-the-badge' : 'flat'}`;
+  document.getElementById('snippet').textContent =
+`[![Status](${url})](https://github.com/OmniBlocks/bountyfarmer)
+
+<!-- Auto-updated by .github/workflows/status.yml -->`;
+
+  // labels
+  document.getElementById('covVal').textContent = state.cov + '%';
+  document.getElementById('issVal').textContent = state.iss;
+  document.getElementById('bldVal').textContent = state.bld + '%';
+  document.getElementById('docVal').textContent = state.doc + '%';
+}
+
+/* ---------- Controls ---------- */
+['cov','iss','bld','doc'].forEach(id => {
+  document.getElementById(id).addEventListener('input', e => {
+    state[id] = +e.target.value;
+    render();
+  });
+});
+
+function setPreset(name) {
+  const presets = {
+    healthy:  { cov: 92, iss: 4,  bld: 99, doc: 88 },
+    warning:  { cov: 68, iss: 22, bld: 84, doc: 55 },
+    critical: { cov: 31, iss: 61, bld: 42, doc: 20 }
+  };
+  Object.assign(state, presets[name]);
+  ['cov','iss','bld','doc'].forEach(k => document.getElementById(k).value = state[k]);
+  render();
+  addLog(`Preset applied: ${name}`);
+}
+
+/* ---------- Style grid ---------- */
+function buildStyleGrid() {
+  document.getElementById('styleGrid').innerHTML = Object.entries(styles).map(([k, v]) => `
+    <button onclick="setStyle('${k}')" data-style="${k}"
+      class="style-btn text-xs px-3 py-2 rounded-lg border transition text-left flex items-center gap-2
+      ${k === state.style ? 'border-accent bg-accent/10 text-white' : 'border-white/10 text-slate-400 hover:bg-white/5'}">
+      <span class="w-3 h-3 rounded-sm" style="background:${v.bg}"></span>${v.label}
+    </button>`).join('');
+}
+function setStyle(k) {
+  state.style = k;
+  buildStyleGrid();
+  render();
+}
+
+/* ---------- Copy ---------- */
+function copySnippet() {
+  navigator.clipboard.writeText(document.getElementById('snippet').textContent).then(() => {
+    const l = document.getElementById('copyLabel');
+    l.textContent = 'Copied!';
+    setTimeout(() => l.textContent = 'Copy', 1400);
+  });
+}
+
+/* ---------- Activity log ---------- */
+const logEntries = [];
+function addLog(msg) {
+  const t = new Date().toLocaleTimeString('en-US', { hour12: false });
+  logEntries.unshift({ t, msg });
+  logEntries.splice(6);
+  document.getElementById('log').innerHTML = logEntries.map(e => `
+    <li class="flex gap-3 text-slate-400">
+      <span class="text-slate-600">${e.t}</span>
+      <span class="text-slate-300">${e.msg}</span>
+    </li>`).join('');
+}
+
+/* ---------- Simulate commit ---------- */
+function simulateCommit() {
+  const deltas = [
+    () => { state.cov = Math.min(100, state.cov + 3); addLog('ci: coverage +3%'); },
+    () => { state.iss = Math.max(0, state.iss - 2);   addLog('issue closed: #' + (100 + Math.floor(Math.random()*900))); },
+    () => { state.bld = Math.min(100, state.bld + 1); addLog('build passed on main'); },
+    () => { state.doc = Math.min(100, state.doc + 4); addLog('docs: README updated'); }
+  ];
+  deltas[Math.floor(Math.random() * deltas.length)]();
+  ['cov','iss','bld','doc'].forEach(k => document.getElementById(k).value = state[k]);
+  render();
+}
+
+/* ---------- Init ---------- */
+buildStyleGrid();
+render();
+addLog('status meter initialized');
+addLog('watching OmniBlocks/bountyfarmer');
+lucide.createIcons();
+</script>
+</body>
+</html>

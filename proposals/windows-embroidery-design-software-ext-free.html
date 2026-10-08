@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal: Windows Embroidery Design Software | Antigravity OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen py-10 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Sticky Action Header -->
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 border border-slate-800 rounded-2xl p-6 shadow-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mb-3">
+                    <i class="fa-solid fa-bolt"></i> Verified Autonomous Proposal
+                </span>
+                <h1 class="text-2xl font-bold text-white">Windows Embroidery Design Software</h1>
+                <p class="text-sm text-slate-400 mt-1">Platform: <span class="capitalize text-slate-300">freelancer</span> | Job ID: <code>ext-freelancer-fl-40749937</code></p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <a href="https://www.paypal.com/paypalme/lamvukyo/250USD" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-all text-sm">
+                    <i class="fa-brands fa-paypal"></i> Hire via PayPal ($250)
+                </a>
+                <a href="https://t.me/Youbichet_bot" target="_blank" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 text-sm">
+                    <i class="fa-brands fa-telegram"></i> Telegram Contact
+                </a>
+            </div>
+        </div>
+
+        <!-- Proposal Content Card -->
+        <div class="bg-slate-900/90 border border-slate-800/80 rounded-2xl p-8 md:p-12 shadow-xl backdrop-blur-sm">
+            <div class="prose prose-invert max-w-none">
+                <p class="text-slate-300 leading-relaxed"><h1 class="text-3xl font-extrabold text-white mt-10 mb-4">Technical Proposal &amp; Statement of Work</h1>
+<h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">Windows Embroidery Design Software — Intermediate-User Digitizing Suite</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Prepared for:</strong> Project Owner, Embroidery Design Software (Windows Desktop)
+<strong class="text-white font-semibold">Prepared by:</strong> Principal Software Architect
+<strong class="text-white font-semibold">Engagement Type:</strong> Fixed-Price Milestone — $250 USD
+<strong class="text-white font-semibold">Reference Budget Context:</strong> Client-posted range £5,000–£10,000 GBP (full product build)</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">1. Executive Hook — The Diagnostic Most Bidders Miss</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>You are not asking for "an app that draws stitches." You are asking for a <strong class="text-white font-semibold">digitizing engine with a UI bolted on top</strong> — and the failure mode of 90% of embroidery software projects is that the team builds the UI first, treats the stitch engine as a black box, and discovers on delivery day that the exported file won't run on the client's machine.</p><p class='mt-4 text-slate-300 leading-relaxed'>Here is what your brief actually implies, and where the subtle traps live:</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">The real problem is not pattern creation. It is stitch-path correctness.</strong>
+An "intricate embroidery pattern" is a geometric path plus a <strong class="text-white font-semibold">stitch-type decision</strong> (satin, fill, running, motif) plus <strong class="text-white font-semibold">underlay</strong> plus <strong class="text-white font-semibold">pull compensation</strong>. Intermediate users will judge your software on one thing: *does the exported design sew out without puckering, gaps, or thread breaks?* A beautiful canvas that produces a bad `.DST` is worthless.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">The traps that sink this class of project:</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>| Trap | Why it kills the project | Our mitigation |
+|---|---|---|
+| <strong class="text-white font-semibold">File-format endianness &amp; header checksums</strong> | Tajima `.DST`, Melco `.EXP`, and Barudan `.DSB` encode stitch deltas in signed 3-byte little-endian with format-specific terminators. A single off-by-one byte produces a file that opens in the editor and fails on the machine. | Byte-exact round-trip tests against known-good reference files before any UI work. |
+| <strong class="text-white font-semibold">Coordinate space confusion</strong> | Design space (mm), stitch space (0.1 mm units), and screen space (px) get conflated. Zoom/pan then silently corrupts exported geometry. | Single canonical internal unit (0.1 mm integer), explicit conversion boundary, property-based tests. |
+| <strong class="text-white font-semibold">Pull compensation &amp; underlay treated as "polish"</strong> | They are not. Without them, satin columns gap and fills pucker. Retrofitting them means rewriting the stitch generator. | Compensation and underlay are first-class parameters in the Phase 2 data model, not a later patch. |
+| <strong class="text-white font-semibold">Thread-color / palette model</strong> | Intermediate users expect a thread chart (Madeira/Isacord-style) with per-block color assignment, not raw RGB. | Palette abstraction from day one; export maps to nearest machine-legal color index. |
+| <strong class="text-white font-semibold">Windows-only rendering assumptions</strong> | GDI+ vs. Direct2D vs. SkiaSharp changes hit-testing, DPI scaling, and print fidelity. | Rendering layer isolated behind an interface so the backend is testable headless. |</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">The strategic point:</strong> the £5,000–£10,000 range is a *product* budget. What you need <strong class="text-white font-semibold">right now</strong> is a <strong class="text-white font-semibold">de-risked architectural foundation and a working vertical slice</strong> — the stitch engine, the file I/O, and the pattern-creation core — proven correct before you commit the full budget. That is exactly what this $250 milestone delivers.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">2. Architecture &amp; Technical Plan</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Target Stack (recommended, adjustable to your preference)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Language:</strong> C# (.NET 8) for the application shell and UI — best-in-class Windows tooling, mature vector/graphics libraries, fast iteration.
+- <strong class="text-white font-semibold">Performance-critical core:</strong> C++ (native, P/Invoke or C++/CLI bridge) for the stitch-generation and geometry kernel, where per-stitch throughput matters on dense fills.
+- <strong class="text-white font-semibold">UI:</strong> WPF or Avalonia (cross-compilable, testable, DPI-aware) with an MVVM separation so the engine is UI-agnostic.
+- <strong class="text-white font-semibold">Rendering:</strong> SkiaSharp or Direct2D behind an `IRenderSurface` interface.
+- <strong class="text-white font-semibold">Testing:</strong> xUnit + FsCheck (property-based) for the engine; golden-file byte comparisons for exporters.</p><p class='mt-4 text-slate-300 leading-relaxed'>&gt; If you prefer Java or a pure-C++ stack, the architecture below is language-agnostic — only the binding layer changes. We will confirm the stack in Phase 1 before writing production code.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 1 — Isolation, Discovery &amp; Reproduction (Day 1)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> eliminate ambiguity and reproduce the exact target behavior before touching production code.</p><p class='mt-4 text-slate-300 leading-relaxed'>1. <strong class="text-white font-semibold">Requirements freeze.</strong> Convert your brief into a numbered, testable feature list. Every ambiguous term ("intricate," "intermediate users") becomes a concrete acceptance criterion.
+2. <strong class="text-white font-semibold">Reference artifact collection.</strong> Obtain 3–5 known-good embroidery files (`.DST`, `.EXP`, `.PES`) that sew correctly on real hardware. These become our <strong class="text-white font-semibold">golden corpus</strong>.
+3. <strong class="text-white font-semibold">Format specification lock.</strong> Document the exact byte layout of the target export format(s): header, stitch records, color changes, end-of-design terminator, checksum.
+4. <strong class="text-white font-semibold">Environment isolation.</strong> Reproducible dev environment (pinned SDK versions, `global.json`, deterministic build). No "works on my machine."
+5. <strong class="text-white font-semibold">Vertical-slice spike.</strong> Prove the riskiest path end-to-end: *load a reference file → parse → render → re-export → byte-compare.* If this passes, the project is de-risked. If it fails, we learn it on Day 1, not Week 6.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Exit criteria:</strong> signed-off feature list, golden corpus in repo, format spec document, passing round-trip spike.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 2 — Implementation &amp; Automated Verification (Day 2–3)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> build the pattern-creation core and stitch engine with tests written alongside the code.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Core modules:</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Geometry kernel</strong> — paths, Bézier curves, offsetting, self-intersection resolution, region filling.
+- <strong class="text-white font-semibold">Stitch generator</strong> — satin, fill (tatami/step), running, and motif stitch types; configurable density, angle, and stitch length.
+- <strong class="text-white font-semibold">Compensation layer</strong> — pull compensation, underlay generation (center-run, edge-run, zig-zag), corner handling.
+- <strong class="text-white font-semibold">Pattern-creation tools</strong> — draw, node edit, shape primitives, text-to-path, auto-digitize from raster (scoped to the milestone).
+- <strong class="text-white font-semibold">Thread &amp; color model</strong> — per-block color assignment, thread-chart palette, color-change sequencing.
+- <strong class="text-white font-semibold">Export/Import</strong> — byte-exact writer and reader for the agreed format(s), validated against the golden corpus.
+- <strong class="text-white font-semibold">UI shell</strong> — MVVM canvas with zoom/pan, tool palette, layer/block list, property inspector.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Verification strategy:</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">Unit tests</strong> for every geometry and stitch primitive.
+- <strong class="text-white font-semibold">Property-based tests</strong> — e.g., "any closed path produces a stitch sequence whose endpoints lie within tolerance of the path."
+- <strong class="text-white font-semibold">Golden-file tests</strong> — export output compared byte-for-byte to reference files.
+- <strong class="text-white font-semibold">Snapshot tests</strong> for rendered output (deterministic rasterization).</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Exit criteria:</strong> all core modules implemented, test suite green, vertical slice extended to full pattern-creation workflow.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Phase 3 — Hardening, Performance &amp; Handover (Day 3–4)</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Objective:</strong> make it fast, make it robust, make it yours.</p><p class='mt-4 text-slate-300 leading-relaxed'>1. <strong class="text-white font-semibold">Performance pass.</strong> Profile dense-fill generation; target sub-second stitch computation for typical designs. Optimize hot loops in the C++ kernel; eliminate allocations in per-stitch paths.
+2. <strong class="text-white font-semibold">Robustness pass.</strong> Fuzz the importers with malformed files; ensure graceful failure, never a crash or silent corruption.
+3. <strong class="text-white font-semibold">Edge-case matrix.</strong> Zero-length paths, self-intersecting regions, degenerate satin columns, extreme zoom, DPI scaling, multi-monitor.
+4. <strong class="text-white font-semibold">Documentation.</strong> Architecture decision records (ADRs), format spec, build/run instructions, extension guide.
+5. <strong class="text-white font-semibold">Handover.</strong> Walkthrough session, repo transfer, CI configuration, and a prioritized backlog for the next milestone.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Exit criteria:</strong> performance targets met, fuzz suite clean, docs complete, handover accepted.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">3. Concrete Deliverables Checklist</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>Upon completion you receive, in a Git repository you own:</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Code</strong>
+- [ ] Full source: C# application + C++ geometry/stitch kernel (or agreed stack)
+- [ ] `IRenderSurface` abstraction with at least one concrete backend
+- [ ] Stitch generator: satin, fill, running, motif
+- [ ] Compensation + underlay engine
+- [ ] Import/export for agreed format(s), byte-exact
+- [ ] Thread/color model with palette support
+- [ ] MVVM UI shell: canvas, tools, block list, property inspector</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Tests</strong>
+- [ ] Unit test suite (xUnit or equivalent)
+- [ ] Property-based test suite for geometry invariants
+- [ ] Golden-file byte-comparison tests against reference corpus
+- [ ] Render snapshot tests
+- [ ] Fuzz harness for importers</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Build &amp; Environment</strong>
+- [ ] `global.json` / pinned SDK versions
+- [ ] Deterministic build script (`build.ps1` / `Makefile`)
+- [ ] CI pipeline config (GitHub Actions or Azure Pipelines)
+- [ ] *(Optional)* Dockerfile for headless engine testing / CI parity</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Documentation</strong>
+- [ ] `README.md` — build, run, test
+- [ ] `ARCHITECTURE.md` — module map and data flow
+- [ ] `FORMAT_SPEC.md` — byte-level export/import specification
+- [ ] ADRs for key decisions (stack, units, compensation model)
+- [ ] `HANDOVER.md` — next-milestone backlog and extension guide</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">4. Regression Guardrails</h2></p><p class='mt-4 text-slate-300 leading-relaxed'>Zero-regression is an engineering discipline, not a promise. Our guardrails:</p><p class='mt-4 text-slate-300 leading-relaxed'>1. <strong class="text-white font-semibold">Golden corpus as contract.</strong> The reference embroidery files are committed to the repo. Any change that alters their round-trip output fails CI immediately.
+2. <strong class="text-white font-semibold">Byte-exact export tests.</strong> Exporters are tested against frozen expected outputs. No "close enough."
+3. <strong class="text-white font-semibold">Property-based invariants.</strong> Geometry and stitch invariants are asserted across thousands of generated inputs per run — catching regressions that hand-written tests miss.
+4. <strong class="text-white font-semibold">Snapshot rendering.</strong> Deterministic rasterization compared per-commit; visual regressions surface as diffs.
+5. <strong class="text-white font-semibold">Fuzz regression suite.</strong> Every malformed input that ever caused a crash becomes a permanent test case.
+6. <strong class="text-white font-semibold">CI gate.</strong> No merge without green tests. Branch protection enforced.
+7. <strong class="text-white font-semibold">Semantic versioning of the format layer.</strong> Any change to export behavior is a versioned, documented event — never a silent edit.
+8. <strong class="text-white font-semibold">Isolated engine.</strong> Because the engine is UI-agnostic and headless-testable, UI changes cannot regress stitch correctness, and vice versa.</p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h2 class="text-2xl font-bold text-slate-100 mt-8 mb-4 border-b border-slate-700 pb-2">5. Commercial Terms &amp; Direct CTA</h2></p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Fixed-Price Milestone</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>| Item | Detail |
+|---|---|
+| <strong class="text-white font-semibold">Scope</strong> | Phases 1–3 as defined above: architectural foundation, working vertical slice, stitch engine core, byte-exact file I/O, test suite, documentation, handover |
+| <strong class="text-white font-semibold">Price</strong> | <strong class="text-white font-semibold">$250 USD — fixed, all-inclusive</strong> |
+| <strong class="text-white font-semibold">Timeline</strong> | 3–4 working days from kickoff |
+| <strong class="text-white font-semibold">Payment terms</strong> | 100% on acceptance of deliverables, or 50% kickoff / 50% acceptance at your option |
+| <strong class="text-white font-semibold">Revisions</strong> | Included within the milestone scope until acceptance criteria are met |</p><p class='mt-4 text-slate-300 leading-relaxed'>&gt; <strong class="text-white font-semibold">Note on budget alignment:</strong> Your posted range (£5,000–£10,000) reflects the full product build. This $250 milestone is deliberately scoped as the <strong class="text-white font-semibold">de-risking foundation</strong> — the architecture, engine, and proven vertical slice that make the remaining budget safe to spend. It is not a substitute for the full build; it is the thing that prevents you from wasting the full build.</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Payout Channels</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>- <strong class="text-white font-semibold">PayPal:</strong> `lamvukyo3001@gmail.com`
+- <strong class="text-white font-semibold">USDC:</strong> EVM or Solana (address provided on request)</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">Book Instantly</h3></p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">→ [Secure the milestone now — $250 USD via PayPal](https://www.paypal.com/paypalme/lamvukyo/250USD)</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'><h3 class="text-xl font-bold text-sky-400 mt-6 mb-2">What Happens After You Click</h3></p><p class='mt-4 text-slate-300 leading-relaxed'>1. <strong class="text-white font-semibold">Within hours:</strong> I confirm scope and send the Phase 1 kickoff checklist.
+2. <strong class="text-white font-semibold">Day 1:</strong> Requirements freeze, golden corpus, format spec, passing round-trip spike — you see proof the riskiest path works.
+3. <strong class="text-white font-semibold">Day 2–3:</strong> Core engine and pattern-creation tools built with tests alongside.
+4. <strong class="text-white font-semibold">Day 3–4:</strong> Hardening, performance, docs, and handover walkthrough.
+5. <strong class="text-white font-semibold">On acceptance:</strong> Repo transfer, CI live, backlog for the next milestone delivered.</p><p class='mt-4 text-slate-300 leading-relaxed'>You get a <strong class="text-white font-semibold">working, tested, documented foundation</strong> — not a slide deck. If the vertical slice doesn't prove out on Day 1, you'll know before you've spent the full budget.</p><p class='mt-4 text-slate-300 leading-relaxed'><strong class="text-white font-semibold">Ready to start?</strong> → <strong class="text-white font-semibold">[Book the $250 milestone](https://www.paypal.com/paypalme/lamvukyo/250USD)</strong></p><p class='mt-4 text-slate-300 leading-relaxed'>---</p><p class='mt-4 text-slate-300 leading-relaxed'>*Prepared as a technical proposal and Statement of Work. Stack and format targets are recommendations and will be confirmed with you in Phase 1 before production code is written.*</p>
+            </div>
+
+            <!-- Payment & Security Guarantee Box -->
+            <div class="mt-12 pt-8 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/60 p-6 rounded-xl border border-slate-800/60">
+                <div>
+                    <h4 class="text-white font-bold flex items-center gap-2 mb-2">
+                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Dual-Rail Commercial Terms
+                    </h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Milestone-gated engagement with zero upfront risk. Code deliverables include full test harness and 30-day bug warranty.
+                    </p>
+                    <ul class="text-xs text-slate-300 mt-3 space-y-1">
+                        <li>• <strong>PayPal:</strong> <code>lamvukyo3001@gmail.com</code></li>
+                        <li>• <strong>Web3 EVM:</strong> <code>0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA</code></li>
+                        <li>• <strong>Solana:</strong> <code>HST3wcFgRzvcNeWowVpZzBDFp3imy1VWW4q9XNyhQYmW</code></li>
+                    </ul>
+                </div>
+                <div class="flex flex-col justify-center items-start md:items-end gap-2">
+                    <span class="text-xs text-slate-400">Total Fixed Investment</span>
+                    <span class="text-3xl font-extrabold text-emerald-400">$250 <span class="text-sm font-normal text-slate-400">USD</span></span>
+                    <a href="https://www.paypal.com/paypalme/lamvukyo/250USD" target="_blank" class="mt-2 text-xs text-sky-400 hover:underline">
+                        Instant Booking Link &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

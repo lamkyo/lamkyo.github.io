@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>normalizePublicSignals · Test Suite Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: { fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] } } }
+  };
+</script>
+<style>
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  .glow { box-shadow: 0 0 0 1px rgba(56,189,248,.15), 0 8px 30px -12px rgba(56,189,248,.35); }
+  .fade-in { animation: fade .35s ease both; }
+  @keyframes fade { from { opacity:0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased min-h-screen">
+
+<!-- Sticky Banner -->
+<div class="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center gap-3 justify-between">
+    <p class="text-[13px] text-slate-300 flex items-center gap-2">
+      <span class="text-base">🚀</span>
+      <span class="font-medium">Live Interactive Prototype for: <span class="text-sky-400">[LIVE FRONTIER: $3000] [Bounty: $70] Add tests for</span></span>
+      <span class="hidden md:inline text-slate-500">|</span>
+      <span class="hidden md:inline text-slate-400">Built autonomously by Antigravity OS</span>
+      <span class="hidden lg:inline text-slate-500">|</span>
+      <span class="hidden lg:inline text-emerald-400">Ready for deployment</span>
+    </p>
+    <a href="mailto:lamvukyo3001@gmail.com?subject=Hire%20Antigravity%20Team%20for%20gh-live-5752308393"
+       class="shrink-0 inline-flex items-center gap-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-[13px] px-3.5 py-1.5 transition">
+      <i data-lucide="briefcase" class="w-4 h-4"></i> Hire Team ($150 - $500)
+    </a>
+  </div>
+</div>
+
+<main class="max-w-7xl mx-auto px-4 py-8">
+
+  <!-- Header -->
+  <header class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center glow">
+        <i data-lucide="flask-conical" class="w-5 h-5 text-white"></i>
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">normalizePublicSignals · Test Suite</h1>
+        <p class="text-sm text-slate-400 font-mono">prover/src/format_for_contract.test.ts</p>
+      </div>
+    </div>
+    <p class="text-slate-400 text-sm max-w-3xl">
+      Guards the public-signal ordering contract between <span class="font-mono text-sky-400">circuits/invoice_range.circom</span> and
+      <span class="font-mono text-sky-400">format_for_contract.ts</span>. A swap of any two publics must fail the suite.
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Left: Controls + Circuit order -->
+    <section class="lg:col-span-1 space-y-6">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2 mb-4">
+          <i data-lucide="settings-2" class="w-4 h-4 text-sky-400"></i> Test Controls
+        </h2>
+        <label class="block text-xs text-slate-400 mb-1.5">Public signal input (JSON array)</label>
+        <input id="signalInput" value='["1000","5000","0xabc"]'
+          class="w-full rounded-lg bg-slate-950 border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none px-3 py-2 text-sm font-mono text-sky-300 mb-3" />
+        <div class="flex flex-wrap gap-2 mb-4">
+          <button onclick="runSuite()" class="inline-flex items-center gap-1.5 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 text-xs font-semibold px-3 py-2 transition">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Suite
+          </button>
+          <button onclick="swapSignals()" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 transition">
+            <i data-lucide="arrow-left-right" class="w-3.5 h-3.5"></i> Swap lo/hi
+          </button>
+          <button onclick="resetInput()" class="inline-flex items-center gap-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 transition">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+          </button>
+        </div>
+        <div class="rounded-lg bg-slate-950 border border-slate-800 p-3">
+          <p class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Circuit-declared order</p>
+          <ol class="space-y-1.5 text-xs font-mono">
+            <li class="flex items-center gap-2"><span class="w-5 h-5 rounded bg-sky-500/15 text-sky-400 flex items-center justify-center text-[10px]">0</span> lo_bound</li>
+            <li class="flex items-center gap-2"><span class="w-5 h-5 rounded bg-sky-500/15 text-sky-400 flex items-center justify-center text-[10px]">1</span> hi_bound</li>
+            <li class="flex items-center gap-2"><span class="w-5 h-5 rounded bg-sky-500/15 text-sky-400 flex items-center justify-center text-[10px]">2</span> commitment</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-5">
+        <h2 class="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+          <i data-lucide="activity" class="w-4 h-4 text-emerald-400"></i> Suite Status
+        </h2>
+        <div id="statusBox" class="text-sm">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-slate-400">Result</span>
+            <span id="statusLabel" class="font-semibold text-slate-500">idle</span>
+          </div>
+          <div class="h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div id="progressBar" class="h-full w-0 bg-gradient-to-r from-sky-500 to-emerald-400 transition-all duration-500"></div>
+          </div>
+          <p id="summary" class="text-xs text-slate-500 mt-3">Press "Run Suite" to execute assertions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right: Results -->
+    <section class="lg:col-span-2 space-y-6">
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+        <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+            <i data-lucide="list-checks" class="w-4 h-4 text-sky-400"></i> Assertions
+          </h2>
+          <span id="passCount" class="text-xs font-mono text-slate-500">0 / 0 passed</span>
+        </div>
+        <div id="results" class="divide-y divide-slate-800/70"></div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-800 bg-slate-900/50 overflow-hidden">
+        <div class="px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+            <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i> Output
+          </h2>
+          <span class="text-xs font-mono text-slate-500">npm --prefix prover run check</span>
+        </div>
+        <pre id="console" class="p-5 text-xs font-mono text-slate-400 leading-relaxed whitespace-pre-wrap max-h-72 overflow-auto">$ waiting for run…</pre>
+      </div>
+    </section>
+  </div>
+
+  <footer class="mt-10 text-center text-xs text-slate-600">
+    Antigravity OS · autonomous delivery prototype · <span class="font-mono">gh-live-5752308393</span>
+  </footer>
+</main>
+
+<script>
+const DEFAULT = '["1000","5000","0xabc"]';
+const ORDER = ['lo_bound','hi_bound','commitment'];
+
+// Mirror of normalizePublicSignals (line 17)
+function normalizePublicSignals(signals) {
+  const [lo_bound, hi_bound, commitment] = signals;
+  return { lo_bound, hi_bound, commitment };
+}
+// Mirror of formatVerifierInputs (line 27)
+function formatVerifierInputs(signals) { return signals; }
+
+function eq(a,b){ return JSON.stringify(a)===JSON.stringify(b); }
+
+function buildAssertions(input) {
+  const norm = normalizePublicSignals(input);
+  const raw  = formatVerifierInputs(input);
+  const swapped = [input[1], input[0], input[2]];
+  const normSwapped = normalizePublicSignals(swapped);
+
+  return [
+    { name: 'maps lo_bound to slot 0',        pass: norm.lo_bound === input[0], detail: `expected ${input[0]}, got ${norm.lo_bound}` },
+    { name: 'maps hi_bound to slot 1',        pass: norm.hi_bound === input[1], detail: `expected ${input[1]}, got ${norm.hi_bound}` },
+    { name: 'maps commitment to slot 2',      pass: norm.commitment === input[2], detail: `expected ${input[2]}, got ${norm.commitment}` },
+    { name: 'keys match circuit declaration', pass: eq(Object.keys(norm), ORDER), detail: `keys: ${Object.keys(norm).join(', ')}` },
+    { name: 'formatVerifierInputs returns input unchanged', pass: eq(raw, input), detail: `got ${JSON.stringify(raw)}` },
+    { name: 'raw array order preserved',      pass: raw[0]===input[0] && raw[1]===input[1] && raw[2]===input[2], detail: `order: ${raw.join(' → ')}` },
+    { name: 'swap of lo/hi is detected',      pass: !(normSwapped.lo_bound === input[0] && normSwapped.hi_bound === input[1]), detail: 'swapped input must not satisfy mapping' },
+    { name: 'no two signals share a slot',    pass: new Set([norm.lo_bound,norm.hi_bound,norm.commitment]).size === 3, detail: 'distinct values required' },
+  ];
+}
+
+function render(results) {
+  const box = document.getElementById('results');
+  box.innerHTML = results.map(r => `
+    <div class="fade-in px-5 py-3 flex items-start gap-3">
+      <div class="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${r.pass ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}">
+        <i data-lucide="${r.pass ? 'check' : 'x'}" class="w-3.5 h-3.5"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm ${r.pass ? 'text-slate-200' : 'text-rose-300'}">${r.name}</p>
+        <p class="text-xs font-mono text-slate-500 truncate">${r.detail}</p>
+      </div>
+    </div>`).join('');
+  lucide.createIcons();
+}
+
+function runSuite() {
+  let input;
+  try { input = JSON.parse(document.getElementById('signalInput').value); }
+  catch { document.getElementById('console').textContent = '✗ Invalid JSON input'; return; }
+
+  const results = buildAssertions(input);
+  const passed = results.filter(r => r.pass).length;
+  const allPass = passed === results.length;
+
+  render(results);
+  document.getElementById('passCount').textContent = `${passed} / ${results.length} passed`;
+  document.getElementById('statusLabel').textContent = allPass ? 'PASS' : 'FAIL';
+  document.getElementById('statusLabel').className = `font-semibold ${allPass ? 'text-emerald-400' : 'text-rose-400'}`;
+  document.getElementById('progressBar').style.width = (passed/results.length*100) + '%';
+  document.getElementById('summary').textContent = allPass
+    ? 'All assertions satisfied — public-signal ordering is locked.'
+    : `${results.length - passed} assertion(s) failed — ordering contract violated.`;
+
+  const lines = [
+    `$ npm --prefix prover run check`,
+    ``,
+    `  normalizePublicSignals`,
+    ...results.map(r => `    ${r.pass ? '✓' : '✗'} ${r.name}`),
+    ``,
+    `  Tests: ${passed} passed, ${results.length - passed} failed, ${results.length} total`,
+    allPass ? `  ✓ check passed` : `  ✗ check failed`
+  ];
+  document.getElementById('console').textContent = lines.join('\n');
+}
+
+function swapSignals() {
+  try {
+    const a = JSON.parse(document.getElementById('signalInput').value);
+    document.getElementById('signalInput').value = JSON.stringify([a[1], a[0], a[2]]);
+    runSuite();
+  } catch {}
+}
+function resetInput() {
+  document.getElementById('signalInput').value = DEFAULT;
+  runSuite();
+}
+
+lucide.createIcons();
+runSuite();
+</script>
+</body>
+</html>
