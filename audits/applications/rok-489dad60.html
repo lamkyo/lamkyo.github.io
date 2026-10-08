@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: AI agent engineer at Sticker Mule</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>AI agent engineer</h2>
+        <p><strong>Company:</strong> Sticker Mule | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-ai-agent-engineer-sticker-mule-1137399" target="_blank">https://remoteOK.com/remote-jobs/remote-ai-agent-engineer-sticker-mule-1137399</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: AI agent engineer at Sticker Mule
+
+**Candidate:** Principal Systems Architect — Distributed Systems / Applied AI Infrastructure
+**Target:** Sticker Mule — AI Agent Engineer (Remote, US)
+**Source:** RemoteOK US — [remoteOK.com/remote-jobs/remote-ai-agent-engineer-sticker-mule-1137399](https://remoteok.com/remote-jobs/remote-ai-agent-engineer-sticker-mule-1137399)
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Sticker Mule is not a sticker company that uses software — it is a vertically integrated manufacturing platform that happens to sell stickers. That distinction matters enormously for this role, because it defines the failure mode: an agent that hallucinates in a pure SaaS product produces a bad support reply; an agent that hallucinates here **prints 40,000 misregistered die-cut vinyl sheets**, ships them, and eats the margin.
+
+My background is in exactly the discipline this requires: **durable distributed execution with human gates and hard financial circuit breakers**. I have spent a career building systems where autonomous components operate on real money and real physical inventory — the class of problem where "the agent runs on its own" is table stakes and the actual engineering is *making autonomous failure recoverable, observable, and cheap*.
+
+### 1.1 Why this background maps to Sticker Mule's problem space
+
+| Sticker Mule need | What I bring |
+|---|---|
+| "Build agents that run on their own and do meaningful work" | Durable workflow engines with Postgres-backed state machines — every agent step is a persisted, resumable, idempotent unit of work. No in-memory agent loops that die with a pod. |
+| "Identify where agents can help" | A scoring rubric for agent *candidacy* (volume × variability × tolerance for error × verifiability). I've learned that the highest-ROI agents are boring: quoting, order triage, prepress file QA, ticket classification — not "autonomous manufacturing." |
+| "Connect agents to third-party and internal tools" | MCP-first tool gateway design: typed schemas, allowlists, per-tool rate limits, PII redaction, and a capability model where an agent's authority is declared, not implied. |
+| "Measure results and remove agents that don't deliver" | **Evals as infrastructure.** Every agent ships with a golden set, an automated scoring harness gated in CI, a unit-economics dashboard (cost per resolved task vs. human baseline), and an auto-retirement policy. Agents that can't beat their baseline get flagged and killed. |
+| "Test new tools and models as they ship" | Provider-agnostic router (Grok / Claude / OpenAI / open-source) behind one interface, with model *shadow traffic* — new models run in parallel on production inputs at zero customer risk, scored offline, promoted only on measured lift. |
+| Go, TypeScript, GraphQL, Postgres, GCP | Day-one productive: Go for the runtime and tool mesh, TypeScript for the agent SDK and operator tooling, Postgres as the system of record, Cloud Run + Pub/Sub + Cloud SQL on GCP. |
+
+### 1.2 The core thesis I'd bring to the role
+
+**Most agent platforms fail not because the model is weak but because the surrounding system is soft.** No idempotency, so retries double-charge customers. No leases, so two workers act on the same order. No budget caps, so a runaway loop burns $9k overnight. No evals, so nobody can tell improvement from regression. The leverage is overwhelmingly in the *plumbing*, and that is the plumbing I build.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural proposal — "Agent Fabric"
+
+A three-plane architecture that treats agents as **first-class, versioned, quota'd production workloads** rather than scripts.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  CONTROL PLANE                                                       │
+│  Agent Registry (versioned manifests) · Eval Harness · Kill Switch   │
+│  Cost/ROI Dashboard · Prompt & Tool Versioning · Shadow Router       │
+└───────────────┬─────────────────────────────────────────────────────┘
+                │
+┌───────────────▼─────────────────────────────────────────────────────┐
+│  EXECUTION PLANE (Go)                                                │
+│  Scheduler ──▶ Orchestrator ──▶ Step Executor ──▶ Tool Gateway (mTLS)│
+│  (leases)      (state machine)   (retry+idem)     (MCP + internal)   │
+└───────────────┬─────────────────────────────────────────────────────┘
+                │
+┌───────────────▼─────────────────────────────────────────────────────┐
+│  DATA PLANE                                                          │
+│  Postgres (runs/steps/tool_calls/evals) · Redis (locks, budgets)     │
+│  GCS (artifacts, rendered proofs) · BigQuery (analytics export)      │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+**Why Postgres-as-runtime rather than a bespoke queue:** Sticker Mule already runs Postgres. `SELECT ... FOR UPDATE SKIP LOCKED` gives exactly-once *claiming*, gives operators SQL-level visibility into every in-flight agent, and gives the audit trail that a manufacturing-adjacent business needs for free. I'll reach for a Kafka/Temporal-style system when volume demands it — not before.
+
+### 2.2 Core components
+
+**(a) Agent Manifest — the contract.**
+Every agent is declared, not discovered:
+
+```yaml
+# agents/order-triage/agent.yaml
+id: order-triage
+version: 4.2.0            # bumping = new durable runs pin the old version
+owner: operations
+trigger:
+  source: pubsub.orders.created
+budget:
+  max_usd_per_run: 0.40
+  ma</pre>
+    </div>
+</body>
+</html>

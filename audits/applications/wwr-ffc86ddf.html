@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Staff Machine Learning Platform Engineer at Faire</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Staff Machine Learning Platform Engineer</h2>
+        <p><strong>Company:</strong> Faire | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/faire-senior-staff-machine-learning-platform-engineer" target="_blank">https://weworkremotely.com/remote-jobs/faire-senior-staff-machine-learning-platform-engineer</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Staff Machine Learning Platform Engineer at Faire
+
+> **Prepared by:** [Your Name] · Principal / Staff-level ML Platform Engineer
+> **Target:** Faire — Senior Staff ML Platform Engineer (Kitchener-Waterloo · Toronto · Remote–Ontario)
+> **Application channel:** WeWorkRemotely → Faire careers portal · plus direct email to the hiring team (§5)
+>
+> **Two things to fix before you send:** (1) this req is **Ontario, Canada** — hybrid KW/Toronto or remote-in-Ontario — not a US-remote role, so any US-work-authorization framing should be dropped and Canadian work authorization stated instead; (2) §4 is written as a consulting proposal, which is appropriate for a contract engagement but should be **deleted entirely** for an FTE application to Faire (a salaried req doesn't have milestone billing). Everything else stands as-is.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+I build the layer *underneath* the models — the governed lakehouse, the feature contract, the training and serving rails — and I've made a career of the specific thing this role is about: turning a Databricks environment from "a place data scientists run notebooks" into a **platform with standards, SLOs, and org-wide adoption**.
+
+Three things make me an unusual fit for Faire specifically.
+
+**The problem shape matches my track record.** Faire's core ML surface is a two-sided marketplace: retailer↔brand matching, demand forecasting for thousands of long-tail SKUs, ranking a catalog that is fragmented and offline at the source…workloads that punish naive feature platforms — high-cardinality entity keys, sparse and heavy-tailed labels, seasonality, cold-start on newly onboarded retailers and brands, and point-in-time correctness that is genuinely hard because wholesale order *timestamps* are not the same as ingestion timestamps. I've shipped point-in-time-correct feature layers for marketplace-shaped data before and I know where they break.
+
+**I've done the Databricks depth this req actually asks for.** Unity Catalog governance across a **multi-workspace hub-and-spoke topology** (account-level metastore, workspace binding, storage credentials and external locations under Terraform), Databricks Workflows orchestration with cross-workspace job dependencies, Delta Lake table design under liquid clustering and predictive optimization, MLflow model registry with UC-backed model versioning and lineage, and — the part people underestimate — **cost as a first-class SLO**, with per-team chargeback derived from cluster tags, budget policies as guardrails rather than suggestions, and Photon/serverless migration justified by measured job-level $/run deltas.
+
+**I build the LLM path as platform, not as a hack.** Integrating LLM workflows into an enterprise platform is a governance problem before it is a modeling problem: a shared inference gateway with per-team quotas and token accounting, retrieval over governed tables so a vector index inherits the same ACLs as the source data, an offline evaluation harness with regression gates in CI, and tracing that flows into the same observability backend as the rest of the platform. That is the piece most companies bolt on badly, and it's the piece I'd own here.
+
+**Stack alignment, concretely:**
+
+| Faire's stack | My depth |
+|---|---|
+| Databricks, Spark, Delta Lake, Unity Catalog | Primary working environment for the last several years; medallion + mesh patterns, multi-workspace governance, external locations, row/column-level security |
+| MLflow, PySpark, PyTorch | Model registry + UC model versions, custom pyfunc signatures, distributed training/serving plumbing |
+| Snowflake, Iceberg, Fivetran, Kafka | Cross-engine interop — the realistic question Faire will hit is Delta↔Iceberg and Snowflake↔lakehouse boundary design, not a single-engine monoculture |
+| AWS, S3, SageMaker, Kubernetes, Terraform, GitHub Actions | IaC for the whole platform; GPU autoscaling pools; blue/green model serving |
+| Airflow, CockroachDB, MySQL, Datadog | Orchestration coexistence during migration, low-latency online feature serving, OTel/Datadog observability |
+| Kotlin | Comfortable reading and contributing to JVM services that consume the platform's contracts (serving APIs, event producers) |
+
+My leadership style is the one the req describes: **influence without authority**. I write the RFC, prototype the thin slice, measure it, publish the migration path, then make the paved road cheap enough that adoption is the rational choice — rather than mandating a standard nobody can afford to follow.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Target architecture
+
+```mermaid
+flowchart TB
+  subgraph Sources
+    K[Kafka - order/catalog/clickstream]
+    FT[Fivetran - Salesforce/Postgres]
+    S3R[S3 raw landing]
+  end
+
+  subgraph "Databricks Account - single UC metastore"
+    subgraph "Hub workspace: platform-admin"
+      UC[Unity Catalog\ndata + models + functions + volumes]
+      GOV[Governance: tags, ABAC,\nrow filters, column masks]
+      CAT[Catalog lineage + audit]
+      WF[Workflows: platform control plane]
+    end
+    subgraph "Spoke: ml-training"
+      BRZ[Bronze - raw, append-only]
+      SLV[Silver - conformed, PIT-correct]
+      GLD[Gold - feature tables + labels]
+    end
+    subgraph "Spoke: ml-serving"
+      MS[Model Serving\nGPU/CPU autoscaling]
+      FSTS[Online Feature Store\nLakebase/CockroachDB]
+    end
+    subgraph "Spoke: ds-sandbox"
+      NBs[Team notebooks,\nserverless, budget-policied]
+    end
+  end
+
+  su</pre>
+    </div>
+</body>
+</html>

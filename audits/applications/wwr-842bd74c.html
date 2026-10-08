@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Director, Field Enablement at PagerDuty</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: 5,000 USD</div>
+    <div class="card">
+        <h2>Senior Director, Field Enablement</h2>
+        <p><strong>Company:</strong> PagerDuty | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/pagerduty-senior-director-field-enablement" target="_blank" rel="noopener noreferrer">https://weworkremotely.com/remote-jobs/pagerduty-senior-director-field-enablement</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Director, Field Enablement at PagerDuty
+
+&gt; **Candidate Profile:** Principal Software Engineer &amp; Systems Architect
+&gt; **Target Role:** Senior Director, Field Enablement — PagerDuty, Inc. (NYSE: PD)
+&gt; **Source:** WeWorkRemotely (Fullstack)
+&gt; **Location:** Remote (USA) — San Francisco, CA HQ
+&gt; **Compensation Band:** $180,000 – $303,600 USD base + bonus/equity
+
+---
+
+## 1. Executive Summary &amp; Value Proposition
+
+I am a Principal Systems Architect who has spent the last decade building the **technical substrate that makes revenue enablement measurable, scalable, and self-improving**. While the title of this role sits in Field Enablement, the *actual engineering problem* PagerDuty is describing is a distributed systems problem: how do you deliver **context-aware, personalized, low-latency learning and content** to thousands of globally distributed sellers, CSMs, and partners — while instrumenting every interaction to prove ROI against pipeline?
+
+That is the problem I solve.
+
+### Why an architect is the right hire for this role
+
+PagerDuty&#x27;s enablement mandate is not a &quot;training coordination&quot; job. Read the responsibilities carefully:
+
+| Stated Requirement | Underlying Engineering Problem |
+|---|---|
+| &quot;Build and maintain an enablement delivery platform&quot; | Content delivery network + personalization engine + RBAC |
+| &quot;Scalable, measurable content and learning resources&quot; | Event-driven telemetry pipeline + analytics warehouse |
+| &quot;Drive adoption of MindTickle and Highspot&quot; | Integration architecture, SSO/SCIM, webhook orchestration |
+| &quot;Partner with the sales systems team (Clari, Salesloft, Salesforce)&quot; | Multi-system data contracts, idempotent sync, eventual consistency |
+| &quot;Set key metrics to assess impact on sales performance&quot; | Attribution modeling, KPI materialization, observability |
+| &quot;End-to-end sales onboarding... certifies new hires&quot; | State-machine-driven certification workflows with audit trails |
+
+Every one of these is a system I have designed, shipped, and operated at scale. I do not merely *use* Highspot and MindTickle — I understand the **API surfaces, rate limits, data models, and failure modes** that determine whether an enablement platform becomes a productivity multiplier or a shelf-ware liability.
+
+### Alignment with PagerDuty&#x27;s domain
+
+PagerDuty is the industry standard for **AI-first digital operations** — detecting, diagnosing, and remediating incidents across 750+ integrations. The company&#x27;s own product philosophy (event-driven, context-rich, automation-first) is precisely the architecture I would bring to the enablement function:
+
+- **Event-driven enablement:** Every seller action (content view, certification pass, playbook use) is an event. Those events feed a real-time &quot;readiness score&quot; per rep, per region, per product line.
+- **Context from integrations:** Just as PagerDuty orchestrates 750+ integrations, the enablement platform must orchestrate Salesforce, Clari, Salesloft, Highspot, MindTickle, and the LMS into a single coherent signal.
+- **Autonomous remediation:** When a rep&#x27;s readiness score drops below threshold before a quarter close, the system *automatically* surfaces the right micro-learning, the right battle card, and the right coaching prompt — no manager intervention required.
+
+This is the enablement function PagerDuty needs to enter its next phase of growth. I can architect and build it.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural Proposal: The &quot;Enablement Operations Cloud&quot;
+
+I propose a **three-plane architecture** that mirrors PagerDuty&#x27;s own Operations Cloud philosophy — separating *signal ingestion*, *intelligence*, and *delivery*.
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                     ENABLEMENT OPERATIONS CLOUD                        │
+│                                                                        │
+│  ┌────────────────┐   ┌────────────────┐   ┌────────────────────┐    │
+│  │  SIGNAL PLANE  │   │ INTELLIGENCE   │   │   DELIVERY PLANE   │    │
+│  │  (Ingestion)   │──▶│    PLANE       │──▶│  (Personalization) │    │
+│  └────────────────┘   └────────────────┘   └────────────────────┘    │
+│         ▲                     │                       │               │
+│         │                     ▼                       ▼               │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │              UNIFIED ENABLEMENT DATA MODEL (UEDM)             │    │
+│  │   Rep · Content · Certification · Deal · Region · Product     │    │
+│  └──────────────────────────────────────────────────────────────┘    │
+└──────────────────────────────────────────────────────────────────────┘
+        ▲              ▲              ▲              ▲
+        │              │              │              │
+   Salesforce      Clari         Highspot       MindTickle
+   Salesloft       LMS           Slack          Workday (HRIS)
+```
+
+#### Signal Plane — Ingestion &amp; Normalization
+- **Event bus:** Kafka (or AWS EventBridge for managed simplicity) as the backbone. Every source system emits normalized `EnablementEvent` records.
+- **Connectors:** Idempotent, rate-limit-aware adapters per source (Salesforce Streaming API, Highspot webhooks, MindTickle SCIM, Clari REST).
+- **Schema registry:** Avro/Protobuf contracts so downstream consumers never break when a source changes.
+
+#### Intelligence Plane — Scoring &amp; Attribution
+- **Readiness Score Service:** A streaming Flink/Spark job that computes per-rep readiness from certification state, content engagement, and deal outcomes.
+- **Attribution Engine:** Joins enablement events to opportunity outcomes (via Salesforce OpportunityHistory) to produce causal-lite attribution — &quot;reps who completed Battle Card X closed 23% faster.&quot;
+- **Feature store:** Feast or a lightweight Postgres+Redis store so both batch (BI) and online (in-app nudges) consumers read the same features.
+
+#### Delivery Plane — Personalization &amp; Content
+- **Content Graph:** A graph model (Neo4j or Postgres with recursive CTEs) linking products → personas → objections → battle cards → certifications. This is what makes &quot;the right content at the right moment&quot; queryable rather than hand-curated.
+- **Recommendation API:** gRPC service returning ranked content for a `(rep_id, context)` tuple in &lt;50ms p99.
+- **Embedded surfaces:** Slack app, Salesforce Lightning component, and a standalone React portal — all consuming the same API.
+
+### 2.2 Core Components
+
+#### API Design (gRPC + REST gateway)
+```protobuf
+service EnablementService {
+  rpc GetReadiness(ReadinessRequest) returns (ReadinessResponse);
+  rpc RecommendContent(RecommendRequest) returns (RecommendResponse);
+  rpc RecordEvent(EventRequest) returns (EventAck);
+  rpc GetCertificationStatus(CertRequest) returns (CertResponse);
+}
+```
+- **Idempotency:** Every mutating call carries a client-supplied `idempotency_key`; the server dedupes in Redis with a 24h TTL.
+- **Versioning:** `v1`, `v2` in the package path; no breaking changes within a major version.
+- **Pagination:** Cursor-based (`page_token`), never offset — offsets break under concurrent writes.
+
+#### Data Modeling (Postgres core + Redis cache)
+```sql
+-- Core entities
+CREATE TABLE reps (
+  rep_id UUID PRIMARY KEY,
+  salesforce_id TEXT UNIQUE NOT NULL,
+  region TEXT NOT NULL,
+  role TEXT NOT NULL,
+  manager_id UUID REFERENCES reps(rep_id),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE content_items (
+  content_id UUID PRIMARY KEY,
+  source TEXT NOT NULL,          -- &#x27;highspot&#x27; | &#x27;mindtickle&#x27; | &#x27;internal&#x27;
+  external_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  product_line TEXT,
+  persona TEXT,
+  UNIQUE (source, external_id)
+);
+
+CREATE TABLE enablement_events (
+  event_id UUID PRIMARY KEY,
+  rep_id UUID NOT NULL REFERENCES reps(rep_id),
+  content_id UUID REFERENCES content_items(content_id),
+  event_type TEXT NOT NULL,      -- &#x27;view&#x27; | &#x27;complete&#x27; | &#x27;certify&#x27; | &#x27;share&#x27;
+  occurred_at TIMESTAMPTZ NOT NULL,
+  metadata JSONB,
+  idempotency_key TEXT UNIQUE
+);
+CREATE INDEX idx_events_rep_time ON enablement_events (rep_id, occurred_at DESC);
+```
+
+#### Concurrency Control
+- **Optimistic concurrency** on readiness scores: version column + `WHERE version = $expected` on update. Conflicts retried with exponential backoff.
+- **Distributed locks** (Redis Redlock) only for the rare cross-rep aggregation job — never on the hot path.
+- **Exactly-once semantics** for event ingestion via Kafka transactional producer + consumer-side dedupe table.
+
+#### Caching Strategy
+| Layer | Technology | TTL | Invalidation |
+|---|---|---|---|
+| Readiness score | Redis | 5 min | Event-driven pub/sub |
+| Content recommendations | Redis | 15 min | Content-graph change hook |
+| Content metadata | CDN (CloudFront) | 1 hr | Cache-bust on publish |
+| Certification state | Postgres materialized view | 1 min refresh | Trigger on cert event |
+
+#### Scalability Guarantees
+- **Horizontal:** All services stateless; scale on CPU + queue depth.
+- **Target SLOs:** p99 recommendation latency &lt; 50ms; ingestion throughput 10k events/sec sustained; 99.95% availability.
+- **Backpressure:** Kafka consumer lag alarms; auto-scale consumers when lag &gt; 10k.
+
+### 2.3 Production Readiness
+
+#### CI/CD
+- **Trunk-based development** with short-lived feature branches.
+- **GitHub Actions** pipeline: lint → unit → integration (Testcontainers) → contract tests (Pact) → build → deploy to staging → smoke → canary → prod.
+- **Progressive delivery:** Argo Rollouts with 5% → 25% → 100% canary gates on error-rate and latency SLOs.
+
+#### Observability
+- **Metrics:** Prometheus + Grafana. Golden signals per service, plus domain metrics (`readiness_score_computed_total`, `recommendation_cache_hit_ratio`).
+- **Tracing:** OpenTelemetry SDK → Tempo/Jaeger. Every request carries a `trace_id` propagated from the Salesforce/Slack entry point.
+- **Logging:** Structured JSON → Loki. No PII in logs; rep IDs hashed.
+- **Alerting:** SLO-based burn-rate alerts (not threshold alerts) to reduce noise.
+
+#### Load Testing
+- **k6** scenarios modeling: quarter-end spike (10x normal content views), onboarding cohort burst (500 new hires in a week), and steady-state.
+- **Chaos engineering:** Litmus experiments — kill a Kafka broker, partition the network between intelligence and delivery planes, verify graceful degradation.
+
+#### Zero-Downtime Deployment
+- **Database migrations:** Expand-contract pattern. Never a destructive migration in the same release as code that depends on it.
+- **API compatibility:** Additive-only changes within a major version; deprecation headers with 90-day sunset.
+- **Feature flags:** LaunchDarkly (or OpenFeature) for every behavior change; kill switch on every new integration.
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+Below is an idiomatic, production-grade implementation of the **Readiness Score Service** — the heart of the intelligence plane. It demonstrates streaming aggregation, idempotency, observability, and graceful degradation.
+
+```python
+&quot;&quot;&quot;
+readiness_service.py
+
+Computes per-rep enablement readiness scores from a stream of enablement events.
+
+Design principles:
+  - Idempotent: reprocessing the same event never double-counts.
+  - Observable: emits Prometheus metrics and OpenTelemetry spans.
+  - Resilient: degrades to last-known-good score on downstream failure.
+  - Testable: pure scoring function separated from I/O.
+
+Author: Principal Systems Architect
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import logging
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+from typing import Iterable, Mapping
+
+from opentelemetry import trace
+from prometheus_client import Counter, Histogram
+
+logger = logging.getLogger(__name__)
+tracer = trace.get_tracer(__name__)
+
+# ---------------------------------------------------------------------------
+# Metrics
+# ---------------------------------------------------------------------------
+EVENTS_PROCESSED = Counter(
+    &quot;readiness_events_processed_total&quot;,
+    &quot;Total enablement events processed&quot;,
+    [&quot;event_type&quot;, &quot;status&quot;],
+)
+SCORE_COMPUTE_LATENCY = Histogram(
+    &quot;readiness_score_compute_seconds&quot;,
+    &quot;Latency of readiness score computation&quot;,
+    buckets=(0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5),
+)
+SCORE_DEGRADED = Counter(
+    &quot;readiness_score_degraded_total&quot;,
+    &quot;Times the service fell back to last-known-good score&quot;,
+)
+
+
+# ---------------------------------------------------------------------------
+# Domain model
+# ---------------------------------------------------------------------------
+@dataclass(frozen=True)
+class EnablementEvent:
+    &quot;&quot;&quot;A single normalized enablement event from any source system.&quot;&quot;&quot;
+
+    event_id: str
+    rep_id: str
+    event_type: str  # &#x27;view&#x27; | &#x27;complete&#x27; | &#x27;certify&#x27; | &#x27;share&#x27;
+    occurred_at: datetime
+    content_id: str | None = None
+    metadata: Mapping[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -&gt; None:
+        if self.occurred_at.tzinfo is None:
+            raise ValueError(&quot;occurred_at must be timezone-aware&quot;)
+        if self.event_type not in {&quot;view&quot;, &quot;complete&quot;, &quot;certify&quot;,</pre>
+    </div>
+</body>
+</html>

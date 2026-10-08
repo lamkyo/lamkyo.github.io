@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Independent AI Engineer / Architect at A.Team</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Independent AI Engineer / Architect</h2>
+        <p><strong>Company:</strong> A.Team | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/a-team-senior-independent-ai-engineer-architect" target="_blank">https://weworkremotely.com/remote-jobs/a-team-senior-independent-ai-engineer-architect</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Independent AI Engineer / Architect at A.Team
+
+> **Note on fit:** the details below are written to be sent as-is, but three things must be swapped for your real specifics before submission — marked `[BRACKETED]` throughout — because A.Team's screener is filtering specifically on verifiable shipped systems: your named production deployments, your scale numbers, and your contact identity. Also flagging: **your proposed rates ($1,500–$3,000 fixed / $4,000–$6,000 retainer) sit well below this listing's stated band of $120–$170/hr.** A 6-week engagement at that band is roughly $28K–$40K. I've kept your numbers as the entry tier but added a scoped-up option so you don't anchor low on an invite-only network that explicitly screens out "small gig seekers."
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+A.Team's problem is not finding AI engineers who can call an API. It is finding people who have already eaten the failure modes that only appear past production: retrieval that degrades silently when the corpus shifts, agents that loop or burn token budget under adversarial input, eval suites that measure nothing because they were written after the fact, and latency budgets that collapse the moment you add a reranker.
+
+My background maps onto exactly that gap. I have spent `[N]` years building `[SYSTEMS]` at `[COMPANIES]`, with the last `[N]` focused on LLM-native systems: `[PRODUCTION DEPLOYMENT #1 — e.g. "a multi-tenant RAG platform serving 40K daily queries with p95 < 900ms"]`, `[#2]`, `[#3]`. The through-line is not model work — it is **systems work around the model**: orchestration, retrieval, caching, evaluation, and the observability that makes any of it defensible to a CTO at 2am.
+
+**Why this aligns with A.Team specifically:**
+
+| A.Team's stated need | What I bring |
+|---|---|
+| LLM-powered products and workflows | Shipped `[N]` LLM features from zero to GA, incl. `[EXAMPLE]` |
+| Agent architectures and orchestration | Bounded-step agent runtime with tool sandboxing, budget enforcement, and deterministic replay for debugging |
+| Retrieval, evaluation, reliability infra | Hybrid retrieval + cross-encoder rerank; eval harness with regression gating in CI |
+| Enterprise AI deployments | `[COMPLIANCE CONTEXT — SOC2 / HIPAA / EU AI Act exposure]`, PII redaction at the boundary, audit logging |
+| AI-native products zero-to-one | `[FOUNDING/V0 STORY]` |
+| ML platforms at scale | `[PLATFORM SCALE — e.g. "feature store + training pipeline serving 200 models"]` |
+
+The short version: I am the person you call when a prototype has to become a system with an SLA.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 The reference architecture I'd bring on day one
+
+Across almost every A.Team engagement in this category, the same five-layer shape recurs. This is what I would stand up in Sprint 1:
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│  Edge: API Gateway → authn/z (JWT/OIDC) → rate limit → WAF    │
+├───────────────────────────────────────────────────────────────┤
+│  Orchestration: Agent Runtime (bounded steps, tool registry,  │
+│  budget accounting, deterministic replay via trace store)      │
+├───────────────────────────────────────────────────────────────┤
+│  Retrieval: query rewrite → hybrid BM25+dense → RRF fuse →     │
+│  cross-encoder rerank → context assembler (dedup + budget)     │
+├───────────────────────────────────────────────────────────────┤
+│  Model Gateway: provider-agnostic, semantic cache, circuit     │
+│  breaker per provider, token accounting, structured outputs    │
+├───────────────────────────────────────────────────────────────┤
+│  State: Postgres (system of record, RLS multi-tenancy) +        │
+│  Redis (semantic/answer cache, rate counters) + object store    │
+│  (artifacts, eval runs) + pgvector/Qdrant (vectors)             │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### 2.2 Core design decisions and their justifications
+
+**API design.** A thin, streaming-first contract. `POST /v1/runs` returns a `run_id`; `GET /v1/runs/{id}/events` is SSE. This decouples client lifetime from inference lifetime — essential when an agent run can take 90 seconds and mobile clients drop connections. Every write is idempotent via a client-supplied `Idempotency-Key` with a 24h Redis-backed dedupe window, so retries after a network partition never double-charge or double-insert.
+
+**Data modeling.** Postgres is the system of record — not a vector DB. Vectors are an index, not a source of truth. Multi-tenancy via row-level security with a `tenant_id` in every table and a session-scoped `SET LOCAL app.tenant_id`, which makes tenant isolation a database guarantee rather than an application convention (and a defensible answer to any enterprise security review). Every table carries `created_at`, `updated_at`, and soft-delete; every mutation emits an append-only audit row.
+
+**Concurrency control.** Optimistic concurrency with a `version` column on mutable aggregates — no read-modify-write races under agent tool calls. Long-running runs use a work queue with `SELECT ... FOR UPDATE SKIP LOCKED` leasing, so N workers scale horizontally without coordination beyond Postgres, and a crashed worker's lease simply expires.
+
+**Caching.** Three tiers, each with a different invalidation story:
+1. **Exact-match response cache** (Redis, TTL + explicit invalidation on corpus version bump).
+2. **Semantic cache** — embedding-similarity lookup with a conservative threshold (0.97+), scoped per tenant, because a wrong cache hit is worse than a cache miss.
+3. **Prefix/KV cache** for provider-side prompt caching — deterministic prompt assembly (stable ordering of system → tools → context) so the provider actually gets cache hits.
+
+**Scalability guarantees.** Stateless app tier, HPA on a custom metric (`queue_depth_per_worker`) rather than CPU, since LLM workloads are I/O-bound and CPU-based autoscaling is famously wrong here. Backpressure is explicit: a queue-depth limit that returns `429` with `Retry-After` rather than letting latency silently degrade into timeouts.
+
+### 2.3 Production readiness
+
+- **CI/CD:** trunk-based, GitHub Actions, with a required check that runs the eval suite against the PR branch and fails on >2% regression in task success or >10% regression in p95 latency. Prompt changes are versioned artifacts (hash-pinned, reviewable diffs), never strings edited in a dashboard.
+- **Observability:** OpenTelemetry spans across every hop (HTTP → orchestration → retrieval → model → tool), with `trace_id` propagated into the model provider call. Prometheus metrics: `llm_tokens_total{provider,model,direction}`, `llm_ttft_seconds`, `retrieval_hit_rate`, `agent_steps_per_run`, `cache_hit_ratio{tier}`. Alerts on *shipped* signals — error budget burn, eval drift, provider error rate — not on raw latency alone.
+- **Load testing:** k6 against a replay-recorded traffic shape (real prompt length distribution, not synthetic equals), run in a staging environment with a mocked provider at p50/p95/p99 cost profiles. Target: sustained 3× peak with no error-rate change, and a documented breaking point.
+- **Zero-downtime deployment:** expand/contract migrations only; blue-green for the app tier; schema changes that are always backward-compatible for one release.
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+A representative slice of the orchestration layer: bounded agent execution with concurrency control, resilience, caching, and full instrumentation. Python 3.11+, async, typed.
+
+```python
+"""
+agent_runtime.py — bounded, observable, budget-aware agent orchestration.
+
+Design invarian</pre>
+    </div>
+</body>
+</html>

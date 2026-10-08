@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Software engineer at Sticker Mule</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Software engineer</h2>
+        <p><strong>Company:</strong> Sticker Mule | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/sticker-mule-software-engineer-3" target="_blank">https://weworkremotely.com/remote-jobs/sticker-mule-software-engineer-3</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Software engineer at Sticker Mule
+
+> **Candidate:** Principal Software Engineer / Systems Architect
+> **Target:** Sticker Mule — Software Engineer (Sticker Mule Pro)
+> **Stack under discussion:** Go, TypeScript, React, Expo, GraphQL, Postgres, GCP
+> **Source:** https://weworkremotely.com/remote-jobs/sticker-mule-software-engineer-3
+>
+> **Note on personalization:** Sections 1–3 and 5 are written to be sent as-is; the bracketed tokens (`[X yrs]`, `[Company]`, `[metric]`) are the only fields to replace with your verified numbers. Everything else is substantive engineering content, not filler.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Sticker Mule is not a print company that hired engineers, and it is not a SaaS company that happens to own a factory. It is a **vertically integrated commerce-and-manufacturing system** where software, physical production capacity, and AI compilers sit on one P&L. That combination dictates a very specific engineering profile — and it is the profile I've spent `[X yrs]` building toward.
+
+**Why this problem space is the one I'm optimized for:**
+
+| Sticker Mule's stated need | My corresponding depth |
+|---|---|
+| **Stores** — a Shopify alternative | Multi-tenant commerce: catalog modeling, variant/SKU graphs, transactional checkout under contention, payment orchestration, tax/shipping abstraction layers, idempotent order state machines. |
+| **Notify** — a Mailchimp alternative | High-throughput fanout: per-tenant token-bucket rate limiting, provider-side reputation management (bounce/complaint suppression), outbox→queue delivery with at-least-once + dedupe semantics, deterministic retry with jitter. |
+| **Reply** — a Zendesk alternative | Inbound event ingestion at webhook velocity: thread reconstruction, exactly-once assignment, full-text search over Postgres (`tsvector` + GIN) or OpenSearch, SLA timers implemented as durable scheduled work rather than cron. |
+| **AI tools (internal + customer-facing)** | Model gateway with prompt versioning, eval harness, per-tenant cost accounting and hard budget ceilings, streaming inference over SSE, human-in-the-loop gates for outbound artifacts. |
+| **Mobile apps from the same codebase** | Expo/React Native against a shared GraphQL schema — persisted queries, offline mutation queues, optimistic UI, and a single typed contract generated from the server. |
+| **"Move fast, build for the masses, deprioritize edge cases"** | This is an *architectural* instruction, not a cultural slogan. It means: modular monolith over microservices, one Postgres cluster with tenant-scoped schemas over polyglot persistence, expand/contract migrations, trunk-based development behind flags. Every abstraction I propose below is justified by a measured cost, not by résumé aesthetics. |
+
+**The one-sentence version:** I build systems where a physical-goods order and an AI inference job share the same transactional guarantees — because at Sticker Mule, they do.
+
+**Specific alignment with the stack:**
+- **Go** is what I reach for when correctness-under-concurrency and predictable p99 matter more than developer ergonomics — checkout, inventory ledgers, and the delivery workers are Go.
+- **TypeScript + React + Expo** is the right surface layer: one schema, one generated type contract, three renderers (web, iOS, Android).
+- **GraphQL** as a *BFF*, not as a database mirror — batched loaders, persisted queries, depth/complexity limiting, and no N+1 escaping to production.
+- **Postgres** as the system of record, and I mean *system of record*: `SERIALIZABLE` where money moves, conditional `UPDATE ... RETURNING` where inventory moves, row-level security where tenants meet.
+- **GCP**: Cloud Run for stateless services (scale-to-zero for internal tools, min-instances ≥1 for latency-critical paths), Cloud SQL / AlloyDB for Postgres, Memorystore for hot reads, Pub/Sub for the asynchronous spine, GCS for assets, and OTel→Cloud Trace for the whole thing.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Shape of the system: a modular monolith with a hard asynchronous edge
+
+The single most expensive mistake a company at Sticker Mule's stage can make is premature service extraction. Nine figures of revenue with small autonomous teams means **the bottleneck is coordination cost, not compute**. Therefore:
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  Edge: Cloud Armor + Global LB + Cloud CDN (assets)                  │
+└───────────────────────────┬──────────────────────────────────────────┘
+                            │
+              ┌─────────────▼──────────────┐
+              │  api (Go) — GraphQL BFF    │  Cloud Run, min-inst 2
+              │  • persisted queries       │
+              │  • complexity/depth limits │
+              │  • DataLoader batching     │
+              └───┬──────────┬─────────┬───┘
+                  │          │         │
+   ┌──────────────▼──┐  ┌────▼─────┐  ┌▼──────────────┐
+   │ Postgres        │  │ Memory-  │  │ GCS           │
+   │ • app schema    │  │ store    │  │ (assets,      │
+   │ • RLS by tenant │  │ (Redis)  │  │  art files)   │
+   │ • outbox table  │  └──────────┘  └───────────────┘
+   └──────┬──────────┘
+          │ outbox relay (transactional ⇒ Pub/Sub)
+          ▼
+   ┌──────────────────────────────────────────────────────┐
+   │ Pub/Sub topics: order.events, notify.fanout,         │
+</pre>
+    </div>
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Analytics Engineer, Data at Tailscale</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Analytics Engineer, Data</h2>
+        <p><strong>Company:</strong> Tailscale | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/tailscale-analytics-engineer-data" target="_blank">https://weworkremotely.com/remote-jobs/tailscale-analytics-engineer-data</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Analytics Engineer, Data at Tailscale
+
+## 1. Executive Summary & Value Proposition
+
+I build and repair production data systems at the point where finance, product, and engineering all depend on the same number — which is exactly where this role lives. My background is centered on turning manual, spreadsheet-mediated workflows (billing exports, revenue schedules, pipeline handoffs) into version-controlled, tested, production-grade dbt architectures on Snowflake, with contracts and lineage that let Finance sign off on a figure without pinging an engineer.
+
+**Stack alignment (direct, hands-on):**
+- **Snowflake + dbt** — dimensional and wide-table modeling, incremental strategies (merge/window), dbt macros for late-arriving facts, source freshness, `dbt test` suites, exposure definitions for BI.
+- **Fivetran / Hightouch** — ingestion orchestration and reverse-ETL activation (product usage → Salesforce, billing state → support tooling).
+- **Looker** — LookML layer, symmetric aggregates, PDTs, and governed metric definitions.
+- **Stripe / Orb / Salesforce** — subscription → invoice → payment → recognition chains, usage-based rating, CRM opportunity-to-ARR reconciliation.
+
+**Domain alignment:** ARR, revenue recognition (ASC 606 / IFRS 15), month-end and quarter-end close, audit support, and the specific pain of reconciling Stripe, Orb, and Salesforce into a single defensible number. I treat the close calendar as a hard SLA and design models so the last-mile variance investigation is a query, not a war room.
+
+**Why this works for Tailscale specifically:** Tailscale is a PLG business with a self-serve funnel, a sales-assisted motion, and usage/network effects that don't map cleanly onto classic SaaS metrics. The interesting problems — trial-to-paid conversion, device/node growth vs. seat expansion, free-to-paid motion, network-effect retention — require models that respect both product telemetry and billing truth. I've built exactly that seam.
+
+---
+
+## 2. Deep Technical Technical Blueprint
+
+### 2.1 Architectural Overview
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                          SOURCES (Fivetran)                              │
+│  Stripe  ·  Orb  ·  Salesforce  ·  Postgres (app)  ·  Product events     │
+└──────────────┬───────────────────────────────────────────────────────────┘
+               │  raw schema (append-only, source-freshness monitored)
+               ▼
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     dbt (Snowflake) — LAYERED MODELS                     │
+│                                                                          │
+│  staging/     1:1 with source, light rename/cast, no business logic      │
+│      │                                                                  │
+│  intermediate/ reusable transforms (invoice line → MRR event, etc.)      │
+│      │                                                                  │
+│  marts/       dimensional (dim_customer, dim_product, fct_subscription)  │
+│               + wide reporting tables (fct_arr_monthly, fct_rev_rec)     │
+│      │                                                                  │
+│  metrics/     semantic layer (dbt metrics / LookML) — single source of   │
+│               truth for ARR, NRR, GRR, MRR, recognized revenue          │
+└──────────────┬───────────────────────────────────────────────────────────┘
+               │
+       ┌───────┴────────┬──────────────────┐
+       ▼                ▼                  ▼
+   Looker          Hightouch           Finance close
+  (reporting)   (reverse ETL: CRM,      (audit-ready
+                 support, lifecycle)     extracts)
+```
+
+### 2.2 Data Modeling Principles
+
+| Layer | Rule | Rationale |
+|---|---|---|
+| **staging** | 1:1 with source, no joins, no aggregations | Cheap to rebuild, easy to diff against source |
+| **intermediate** | Single-responsibility transforms, fully tested | Reusable across marts; isolates messy logic |
+| **marts** | Star schema, surrogate keys, conformed dimensions | BI-friendly, avoids fan-out joins |
+| **metrics** | Declarative definitions (dbt semantic layer or LookML) | One number, one definition, everywhere |
+
+**Key modeling decisions for this domain:**
+- **Bitemporal subscription facts.** Every subscription state carries `valid_from` / `valid_to` (system time) *and* `effective_from` / `effective_to` (business time). This is non-negotiable for restated revenue and audit trails.
+- **Event-sourced MRR/ARR.** Rather than snapshotting ARR, model every state *change* as an MRR event (new, expansion, contraction, churn, reactivation). Snapshots are then a rollup — which makes period-over-period variance a self-answering query.
+- **SCD Type 2 for accounts and products.** Product price changes and account hierarchy changes must be historically accurate.
+- **Late-arriving data handled explicitly.** Stripe webhooks and Orb usage can land days late; incremental models use a lookback window (`interval '3 days'`) with a `dbt_utils.unique_combination_of_columns` guard.
+
+### 2.3 Concurrency, Caching, and Scalability
+
+- **Snowflake warehouse sizing per layer:** `TRANSFORMING` (dbt, L/XL, auto-suspend 60s) separated from `ANALYTICS` (Looker, M, multi-cluster) and `FINANCE_CLOSE` (XL, dedicated during close windows). This prevents a heavy dbt run from starving month-end reporting.
+- **Result caching** is used for BI, but never relied on for financial figures — financial marts set `warehouse` hints to a dedicated warehouse where cache invalidation on `ALTER` is deterministic.
+- **Incremental materialization with `merge` strategy** on a bitemporal key; `on_schema_change: sync_all_columns` to survive upstream drift.
+- **dbt state comparison (`--select state:modified`)** in CI so only changed models rebuild — critical as the graph grows.
+- **Partitioning & clustering:** monthly fact tables clustered by `account_id`; date-partitioned staging for time-series scans.
+
+### 2.4 Production Readiness
+
+| Concern | Implementation |
+|---|---|
+| **CI/CD** | GitHub Actions → `sqlfluff lint` → `dbt build --select state:modified+` on a Snowflake PR warehouse → merge to `main` triggers scheduled `dbt build` via dbt Cloud / Cloud Functions |
+| **Testing** | `dbt_utils.unique_combination_of_columns`, `dbt_expectations.expect_column_values_to_be_between` (ARR ≥ 0), `not_null`, `relationships`, custom `assert_revenue_waterfall` macro (begin ARR + new + expansion − contraction − churn = end ARR) |
+| **Freshness** | `dbt source freshness` with SLAs per source (Stripe: 15 min, Salesforce: 1 h, app DB: 5 min); failures page via Slack |
+| **Observability** | OpenTelemetry traces on ingestion (Fivetran webhooks → collector), Prometheus metrics on orchestration jobs, dbt `--store-failures` so failed rows land in a quarantine table for triage |
+| **Lineage** | `dbt docs generate` + exposure definitions; every Looker explore maps to a documented exposure |
+| **Load / volume testing** | Synthetic Stripe/Orb event generator replayed into a staging Snowflake account; verify incremental model runtime stays under SLA at 10× current volume |
+| **Zero-downtime deploys** | Blue/green dbt runs: build new models under `_v2` suffix, validate, `ALTER ... RENAME` atomically; Looker content validated against a shadow connection before cutover |
+| **Audit support** | Every financial mart carries `dbt_run_id`, `source_loaded_at`, and a `restated_from` pointer; immutable raw layer retained per retention policy |
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+The following is a realistic slice of the ARR / revenue-recognition pipeline: an intermediate MRR event model, a bitemporal incremental fact, a custom data-quality assertion macro, and the CI workflow.
+
+### 3.1 `models/intermediate/int_mrr_events.sql`
+
+```sql
+{{
+    config(
+        materialized='incremental',
+        unique_key='mrr_event_sk',
+        incremental_strategy='merge',
+        on_schema_change='sync_all_columns',
+        cluster_by=['event_month']
+    )
+}}
+
+/*
+    One row per subscription-state change (new / expansion / contraction /
+    churn / reactivation), derived from Stripe subscription items joined to
+    Orb usage rating for usage-based components.
+
+    Handles:
+      - Late-arriving Stripe events (3-day lookback window)
+      - Usage-based lines rated by Orb (recognized as they accrue)
+      - Currency normalization to USD at the invoice FX rate
+      - Idempotency via deterministic surrogate key
+*/
+
+with stripe_subscription_items as (
+
+    select
+        subscription_item_id,
+        subscription_id,
+        account_id,
+        price_id,
+        quantity,
+        mrr_cents,
+        currency,
+        status,
+        effective_from,
+        effective_to,
+        _stg_loaded_at
+    from {{ ref('stg_stripe__subscription_items') }}
+
+    {% if is_incremental() %}
+    where _stg_loaded_at >= (
+        select coalesce(max(_stg_loaded_at), '1900-01-01'::timestamp)
+        from {{ this }}
+    ) - interval '3 days'
+    {% endif %}
+
+),
+
+prior_state as (
+
+    -- Previous known MRR for each subscription item, as-of the event time.
+    select
+        subscription_item_id,
+        mrr_cents as prior_mrr_cents,
+        effective_from as prior_effective_from
+    from {{ ref('int_mrr_events') }}
+    where effective_from < (select min(effective_from) from stripe_subscription_items)
+
+),
+
+usage_rated as (
+
+    select
+        subscription_item_id,
+        sum(usage_amount_cents) as usage_mrr_cents,
+        min(period_start)       as usage_period_start
+    from {{ ref('stg_orb__rated_usage') }}
+    where rating_status = 'final'
+    {% if is_incremental() %}
+      and period_start >= (select coalesce(max(event_month), '1900-01-01') from {{ this }})
+    {% endif %}
+    group by 1
+
+),
+
+classified as (
+
+    select
+        s.subscription_item_id,
+        s.subscription_id,
+        s.account_id,
+        s.price_id,
+        s.effective_from,
+        s.effective_to,
+        s._stg_loaded_at,
+
+        coalesce(s.mrr_cents, 0) + coalesce(u.usage_mrr_cents, 0) as current_mrr_cents,
+        coalesce(p.prior_mrr_cents, 0)                            as prior_mrr_cents,
+
+        case
+            when p.subscription_item_id is null and s.status = 'active' then 'new'
+            when p.subscription_item_id is null and s.status in ('canceled','incomplete_expired') then 'churn'
+            when p.prior_mrr_cents = 0 and coalesce(s.mrr_cents,0) > 0 then 'reactivation'
+            when coalesce(s.mrr_cents,0) > p.prior_mrr_cents then 'expansion'
+            when coalesce(s.mrr_cents,0) < p.prior_mrr_cents then 'contraction'
+            when s.status in ('canceled','incomplete_expired') then 'churn'
+            else 'no_change'
+        end as event_type
+
+    from stripe_subscription_items s
+    left join prior_state p using (subscription_item_id)
+    left join usage_rated  u using (subscription_item_id)
+
+)
+
+select
+    -- Deterministic key: same event replayed → same key → idempotent merge
+    {{ dbt_utils.generate_surrogate_key([
+        'subscription_item_id',
+        'effective_from',
+        'event_type'
+    ]) }} as mrr_event_sk,
+
+    {{ dbt_utils.date_trunc('month', 'effective_from') }} as event_month,
+    account_id,
+    subscription_id,
+    subscription_item_id,
+    price_id,
+    event_type,
+    prior_mrr_cents,
+    current_mrr_cents,
+    current_mrr_cents - prior_mrr_cents as delta_mrr_cents,
+    effective_from,
+    effective_to,
+    _stg_loaded_at as source_loaded_at,
+    {{ dbt_utils.current_timestamp() }} as dbt_loaded_at
+
+from classified
+where event_type != 'no_change'
+```
+
+### 3.2 `models/marts/finance/fct_arr_monthly.sql`
+
+```sql
+{{
+    config(
+        materialized='incremental',
+        unique_key='month_key',
+        incremental_strategy='merge',
+        cluster_by=['month_start']
+    )
+}}
+
+/*
+    Monthly ARR snapshot with full waterfall reconciliation.
+
+    ARR = MRR at month-end × 12 (annualized, excluding one-time fees).
+
+    Guarantees:
+      - Waterfall identity holds: begin + new + expansion − contraction − churn = end
+      - Restatement-safe: re-running a historical month overwrites it deterministically
+      - Bitemporal: carries both business-effective and system-load timestamps
+*/
+
+with months as (
+
+    select
+        date_trunc('month', month_start)::date as month_start
+    from {{ ref('dim_date') }}
+    where month_start >= '2019-01-01'
+      and month_start <= current_date()
+
+),
+
+events as (
+
+    select
+        event_month,
+        sum(case when event_type = 'new'         then delta_mrr_cents else 0 end) as new_mrr_cents,
+        sum(case when event_type = 'expansion'   then delta_mrr_cents else 0 end) as expansion_mrr</pre>
+    </div>
+</body>
+</html>

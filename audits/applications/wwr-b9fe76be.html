@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: FULL TIME: Software Engineer Position - React and Rest at Yooli</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>FULL TIME: Software Engineer Position - React and Rest</h2>
+        <p><strong>Company:</strong> Yooli | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/yooli-full-time-software-engineer-position-react-and-rest-1" target="_blank">https://weworkremotely.com/remote-jobs/yooli-full-time-software-engineer-position-react-and-rest-1</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: FULL TIME: Software Engineer Position - React and Rest at Yooli
+
+**Candidate:** Lam Vukyo — Principal Software Engineer / Systems Architect
+**Target Role:** Senior Software Engineer (NestJS / Node.js / React / REST / PostgreSQL)
+**Company:** Yooli — Australia · [yooli.co](http://yooli.co)
+**Source:** WeWorkRemotely (Fullstack)
+**Application Channel:** https://weworkremotely.com/remote-jobs/yooli-full-time-software-engineer-position-react-and-rest-1
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Yooli is not asking for a generalist who can "do backend." The posting describes a **narrow, specific stack discipline**: NestJS + Node.js + TypeScript with OOP rigour, Prisma over SQL (PostgreSQL), REST API design as the primary system boundary, React/Vite SPAs on the front, and cloud hosting (AWS-preferred) with security lifted to a first-class requirement — inside **healthcare**, where data-protection failure is not a bug, it is a regulatory event.
+
+That is precisely the intersection I work in. My value proposition rests on four claims, each of which I can prove with running code rather than adjectives:
+
+| Requirement (verbatim from posting) | How I satisfy it |
+|---|---|
+| 7+ yrs React / React Vite / REST API development | Production React+Vite SPAs with typed OpenAPI-generated clients, TanStack Query caching, code-split routing; REST as a contract, not an afterthought |
+| 5+ yrs REST API development with **NestJS** | NestJS as the architectural backbone: modular bounded contexts, DI-scoped providers, custom guards/interceptors/pipes, CQRS where write/read shapes diverge |
+| Proficiency in **Prisma** for DB management | Prisma with hand-written migration review, `$transaction` interactive transactions, raw SQL escape hatches for window functions and `EXPLAIN ANALYZE`-driven tuning |
+| Strong **SQL** knowledge | Index design, partial & covering indexes, CTEs, `FOR UPDATE SKIP LOCKED` work queues, row-level locking, isolation-level reasoning |
+| **OOP + data structures** | Domain models with real invariants; internals-aware use of B-trees, hash maps, heaps, tries, consistent hashing, bounded LRU |
+| **AWS** cloud integration | ECS Fargate / RDS / ElastiCache / SQS / S3+KMS / ALB, IaC-managed, with IAM least-privilege |
+| **Security & data protection** | Encryption at rest + in transit, field-level envelope encryption, append-only audit trail, RBAC/ABAC, OWASP ASVS L2 posture |
+| CI/CD, Git, Agile, Redux (nice-to-haves) | Trunk-based development, GitHub Actions with ephemeral preview envs, zero-downtime expand/contract migrations, Redux Toolkit where global state genuinely earns its cost |
+
+### Why this problem space specifically
+
+Healthcare backends are hard for reasons that have nothing to do with CRUD. Three of them dominate:
+
+1. **Correctness under concurrency is a clinical safety property.** Two clinicians editing the same encounter, or a booking engine double-allocating a slot, are not "eventually consistent" problems. They require explicit locking, optimistic versioning, and idempotent writes at the API boundary.
+2. **Auditability is not optional and cannot be retrofitted.** Every read and write of a sensitive record must be attributable to an actor, a purpose, and a timestamp — stored append-only, outside the transactional blast radius of the primary tables.
+3. **The regulatory frame constrains architecture.** In the Australian context, the *Privacy Act 1988* (APPs), the *My Health Records Act 2012*, and — where a provider is an NDIS participant's support — NDIS Practice Standards all impose retention, minimisation, access and breach-notification duties that translate directly into schema and API decisions. *(I would validate Yooli's exact obligations during discovery rather than assume them.)*
+
+My proposal below is therefore not "a NestJS app." It is **an auditable, idempotent, horizontally-scalable REST/PostgreSQL core wrapped in a frontend that never holds more trust than it needs.**
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural posture
+
+**Modular monolith first, service extraction later — and only on evidence.**
+
+A healthcare platform at Yooli's stage almost never benefits from premature microservices. The correct shape is a NestJS application partitioned into *bounded contexts* as modules with enforced boundaries (no cross-module imports except through exported façade providers), backed by a single PostgreSQL cluster using **schema-per-context** separation. This gives extraction optionality at near-zero cost while keeping distributed-transaction pain deferred until there is a real scaling reason to pay it.
+
+```
+yooli-api/
+├── src/
+│   ├── main.ts                      # bootstrap, OTel init BEFORE Nest
+│   ├── app.module.ts
+│   ├── common/                      # cross-cutting: interceptors, guards, filters
+│   │   ├── interceptors/{audit,tracing,idempotency,serialization}.ts
+│   │   ├── guards/{jwt,rbac,scopes}.guard.ts
+│   │   ├── filters/all-exceptions.filter.ts
+│   │   └── pagination/cursor.ts
+│   ├── infra/
+│   │   ├── prisma/{prisma.service.ts,prisma.module.ts}
+│   │   ├── cache/redis.module.ts    # ioredis, bounded LRU in front
+│   │   ├── queue/outbox.publisher.ts
+│   │   └── telemetry/{otel.ts,metrics.ts}
+│   └── modules/
+│       ├── identity/                # authn/authz, sessions, consent
+│       ├── scheduling/              # appointments, resources, slots
+│       ├── encounters/              # clinical records
+│       ├── billing/                 # claims, invoices
+│       └── audit/                   # append-only event store + query API
+└── prisma/
+    ├── schema.prisma
+    └── migrations/                  # reviewed, expand/contract, never destructive in one step
+```
+
+**Frontend companion:**
+
+```
+yooli-web/
+├── src/
+│   ├── api/generated/               # openapi-typescript output — never hand-edited
+│   ├── api/client.ts                # fetch wrapper: auth, retry, correlation IDs
+│   ├── features/{scheduling,encounters,...}/
+│   │   ├── api/{queries.ts,mutations.ts}
+│   │   └── components/
+│   ├── store/                       # Redux Toolkit — only for cross-feature state
+│   └── routes/                      # React Router, lazy + Suspense
+└── vite.config.ts                   # proxy, chunk strategy, env validation
+```
+
+### 2.2 API design: REST as a contract
+
+- **Versioning:** URI-versioned (`/api/v1/...`) plus `Sunset` / `Deprecation` headers on the previous version. Consumer-visible deprecation windows of ≥90 days, tracked in CI.
+- **Resource semantics:** nouns, correct status codes (201 + `Location`, 409 for version conflict, 422 for semantic validation failure distinct from 400 syntax failure), `If-Match`/`ETag` for optimistic concurrency, `Idempotency-Key` for all non-idempotent POSTs.
+- **Pagination:** **cursor (keyset) pagination only** on hot collections, never `OFFSET` — `OFFSET 20000 LIMIT 20` degrades linearly and produces phantom/skipped rows under concurrent inserts. Cursor is an opaque, signed base64 of `(sort_key, id)`.
+- **Errors:** RFC 9457 `application/problem+json` throughout, with a stable machine-readable `type` and a `correlationId`. No stack traces, no ORM errors, ever, in a response body.
+- **Contract-first:** `@nestjs/swagger` decorators emit OpenAPI 3.1 at build time; the frontend client is generated from that artifact in CI. A breaking schema change fails the frontend build — drift becomes impossible</pre>
+    </div>
+</body>
+</html>

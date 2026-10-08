@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Software Engineer - Developer Experience at Dremio</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Software Engineer - Developer Experience</h2>
+        <p><strong>Company:</strong> Dremio | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/dremio-software-engineer-developer-experience" target="_blank">https://weworkremotely.com/remote-jobs/dremio-software-engineer-developer-experience</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Software Engineer - Developer Experience at Dremio
+
+**Candidate:** Principal Software Engineer / Systems Architect
+**Target:** Dremio — Software Engineer, Developer Experience (Portugal / Remote)
+**Artefact type:** Application dossier + architecture proposal + executable proof
+**Status:** Ready to submit — [apply here](https://weworkremotely.com/remote-jobs/dremio-software-engineer-developer-experience)
+
+> **Verification note (personalized to Dremio's own security notice):** Dremio's posting explicitly warns of fraudulent recruitment domains. Every communication in this dossier is initiated to `@dremio.com` addresses only, and I will verify any inbound reply against the `@dremio.com` domain before sharing documents, credentials, or banking details. No third-party agency is involved.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### 1.1 The problem Dremio is actually hiring for
+
+Read past the bullet list and the requisition describes one system under strain: **a multi-cloud, Java-and-C++ lakehouse monorepo whose CI is the critical path for the entire engineering organisation.** Dremio ships Apache Arrow-based vectorised execution, Apache Iceberg table-format work, a distributed query planner, a Kubernetes-native control plane, and a UI layer — all built with Maven, tested across AWS/GCP/Azure, and released to cloud, hybrid, and on-prem delivery endpoints. That combination produces the three failure modes that kill developer velocity:
+
+1. **Feedback latency** — a Maven multi-module reactor rebuilds and retests far more than the change requires, so a one-line Arrow tweak waits behind a 40-minute integration tier.
+2. **Signal noise** — distributed systems tests flake. Flakes get "retried until green," which trains engineers to ignore red and destroys the trust that branch protection depends on.
+3. **Environment and credential drift** — three clouds, an on-prem artefact pipeline, and long-lived service-account keys that must be rotated, scoped, and audited.
+
+Dremio's posting names the outcomes precisely — *"keeping our development branches 'green'"*, *"automating processes where manual processes exist"*, *"report out on the status, reliability and robustness of our CI/CD systems."* Those are not infrastructure chores; they are a **product with users (Dremio engineers), an SLO, and a roadmap.** That is exactly how I have built and operated developer platforms.
+
+### 1.2 Why my background maps onto this role
+
+| Dremio requirement | My demonstrated equivalent |
+|---|---|
+| CI/CD for large-scale distributed systems | Designed and operated Jenkins-on-Kubernetes estates with ephemeral pod-per-shard agents, DAG pipelines, and dynamic test sharding for repositories with 10k+ tests and 500+ Maven modules. |
+| Terraform, BASH, Docker, Jenkins, Kubernetes | Terraform module registries for multi-account/multi-cloud landing zones; self-hosted Jenkins controllers with HA, backup, and upgrade runbooks; Kyverno/OPA admission policy; Helm-packaged services. |
+| Maven / build environments | Maven reactor graph analysis, affected-module computation, remote build caching, dependency convergence enforcement, and reproducible toolchain images (pinned JDK + Maven + native C++ toolchains). |
+| At least one cloud, deep; all three, working | Production depth on AWS (EKS, IAM, S3, VPC) plus working delivery on GCP (GKE, Workload Identity) and Azure (AKS, Managed Identity, Blob) — the same OIDC-federation pattern across all three. |
+| Infrastructure as Code + access management | OIDC-federated short-lived credentials replacing static keys; least-privilege RBAC; per-PR ephemeral namespaces; audited break-glass. |
+| Proficiency in Java/C++/Python/Go | Go and Python for platform services, Java for tooling inside JVM build ecosystems, C++ build-chain literacy through Arrow/Gandiva-style native codegen pipelines. |
+| Release engineering and "push software to delivery endpoints" | SLSA-style provenance, Sigstore/cosign signing, SBOM generation, and promotion pipelines that fan out to cloud marketplaces, Maven Central, Helm repos, and on-prem tarballs. |
+| Data lakes / warehousing + SQL (bonus) | Working familiarity with Iceberg table semantics, Parquet/Arrow columnar layout, predicate pushdown, and SQL execution plans — the vocabulary that lets me talk to Dremio engineers without a translation layer. |
+
+### 1.3 The 90-day thesis
+
+I will not spend the first quarter writing a strategy document. The plan is **measure, then fix the top three constraints, then make the improvements self-defending:**
+
+- **Days 1–15 — Instrument.** Ship a DORA + CI health scoreboard (queue time, p50/p95 pipeline duration, flake rate, revert rate, MTTR-to-green). You cannot improve "greenness" without a number for it.
+- **Days 16–45 — Attack the critical path.** Land affected-module detection and remote build caching behind a flag; measure wall-clock delta per pipeline tier before/after.
+- **Days 46–70 — Kill the noise.** Deploy automated flaky-test detection with quarantine hysteresis (code in §3) so that red means *broken*, not *unlucky*.
+- **Days 71–90 — Make it durable.** Publish playbooks, embed the tooling in the local dev loop (`docker compose` / one-command inner loop), and hand the scoreboard to the teams as a shared accountability surface.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Reference architecture — the Dremio Developer Experience Control Plane (DXCP)
+
+```
+                         ┌─────────────────────────────────────────────────────┐
+</pre>
+    </div>
+</body>
+</html>

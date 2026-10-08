@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Software Engineer at AccuLynx</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Software Engineer</h2>
+        <p><strong>Company:</strong> AccuLynx | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/acculynx-senior-software-engineer" target="_blank">https://weworkremotely.com/remote-jobs/acculynx-senior-software-engineer</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Software Engineer at AccuLynx
+
+**Candidate:** Principal Software Engineer / Systems Architect
+**Target Role:** Senior Software Engineer — AccuLynx (Beloit, WI / Remote-US)
+**Source:** WeWorkRemotely Fullstack
+**Stack Alignment:** C# / .NET, Vue.js, SQL Server, Redis, ElasticSearch, Git
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### The short version
+
+AccuLynx is not a generic CRUD SaaS. It is an **operational system of record for a physical trade** — roofers, crews, adjusters, and homeowners coordinating around weather, insurance cycles, and trucks in driveways. That kind of product lives or dies on three hard engineering properties:
+
+1. **Schedule integrity under concurrency.** Multiple dispatchers, office staff, and field crews touch the same job calendar simultaneously. Double-booked crews and lost appointments are not "bugs" to a roofing contractor — they are lost revenue and blown customer trust.
+2. **Real-time state propagation.** A job status change in the office must be visible on a phone in a truck within seconds, on cellular networks, without hammering the origin database.
+3. **Elastic query surfaces.** Contractors search across jobs, customers, documents, and estimates constantly. That is a text-search and geospatial problem, not a `LIKE '%...%'` problem.
+
+My background is built around exactly these failure modes: transactional correctness in relational systems, cache coherence, event-driven projection pipelines, and API contracts that survive versioning and audit.
+
+### Specific alignment to the AccuLynx stack
+
+| AccuLynx requirement | My depth | How it shows up in the blueprint below |
+|---|---|---|
+| **C# / .NET** | 7+ years production .NET (Framework → .NET 8), async/await discipline, DI lifetimes, `IAsyncEnumerable` streaming | Section 3 is idiomatic .NET 8: Minimal API, EF Core, `DbUpdateConcurrencyException` handling, `BackgroundService` |
+| **SQL Server** | Query tuning, execution plans, covering/indexed views, `rowversion` optimistic concurrency, `geography` + spatial indexes, Service Broker/outbox patterns | Optimistic concurrency on `Appointment`, `STDistance` crew dispatch, expand–contract migrations |
+| **Redis** | Cache-aside, distributed locks (Redlock semantics), rate limiting, `INCR`-based idempotency, SignalR backplane for scale-out | Day-bucket crew locks, idempotency keys, fan-out backplane |
+| **ElasticSearch** | Index design, bulk ingestion, change-feed projection, alias-based zero-downtime reindex, relevance tuning | Outbox → consumer → bulk indexer with `jobs_v3` alias swap |
+| **Vue.js** | Vue 3 + Composition API, Pinia, `vue-query`-style server-state caching, offline-tolerant forms | Field scheduling composable with optimistic UI + conflict reconciliation |
+| **Real-time comms** | SignalR at scale, backplane design, at-least-once delivery, client resync on reconnect | Hub design + outbox-driven push |
+| **Public REST API** | Contract-first OpenAPI, RFC 9457 problem details, cursor pagination, idempotency, deprecation policy | API design rules in Section 2.1 |
+| **"Performance is a feature"** | I measure before I optimize: p50/p95/p99, connection-pool saturation, query plan regressions, allocation profiling | SLOs + load-test gates in Section 2.5 |
+
+### On the AI-augmented engineering line item
+
+AccuLynx explicitly asks for someone who *leverages* AI coding tools **and** who *actively evaluates and integrates* them across a team. That distinction matters, and I treat it as an engineering discipline rather than a novelty:
+
+- **Where these tools genuinely win:** boilerplate DTO/mapper generation, test scaffolding, unfamiliar-library ramp-up, migrational transformations (e.g., converting a batch of NUnit tests to xUnit), regex and query translation, PR-description drafting.
+- **Where they need guardrails:** anything touching concurrency, auth boundaries, money, or schema migrations. AI-generated `Task.Run` fire-and-forget, missing `ConfigureAwait` reasoning, unbounded `ToListAsync()` before filtering, and "helpful" retry loops that duplicate writes are the concrete failure patterns I review for.
+- **How I'd institutionalize it:** a versioned `.github/copilot-instructions.md` encoding our architectural rules (repo patterns, no EF in controllers, required cancellation-token threading), a curated prompt library for recurring tasks, and a short "AI-assisted PR" checklist in the review template so quality standards stay explicit rather than assumed.
+
+That is the difference between adopting a tool and operationalizing it — and it is the second thing the job description actually asks for.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.0 Reference architecture (logical)
+
+```
+                    ┌───────────────────────────────────────────┐
+   Vue 3 SPA  ──────▶  ASP.NET Core Edge API (Minimal APIs)     │
+   Field App  ──────▶  • AuthN/Z (OIDC + tenant claims)         │
+   SignalR    ◀──────  • Rate limiting + idempotency filter      │
+                    │  • ProblemDetails error contract           │
+                    └───────┬──────────────┬──────────────┬──────┘
+                            │              │              │
+                   ┌────────▼──────┐ ┌─────▼──────┐ ┌─────▼─────────┐
+                   │ Write Model   │ │ Cache      │ │ Read Model    │
+                   │ SQL Server    │ │ Redis      │ │ ElasticSearch │
+                   │ (ACID, rowver)│ │ (cache/lock│ │ (search/geo)  │
+                   └────────┬──────┘ └────────────┘ └─────▲─────────┘
+                            │                             │
+                   ┌────────▼──────────┐          ┌───────┴──────────┐
+                   │ Outbox (same txn) │◀─CDC────▶│ Projector Worker │
+                   └────────┬──────────┘          └──────────────────┘
+                            │
+                   ┌────────▼──────────┐
+                   │ SignalR Backplane │──▶ live push to subscribed clients
+                   │ + Notification svc│
+                   └───────────────────┘
+```
+
+The non-negotiable principle: **every state change is one ACID transaction in SQL Server that also writes its own event**, and every derived store (Redis, ElasticSearch, SignalR push) is a *projection* of that log. This is what guarantees the office app, the field app, and the API never disagree about whether a job is scheduled.
+
+### 2.1 Public RESTful API design
+
+Contract-first, generated from OpenAPI 3.1, with `.NET` Minimal APIs grouped by bounded context (`/v1/jobs`, `/v1/appointments`, `/v1/crews`, `/v1/materials`, `/v1/webhooks`).
+
+Rules I'd enforce in review and in CI:
+
+- **Versioning:** URL-major (`/v1`), additive within major. Breaking changes ship as `/v2` with a documented sunset header (`Sunset`, `Deprecation` per RFC 8594). No silent field removals.
+- **Pagination:** cursor-based, never `OFFSET` on hot tables. Cursor is an opaque, HMAC-signed `(sortKey, id)`</pre>
+    </div>
+</body>
+</html>

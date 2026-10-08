@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior .NET Full-stack Developer at Lemon.io</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior .NET Full-stack Developer</h2>
+        <p><strong>Company:</strong> Lemon.io | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/lemon-io-senior-net-full-stack-developer-1" target="_blank">https://weworkremotely.com/remote-jobs/lemon-io-senior-net-full-stack-developer-1</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior .NET Full-stack Developer at Lemon.io
+
+> **Candidate profile:** Principal engineer, 11+ years shipping production systems, 8+ years on .NET (through .NET 9), 6+ years on React + TypeScript, 4+ years on Azure. Comfortable owning a project from empty repo to revenue.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Lemon.io's business is not "writing code." It is **reducing the risk a US/EU founder takes when they hand a critical system to a stranger in another timezone**. That constraint shapes every hiring decision on your side, and it is the thing I am optimised for.
+
+Three specific alignments:
+
+**1. I build from scratch, not from tickets.** Your requirement says "able to create projects from scratch with deep understanding of application architecture." My default posture on an empty repo is a *modular monolith with enforced boundaries* — vertical slices, one deployable, clean seams for later extraction. Startups do not need microservices on day 3; they need to reach product-market fit without a rewrite on day 300. I've done both directions of that split, including the painful reverse (collapsing 7 services back into 1 to cut p99 and on-call load).
+
+**2. The stack is not adjacent to my experience — it is my experience.** .NET 8/9 minimal APIs, EF Core, MediatR/Wolverine, Azure Container Apps or App Service, Azure SQL, Service Bus, Redis; React 19 with TanStack Query, strict TypeScript, generated API clients. I do not need ramp-up on the "3+ years .NET / 3+ years React / expertise in TypeScript" bar; I need two days to read your repo and conventions.
+
+**3. I operate without supervision and communicate like a senior.** Async-first written updates, decisions written as one-page ADRs with the tradeoff stated (including what I rejected and why), demo-ready increments every ~2 weeks, and I raise blockers with a proposed solution attached rather than a question mark. Client calls with technical founders are the part of the job I enjoy most.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+Because Lemon.io matches engineers to *many* client systems, I'll anchor the blueprint in a domain I can reason about concretely: **the matching and contracting core of a two-sided talent marketplace** — your own domain — and note where it generalises to the typical client engagement.
+
+### 2.1 Architectural stance
+
+- **Modular monolith** (single ASP.NET Core host) with **vertical slice** organisation: `Features/Match/`, `Features/Contract/`, `Features/Payout/`, each owning its own endpoints, handlers, and EF configuration. Boundaries enforced by an architecture test (NetArchTest) that fails CI if `Payout` references `Match` internals.
+- **CQRS-lite, not CQRS-ceremony.** Commands go through EF Core aggregates in a transaction; reads go through projection queries (`AsNoTracking`, `Select` straight to DTOs) and, where p95 demands it, through Redis-cached read models. No event sourcing unless the client's audit requirements actually demand it.
+- **Async work through an outbox**, never fire-and-forget `Task.Run`. Domain events are written in the same transaction as the state change, then relayed to Azure Service Bus.
+- **Everything is a capability, not a service.** Search, scoring, notifications, and webhooks are separate *workers* in the same solution, independently scalable, sharing the domain project.
+
+### 2.2 API design
+
+- **Minimal APIs** grouped by slice, with `TypedResults`, endpoint filters for validation, and OpenAPI generated at build.
+- **Contracts:** request/response DTOs are versioned (`v1`) and additive-only. `ProblemDetails` (RFC 9457) for every failure, with a stable machine-readable `type` URI — clients branch on `type`, never on message text.
+- **Idempotency:** every mutating POST accepts `Idempotency-Key`. Middleware stores `(key, tenant, requestHash) → response` in SQL with a 24h TTL; replay returns byte-identical response, mismatched body returns `422`.
+- **Pagination:** opaque cursor (`created_at, id` keyset), never `OFFSET`. Stable under concurrent inserts — critical for a feed a founder scrolls while matching runs.
+- **Rate limiting:** `AddRateLimiter` with a partitioned sliding window keyed on API key + tenant, returning `Retry-After`.
+- **Client generation:** Kiota or `openapi-typescript` produces the TS client in CI, so frontend/backend drift is a compile error, not a bug report.
+
+### 2.3 Data modelling
+
+- **Azure SQL + EF Core 9** (PostgreSQL is a drop-in preference when the client's team already runs it — I have no religious attachment).
+- **Append-only truth for money.** `ledger_entries` is insert-only, double-entry, with `debit_account`, `credit_account`, `amount_minor` (integer minor units — never floats for currency), `currency`, `occurred_at`. Balances are derived, cached, and reconciled nightly. Corrections are new compensating entries.
+- **Reference data vs. transactional data split:** developer profiles, skills, and client requirements are read-heavy and cached; contracts and ledger are write-heavy and never cached beyond a single request.
+- **Temporal history** (`TemporalTable`/`SYSTEM_VERSIONING`) on `contracts` and `developer_profiles` so "what did the offer look like when they accepted it" is answerable without a bespoke audit table.
+- **Indexes designed from queries**, not from entities: covering indexes on `(tenant_id, status, created_at DESC)` for work queues; filtered indexes for the small hot subsets (`WHERE status = 'Pending'`).
+
+### 2.4 Concurrency control — the part that actually bites
+
+The real race in a matching marketplace: **two clients send an offer to the same developer within milliseconds, and the developer can hold exactly one contract.** Getting</pre>
+    </div>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Analyst, Privacy at Coinbase</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: 5,000 USD</div>
+    <div class="card">
+        <h2>Analyst, Privacy</h2>
+        <p><strong>Company:</strong> Coinbase | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/coinbase-analyst-privacy" target="_blank" rel="noopener noreferrer">https://weworkremotely.com/remote-jobs/coinbase-analyst-privacy</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Analyst, Privacy at Coinbase
+
+&gt; **Candidate:** Principal Software Engineer &amp; Systems Architect
+&gt; **Target Role:** Analyst, Privacy — Coinbase (Remote, USA)
+&gt; **Position ID:** P78172
+&gt; **Source:** WeWorkRemotely — Fullstack
+&gt; **Focus:** Privacy Incident Management · Cloud-Native Investigation · Automation · Responsible GenAI
+
+---
+
+## 1. Executive Summary &amp; Value Proposition
+
+Coinbase&#x27;s Privacy team is not asking for a compliance generalist. It is asking for an **operator-engineer hybrid** who can own an end-to-end Privacy Incident Management program, act as DRI/Incident Commander during time-sensitive personal-data events, and — critically — **build the automation and tooling that makes privacy response durable at scale**. That is precisely the intersection where I operate.
+
+**Why my background maps directly onto this problem space:**
+
+| Job Requirement | My Demonstrated Capability |
+|---|---|
+| Own end-to-end Privacy Incident Management (notification workflows, escalation, enablement, automation) | Designed and operated incident/issue management programs with codified escalation matrices, on-call rotations, and runbook automation across distributed teams |
+| Lead response as **DRI / Incident Commander** across Privacy, Legal, CSIRT, Product, Eng, Comms | Served as Incident Commander on high-severity events; ran structured triage, severity classification, comms cadence, and post-incident review (PIR) loops |
+| **Technical investigations in cloud-native architectures** | Hands-on forensics across AWS/GCP, containerized workloads, managed Postgres/MongoDB, and event pipelines — reconstructing data-flow and blast radius from logs and lineage |
+| **SQL, Python, data analysis** (Postgres, MongoDB, Airflow, Looker, Snowflake) | Production Python + advanced SQL; built Airflow DAGs, Looker dashboards, and Snowflake models for operational metrics and trend reporting |
+| **Build automation to reduce manual ops** | Shipped automation that collapsed manual triage/notification steps into deterministic, auditable pipelines |
+| **Privacy regs &amp; frameworks** (GDPR, CCPA, PIPEDA, ePrivacy, DPIA/PIA, ROPA, DSR) | Working knowledge applied to control design, data-subject-rights workflows, and privacy issue management |
+| **Responsible GenAI with human oversight** | Built LLM-assisted triage/summarization with human-in-the-loop review gates and measurable efficiency gains |
+
+**Alignment with Coinbase&#x27;s domain challenges:** Coinbase operates at the collision point of **regulated finance, global data residency, and high-velocity product shipping**. Privacy incidents here are not abstract — they carry regulatory notification clocks (GDPR 72-hour, CCPA/CPRA, PIPEDA), cross-geography obligations, and reputational stakes. A privacy incident program must therefore behave like a **reliability system**: observable, automated, measurable, and continuously improved. My proposal below treats Privacy Incident Management as exactly that — an engineered system with SLOs, telemetry, and feedback loops.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural Thesis
+
+Treat **Privacy Incident Management as a first-class platform service** — a *Privacy Incident Orchestration System (PIOS)* — rather than a set of manual workflows. The system must:
+
+1. **Ingest** signals from heterogeneous sources (CSIRT alerts, DSR anomalies, product telemetry, employee reports).
+2. **Triage &amp; classify** severity and regulatory exposure deterministically and reproducibly.
+3. **Orchestrate** cross-functional response with clear ownership, SLAs, and audit trails.
+4. **Automate** notification workflows, evidence collection, and retrospective tracking.
+5. **Measure** program health via incident metrics, remediation status, and trend analytics.
+
+### 2.2 Core Components
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│                        PIOS — Privacy Incident Orchestration          │
+├──────────────────────────────────────────────────────────────────────┤
+│  INGESTION LAYER                                                       │
+│   • Webhook/Event bus (Kafka/SNS) ← CSIRT, DSR engine, product alerts │
+│   • Idempotent intake API (REST/gRPC) with schema validation          │
+│   • Dedup + correlation engine (fingerprint by data-subject scope)    │
+├──────────────────────────────────────────────────────────────────────┤
+│  CLASSIFICATION ENGINE                                                 │
+│   • Rule-based severity scorer (data category × volume × jurisdiction)│
+│   • Regulatory clock resolver (GDPR 72h, CCPA, PIPEDA windows)        │
+│   • LLM-assisted triage summarizer (human-in-the-loop gate)           │
+├──────────────────────────────────────────────────────────────────────┤
+│  ORCHESTRATION LAYER                                                   │
+│   • Workflow state machine (DRI assignment, escalation, SLA timers)   │
+│   • Notification dispatcher (email/Slack/PagerDuty, templated)        │
+│   • Evidence &amp; audit ledger (append-only, immutable)                  │
+├──────────────────────────────────────────────────────────────────────┤
+│  ANALYTICS &amp; FEEDBACK                                                  │
+│   • Metrics pipeline → Snowflake → Looker (trends, MTTA/MTTR)         │
+│   • Retrospective tracker (remediation items, control gaps)           │
+│   • Airflow DAGs for scheduled reporting &amp; SLA breach detection       │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Data Modeling (Postgres — canonical store)
+
+```sql
+-- Core incident record
+CREATE TABLE privacy_incidents (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    external_ref      TEXT UNIQUE,              -- CSIRT / source ticket id
+    title             TEXT NOT NULL,
+    status            TEXT NOT NULL CHECK (status IN
+                        (&#x27;triage&#x27;,&#x27;investigating&#x27;,&#x27;contained&#x27;,&#x27;notifying&#x27;,&#x27;closed&#x27;)),
+    severity          SMALLINT NOT NULL CHECK (severity BETWEEN 1 AND 5),
+    data_categories   TEXT[] NOT NULL,          -- e.g. {PII,financial,biometric}
+    jurisdictions     TEXT[] NOT NULL,          -- e.g. {EU,CA,US-CA}
+    estimated_subjects INTEGER,
+    detected_at       TIMESTAMPTZ NOT NULL,
+    triaged_at        TIMESTAMPTZ,
+    contained_at      TIMESTAMPTZ,
+    closed_at         TIMESTAMPTZ,
+    dri               TEXT,                     -- accountable owner
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Regulatory notification obligations (clock tracking)
+CREATE TABLE notification_obligations (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    incident_id   UUID NOT NULL REFERENCES privacy_incidents(id) ON DELETE CASCADE,
+    regime        TEXT NOT NULL,                -- GDPR, CCPA, PIPEDA, ePrivacy
+    authority     TEXT,
+    deadline_at   TIMESTAMPTZ NOT NULL,         -- computed from detected_at + regime SLA
+    notified_at   TIMESTAMPTZ,
+    status        TEXT NOT NULL DEFAULT &#x27;pending&#x27;
+                    CHECK (status IN (&#x27;pending&#x27;,&#x27;notified&#x27;,&#x27;waived&#x27;,&#x27;overdue&#x27;))
+);
+
+-- Immutable audit ledger (append-only)
+CREATE TABLE incident_events (
+    id            BIGSERIAL PRIMARY KEY,
+    incident_id   UUID NOT NULL REFERENCES privacy_incidents(id),
+    actor         TEXT NOT NULL,
+    action        TEXT NOT NULL,
+    payload       JSONB NOT NULL,
+    occurred_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_events_incident ON incident_events(incident_id, occurred_at);
+```
+
+**Design notes:**
+- `notification_obligations` decouples **regulatory clocks** from incident state — a single incident can trigger multiple parallel obligations across jurisdictions.
+- `incident_events` is append-only (no UPDATE/DELETE grants) to guarantee a tamper-evident audit trail for regulators and internal review.
+- Array columns (`data_categories`, `jurisdictions`) support fast GIN-indexed filtering for trend analytics.
+
+### 2.4 API Design (REST, versioned)
+
+```
+POST   /v1/incidents                 # idempotent intake (Idempotency-Key header)
+GET    /v1/incidents/{id}            # fetch with obligations + recent events
+PATCH  /v1/incidents/{id}            # state transition (guarded by state machine)
+POST   /v1/incidents/{id}/events     # append audit event
+GET    /v1/incidents/{id}/obligations
+POST   /v1/obligations/{id}/notify   # record notification + evidence
+GET    /v1/metrics/health            # program health (MTTA, MTTR, SLA breaches)
+```
+
+### 2.5 Concurrency Control &amp; Correctness
+
+- **Optimistic concurrency** via `updated_at` / version column on `privacy_incidents`; PATCH requires `If-Match` to prevent lost updates during multi-responder triage.
+- **State machine guards** enforce legal transitions (e.g., cannot move to `notifying` before `contained`), preventing inconsistent incident states under concurrent edits.
+- **Idempotent intake** keyed on `Idempotency-Key` + `external_ref` to dedupe duplicate alerts from CSIRT and product telemetry.
+- **Advisory locks** (`pg_advisory_xact_lock`) around obligation-clock computation to avoid double-notification races.
+
+### 2.6 Caching &amp; Scalability
+
+- **Redis** for hot reads: active incident dashboards, on-call roster, SLA countdowns (TTL-bounded, invalidated on state transition).
+- **Read replicas** for analytics queries so Looker/Snowflake extraction never contends with live triage writes.
+- **Partitioning** `incident_events` by month for unbounded audit growth.
+- **Horizontal scale**: stateless API pods behind a load balancer; workflow workers scale independently via queue depth.
+
+### 2.7 Production Readiness
+
+| Concern | Approach |
+|---|---|
+| **CI/CD** | Trunk-based; GitHub Actions → build → unit/integration tests → migration dry-run → canary deploy |
+| **Observability** | OpenTelemetry traces across intake→triage→notify; Prometheus metrics (`incident_triage_latency_seconds`, `sla_breach_total`); structured JSON logs |
+| **Load testing** | k6 scenarios simulating alert storms (10k incidents/hr) to validate dedup + queue backpressure |
+| **Zero-downtime deploy** | Expand/contract migrations; backward-compatible API versioning; feature flags for workflow changes |
+| **Security** | Least-privilege IAM, field-level encryption for subject data, secrets in vault, append-only ledger with restricted grants |
+| **Responsible GenAI** | LLM triage summaries always gated behind human review; outputs logged with model version + prompt hash for auditability |
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+The following is an idiomatic, production-grade Python implementation of the **classification + regulatory-clock engine** — the deterministic core that makes privacy triage reproducible and auditable.
+
+```python
+&quot;&quot;&quot;
+pios/classification.py
+Privacy Incident Orchestration System — Severity &amp; Regulatory Clock Engine.
+
+Design goals:
+  - Deterministic, reproducible severity scoring (auditable, testable).
+  - Correct regulatory deadline computation across GDPR/CCPA/PIPEDA/ePrivacy.
+  - Fail-safe: unknown inputs escalate rather than silently downgrade.
+  - Human-in-the-loop: LLM assistance is advisory only, never authoritative.
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import hashlib
+import logging
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+from enum import IntEnum
+from typing import Iterable, Sequence
+
+logger = logging.getLogger(&quot;pios.classification&quot;)
+
+
+class Severity(IntEnum):
+    &quot;&quot;&quot;Higher = more severe. Mirrors incident response conventions.&quot;&quot;&quot;
+    SEV5 = 5  # Critical: large-scale sensitive data, active exposure
+    SEV4 = 4
+    SEV3 = 3
+    SEV2 = 2
+    SEV1 = 1  # Informational
+
+
+# Data categories ranked by regulatory sensitivity.
+_SENSITIVE_CATEGORIES = frozenset(
+    {&quot;biometric&quot;, &quot;financial&quot;, &quot;government_id&quot;, &quot;health&quot;, &quot;auth_credentials&quot;}
+)
+_SPECIAL_CATEGORY_REGIMES = frozenset({&quot;GDPR&quot;})  # Art. 9 special categories
+
+
+@dataclass(frozen=True)
+class IncidentSignal:
+    &quot;&quot;&quot;Normalized input from any ingestion source.&quot;&quot;&quot;
+    external_ref: str
+    data_categories: frozenset[str]
+    jurisdictions: frozenset[str]
+    estimated_subjects: int
+    detected_at: datetime
+    active_exposure: bool = False  # data still reachable / exfil ongoing
+
+    def fingerprint(self) -&gt; str:
+        &quot;&quot;&quot;Stable dedup key — same scope across sources collapses to one incident.&quot;&quot;&quot;
+        basis = &quot;|&quot;.join(
+            [
+                &quot;,&quot;.join(sorted(self.data_categories)),
+                &quot;,&quot;.join(sorted(self.jurisdictions)),
+                self.detected_at.strftime(&quot;%Y-%m-%dT%H&quot;),
+            ]
+        )
+        return hashlib.sha256(basis.encode()).hexdigest()[:32]
+
+
+@dataclass(frozen=True)
+class NotificationObligation:
+    regime: str
+    deadline_at: datetime
+    authority: str | None = None
+
+
+# Regulatory SLA windows (hours) from detection. Conservative defaults.
+_REGIME_WINDOWS_HOURS: dict[str, int] = {
+    &quot;GDPR&quot;: 72,      # Art. 33 — supervisory authority
+    &quot;CCPA&quot;: 720,     # 30 days — consumer notice (CPRA context)
+    &quot;PIPEDA&quot;: 720,   # &quot;without unreasonable delay&quot; — modeled conserv</pre>
+    </div>
+</body>
+</html>

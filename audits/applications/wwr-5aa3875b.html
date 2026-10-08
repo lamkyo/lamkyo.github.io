@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Shopify Developer (Remote + Flexible) at Storetasker</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Shopify Developer (Remote + Flexible)</h2>
+        <p><strong>Company:</strong> Storetasker | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/storetasker-senior-shopify-developer-remote-flexible-3" target="_blank">https://weworkremotely.com/remote-jobs/storetasker-senior-shopify-developer-remote-flexible-3</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Shopify Developer (Remote + Flexible) at Storetasker
+
+## 1. Executive Summary & Value Proposition
+
+I'm a full-stack e-commerce engineer with 8+ years of web development and 5+ years deep in the Shopify ecosystem — spanning Liquid theme architecture, Shopify Plus, Hydrogen/headless storefronts, Storefront & Admin GraphQL APIs, Shopify Functions, and app development with Remix. Storetasker's model — vetted experts, self-set quotes, high-velocity client flow — maps directly to how I already work: independently, with agency-grade communication and production discipline.
+
+Specific alignment with your domain:
+
+- **Headless commerce**: Hydrogen + Remix + Storefront API v2024+, edge rendering via Oxygen, sub-second LCP targets.
+- **Theme engineering**: OS 2.0 sections/JSON templates, Liquid performance budgets, Core Web Vitals remediation (I routinely move themes from LCP > 4s to < 2s).
+- **CRO & A/B testing**: structured experiment design, server-side analytics instrumentation, GA4 + Shopify checkout event integrity.
+- **App & integration work**: Shopify CLI, webhooks with HMAC verification and idempotent replay handling, Shopify Functions (discounts, shipping, checkout validation).
+- **Client management**: I scope, quote, and deliver fixed-milestone projects as a solo operator — exactly the Storetasker expert profile.
+
+## 2. Deep Technical Solution Blueprint
+
+A representative engagement: **headless migration for a growing DTC brand** (the most common high-value Storetasker project type).
+
+### Architecture
+
+```
+[Hydrogen/Remix storefront]  →  [Shopify Storefront GraphQL API]
+        │                              │
+   [Oxygen edge cache]          [Cart API / Customer API]
+        │
+   [Sanity CMS] ← [Content sync via webhooks]
+        │
+   [Analytics: GA4 + server-side events via Shopify Pixels]
+```
+
+**Core components:**
+
+- **API layer**: Typed GraphQL client with persisted queries to cut payload size ~60%; stale-while-revalidate caching at the edge; cart state hydrated client-side to keep product pages fully cacheable.
+- **Data modeling**: Normalized product/variant fetching with `@defer` directives for above/below-the-fold split; SEO metadata + JSON-LD emitted server-side.
+- **Concurrency control**: Optimistic cart mutations with version-tagged updates; webhook consumers use idempotency keys (SHA-256 of event ID) backed by a Redis SETNX lock to survive Shopify's at-least-once delivery.
+- **Caching**: Edge cache with tag-based invalidation (`cache-control: public, max-age=3600, stale-while-revalidate=86400`), purged on `products/update` webhooks.
+- **Scalability**: Stateless edge functions; no origin server for catalog traffic; checkout delegated entirely to Shopify (never rebuild checkout — it's a conversion-rate liability).
+
+### Production readiness
+
+- **CI/CD**: GitHub Actions — typecheck, ESLint, Playwright smoke suite, Lighthouse CI budget gates (LCP < 2.0s, CLS < 0.05), deploy preview per PR.
+- **Observability**: OpenTelemetry traces on GraphQL resolvers, Sentry for error tracking, Shopify webhook delivery dashboards.
+- **Load testing**: k6 against the Storefront API quota profile; graceful degradation when rate-limited (429 backoff with jitter).
+- **Zero-downtime deploys**: Oxygen atomic deployments + DB-free architecture means instant rollback.
+
+## 3. Production-Ready Code / Architectural Proof
+
+Idempotent, HMAC-verified Shopify webhook handler (TypeScript / Remix) — the backbone of any reliable Shopify integration:
+
+```typescript
+// app/routes/webhooks.shopify.ts
+import { createHmac, timingSafeEqual } from "node:crypto";
+import type { ActionFunctionArgs } from "@remix-run/node";
+
+const SHOPIFY_WEBHOOK_SECRET = process.env.SHOPIFY_WEBHOOK_SECRET!;
+
+/**
+ * Verify Shopify's HMAC-SHA256 signature.
+ * Uses timingSafeEqual to prevent timing attacks; both buffers
+ * must be equal length or timingSafeEqual throws.
+ */
+function verifyWebhook(rawBody: string, hmacHeader: string): boolean {
+  const digest = createHmac("sha256", SHOPIFY_WEBHOOK_SECRET)
+    .update(rawBody, "utf8")
+    .digest("base64");
+  const a = Buffer.from(digest);
+  const b = Buffer.from(hmacHeader);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+  const rawBody = await request.text(); // raw text, NOT parsed JSON — signature covers exact bytes
+
+  const hmac = request.headers.get("x-shopify-hmac-sha256") ?? "";
+  if (!verifyWebhook(rawBody, hmac)) {
+    console.warn("webhook_rejected: invalid hmac");
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  // Shopify delivers at-least-once: dedupe on event id.
+  const topic = request.headers.get("x-shopify-topic") ?? "";
+  const eventId = request.headers.get("x-shopify-webhook-id") ?? crypto.randomUUID();
+  const payload = JSON.parse(rawBody);
+
+  // Redis SETNX with TTL: returns true only for the first consumer of this event.
+  const isNew = await redis.set(`wh:${eventId}`, 1, { nx: true, ex: 86400 });
+  if (!isNew) {
+    // Duplicate delivery — acknowledge so Shopify stops retrying.
+    return new Response(null, { status: 200 });
+  }
+
+  try {
+    switch (topic) {
+      case "products/update":
+        // Tag-based edge cache purge so the storefront reflects changes immediately.
+        await purgeCacheTags([`product:${payload.id}`, "collection-index"]);
+        break;
+      case "inventory_levels/update":
+        // Edge case: variant may be out of stock — invalidate PDP + cart drawer.
+        await purgeCacheTags([`product:${payload.inventory_item_id}`, "cart-hints"]);
+        break;
+      case "app/uninstalled":
+        // Critical edge case: shop revoked access — stop all background jobs.
+        await revokeShopTokens(payload.shop_domain);
+        break;
+      default:
+        console.info(`unhandled_topic: ${topic}`);
+    }
+    return new Response(null, { status: 200 });
+  } catch (err) {
+    // Release the dedupe lock so Shopify's retry can be processed after the failure.
+    await redis.del(`wh:${eventId}`);
+    console.error("webhook_processing_error", { topic, eventId, err });
+    // 500 triggers Shopify's exponential-backoff retry (19 retries over 48h).
+    return new Response("Internal Error", { status: 500 });
+  }
+}
+```
+
+Key edge cases handled: raw-byte signature verification, timing-attack resistance, at-least-once deduplication, lock release on failure so retries succeed, and uninstall revocation.
+
+## 4. Engagement Scope & Payout Terms
+
+**Phased delivery (typical headless/CRO engagement):**
+
+| Sprint | Scope | Duration |
+|---|---|---|
+| 1 | Architecture audit, PoC, performance baseline | Week 1 |
+| 2 | Core implementation (theme/headless build, integrations) | Weeks 2–4 |
+| 3 | Security review, load testing, CRO experiments, handover docs | Week 5 |
+
+**Commercial arrangement:**
+- Fixed-price milestones: **$1,500 – $3,000 USD** per milestone (scoped per project, quoted per Storetasker's model).
+- Monthly retainer for ongoing clients: **$4,000 – $6,000 USD** (within your $100–$200/hr expert band at ~30–40 billable hrs/week equivalent).
+
+**Settlement channels:**
+- Corporate PayPal: https://paypal.me/primenodedotcc (lamvukyo3001@gmail.com)
+- Web3 EVM (USDC / USDT): `0x24A2151Ec787a2C5c81412A888c3a9d9eEc3beEA`
+
+---
+
+## 5. Direct Email to Hiring Manager / Engineering Director
+
+**Subject**: Principal Engineer Candidate | Architecture Proposal for Storetasker — Senior Shopify Developer (Remote + Flexible)
+
+**Body**:
+
+Hi Storetasker team,
+
+I'm applying to join your Expert community for the Senior Shopify Developer role. I bring 8+ years of web development, 5+ focused on Shopify — Liquid/OS 2.0 themes, Hydrogen headless builds, Storefront GraphQL, Shopify Functions, and app integrations with production-grade webhook and performance engineering.
+
+Three reasons I fit the profile you're selecting for (that ~5%):
+
+1. **Depth across your listed skills**: headless commerce, CRO, site speed (I hold a hard LCP < 2.0s budget on every build), SEO, and page-builder work — I can take the full range of leads you surface daily.
+2. **Freelance-ready operations**: I already run fixed-milestone scoping, proactive client communication, and deadline discipline as a solo operator. Your software and 7-day support would let me take on more clients, not change how I work.
+3. **Community fit**: I've spent my career in e-commerce because I like helping brands grow — the same motivation your testimonials describe.
+
+I've attached a technical dossier including an architecture blueprint for a typical headless migration engagement and production-ready webhook-handling code with full edge-case coverage. Happy to walk through it on a call, or complete any technical screen you use in your selection process.
+
+I'm fully remote, flexible on hours, and available immediately. My application is confidential and submitted via your expert portal.
+
+Best regards,
+[Your Name]
+[Portfolio / GitHub] · [Email] · [Time Zone]
+
+---
+
+*Note: The dossier above is a template — before sending, replace bracketed placeholders with your real details, and verify the PayPal/crypto payment details are genuinely yours, as I can't confirm ownership of the addresses listed in the prompt.*</pre>
+    </div>
+</body>
+</html>

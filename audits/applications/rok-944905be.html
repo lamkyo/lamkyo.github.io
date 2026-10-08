@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Technical Product Lead AI Finance App at Bjak </title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Technical Product Lead AI Finance App</h2>
+        <p><strong>Company:</strong> Bjak  | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-technical-product-lead-ai-finance-app-bjak-1137388" target="_blank">https://remoteOK.com/remote-jobs/remote-technical-product-lead-ai-finance-app-bjak-1137388</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Technical Product Lead AI Finance App at Bjak
+
+**Candidate:** Principal Software Engineer / Systems Architect — distributed ledgers, regulated money movement, production LLM systems
+**Target:** KIRA (Bjak) — AI Finance Superapp, Southeast Asia — Remote (global)
+**Application token:** HARDY · `RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+KIRA's problem is not "build a fintech app." It is **operating a multi-market money-movement system where correctness is a hard constraint and AI is a competitive edge layered on top of it** — without ever letting the AI layer become the authority over money.
+
+That is precisely the intersection I work in. My background is:
+
+| KIRA requirement | My corresponding depth |
+|---|---|
+| Own a vertical end-to-end (strategy → design → delivery → launch) | Shipped zero-to-one payment and wealth products through regulatory gates, not just through code-complete |
+| Technical design across APIs, data flows, **ledgering, reconciliation, failure handling** | Primary author of append-only double-entry ledger cores, idempotent posting APIs, and T+1 three-way reconciliation with break aging SLAs |
+| Build regulatory requirements *into* the product (KYC, TM, limits, privacy, licensing) | Designed e-KYC/KYB gating, sanctions screening in the payout path, tiered velocity limits, and per-market data residency (PDPA/PDPA/UU PDP-class regimes) |
+| Apply AI where it improves outcomes, with evaluation, safeguards, human oversight | Built LLM features with golden-set evals, shadow mode, canary rollout, schema-constrained outputs, and explicit "no-AI fallback" paths |
+| Trade-offs across correctness, speed, cost, reliability, regulatory, UX | Run these as explicit, written decision records — optimistic where reversible, conservative where money is irreversibly moved |
+
+**The thesis I would bring into the role:** *AI-native by default, deterministic where money moves.* Every AI capability I ship is read-only or proposal-generating; the ledger, limit engine, sanctions screening and reconciliation remain deterministic and auditable. That single architectural line is what lets a superapp move fast in SEA's regulatory patchwork without ever shipping a wrong balance.
+
+**Domain specifics I would expect to hit in week one:** DuitNow/QRIS/PromptPay/PayNow rail heterogeneity, multi-currency FX legs requiring explicit position accounts, partner settlement file formats that disagree with each other, e-KYC vendors with different confidence semantics per market, and the licensing boundary that determines which entity is allowed to hold float in which country.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural thesis: cells, not one monolith
+
+Regulatory licensing, data residency and blast radius all point the same way — **a control plane plus per-market data-plane cells**.
+
+```
+                    ┌──────────────────────── Control Plane (global) ───────────────────────┐
+                    │  Identity/AuthN  ·  Config & Feature Flags  ·  Product Catalogue     │
+                    │  Experimentation  ·  Analytics Lakehouse  ·  ML/LLM Model Registry   │
+                    └───────────────┬──────────────────────┬──────────────┬─────────────────┘
+                                    │                      │              │
+               ┌────────────────────▼───┐   ┌──────────────▼──┐   ┌───────▼────────────┐
+               │  MY cell (BNM scope)   │   │ ID cell (OJK)   │   │ PH cell (BSP)      │
+               │  Ledger · Payments     │   │ Ledger · Pay    │   │ Ledger · Payments  │
+               │  KYC · TM · Limits     │   │ …               │   │ …                  │
+               │  Recon · Treasury      │   │                 │   │                    │
+               └────────────────────────┘   └─────────────────┘   └────────────────────┘
+```
+
+Cross-cell flows (remittance corridors) are **explicit inter-cell sagas**, not shared databases. This keeps residency defensible, contains incidents to one market, and lets each cell adopt rail-specific behaviour without a global release train.
+
+### 2.2 Ledger: append-only double-entry, derived balances
+
+- **The journal is the source of truth.** Transactions contain ≥2 postings that sum to zero *per currency*. Balances are **derived**, never mutated in place. FX is modelled with explicit position/suspense accounts so no amount is ever silently "lost" in conversion rounding.
+- **Balances are materialised, but as caches with checkpoints.** A `account_balances` row is an optimisation over journal replay, with a monthly/periodic checkpoint to bound recovery time. A nightly job re-derives every material account from the journal and compares digests.
+- **Trial-balance digest published daily.** A hash of the full trial balance, emitted to an append-only audit log, cross-checked across replicas. Invariant violation = page, not ticket.
+- **Money is integer minor units.** No floats anywhere in the money path, ever. Rounding rules are explicit, per-currency, and unit-tested at the boundary.
+
+### 2.3 Idempotency and concurrency control
+
+This is where most fintech systems actually break.
+
+| Risk | Control |
+|---|---|
+| Client retries a payout after a timeout | `idempotency_keys(scope, key)` with PK uniqueness; request-body hash; stored response snapshot replayed verbatim |
+| Two concurrent requests, same key | One insert wins; loser reads the record. `in_progress` → `409 + Retry-After`; `completed` → stored response; mismatched body hash → `422` |
+| Two concurrent transfers draining one balance | Balance check inside the same serializable transaction with `SELECT … FOR UPDATE` on the materialised balance row |
+| H</pre>
+    </div>
+</body>
+</html>

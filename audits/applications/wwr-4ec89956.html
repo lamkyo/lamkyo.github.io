@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: CPS Solution Architect at Collibra</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>CPS Solution Architect</h2>
+        <p><strong>Company:</strong> Collibra | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/collibra-cps-solution-architect-1" target="_blank">https://weworkremotely.com/remote-jobs/collibra-cps-solution-architect-1</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: CPS Solution Architect at Collibra
+
+**Candidate:** Principal Systems Architect — Federal Data Governance & Platform Engineering
+**Target Role:** CPS Solution Architect, Collibra Public Sector
+**Location Posture:** Remote (USA), DC-metro aligned, up to 50% on-site at federal customer sites
+**Clearance:** `[Active Secret / TS / TS-SCI — set to your actual adjudicated level before sending]`
+**Application Date:** `[YYYY-MM-DD]`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+I sit at the exact intersection this requisition describes and almost nobody occupies cleanly: **hands-on federal data-governance consulting** (5–10+ years delivering inside agency program offices) fused with **production platform engineering** on the substrate Collibra Public Sector actually runs on — AWS GovCloud / Azure Government, Kubernetes, Spark/Hadoop lineage pipelines, and REST/JSON integration surfaces hardened for FedRAMP and FISMA.
+
+Most candidates for Federal Solution Architect roles are strong on one axis and thin on the other. The pure consultant can run a blueprinting workshop but cannot debug a Kerberos SPNEGO handshake failure between an agency LDAP/AD boundary and the platform's SAML/OIDC broker, or read a `kubectl describe` on a CrashLooping ingestion worker at 22:00 the night before a go-live. The pure platform engineer can scale a cluster but has never sat across from a Chief Data Officer arguing for a data-stewardship operating model during a Continuing Resolution. I have done both, and the role's "Measures of Success" — presenting the services catalog and the Customer Journey framework at day 30 — is work I have effectively been doing for years.
+
+**Why this maps to Collibra specifically:**
+
+| Job Requirement | My Demonstrated Match |
+|---|---|
+| 5–10 yrs federal consulting in Data Governance / Management / Quality | Agency engagements across Data Catalog, Business Glossary, Stewardship, MDM, and DQ remediation; artifacts delivered against agency ATO packages |
+| PaaS, Data Lakes, Databases, Integration platforms common in federal | GovCloud + Azure Government, S3/ADLS data lakes, Oracle/PostgreSQL/SQL Server, Kafka/Confluent, MuleSoft/SnapLogic/NiFi |
+| ≥2 yrs cloud, REST/JSON API integration, deployment automation | Kubernetes (EKS/AKS), Helm, Terraform, Argo CD; custom Collibra REST/Import/Lineage API connectors |
+| Linux CLI proficiency | RHEL/STIG-hardened builds, systemd, SELinux, tcpdump/strace/`ss` triage on connectivity escalations |
+| AWS/Azure, Kubernetes, infrastructure & platform | Multi-account governance (Control Tower, SCPs), IRSA/Workload Identity, PrivateLink, EKS add-on lifecycle |
+| Spark, Hadoop | PySpark lineage/settlement-zone pipelines; HDFS/YARN operations on Cloudera/CDP clusters |
+| Enterprise security (LDAP/Kerberos) | AD/LDAP directory integration, Kerberos delegation troubleshooting, SAML/OIDC brokering, PKI/FIPS TLS |
+| APIs via Java/Python for custom implementations | Java workflow delegates + Python service automation for Collibra administrative and integration workflows |
+| ETL, data warehousing, data integration; functional & technical specs | End-to-end ETL remediation and functional/technical spec authoring for governance program charters |
+
+The strategic value I bring on day one is **faster time-to-value on federal engagements**: delivery models and artifacts that a customer's CIO shop can defend in an ATO review, plus engineering depth that shortens the diagnostics loop on the connectivity and API issues that most often stall a governance rollout.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Reference Architecture — Collibra DIC in a FedRAMP High Enclave
+
+The governing constraint in public sector is not throughput; it is **demonstrable control**. Every architectural decision below is traceable to a NIST SP 800-53 Rev.5 control family, because the customer's ISSO will ask.
+
+```
+┌──────────────────────────── AWS GovCloud (us-gov-west-1) / Azure Government ────────────────────────────┐
+│                                                                                                         │
+│  ┌── Ingress (PrivateLink / ExpressRoute + Private Endpoint) ───────────────────────────────────────┐   │
+│  │   Agency IdP (ADFS / Entra ID / Okta)  ──SAML 2.0 / OIDC──►  Collibra SSO (SP-initiated)          │   │
+│  │   mTLS client certs for machine-to-machine API consumers                                          │   │
+│  └───────────────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                         │
+│  ┌── Platform tier (EKS / AKS, private node groups, STIG-hardened AMIs/images) ─────────────────────┐  │
+│  │   Collibra DIC (Console / DGC / Search / Workflow Engine)   │  Collibra Data Lineage (harvester)   │  │
+│  │   Collibra Data Quality (DQ rule runtime)                   │  Integration services (custom)       │  │
+│  └───────────────────────────────────────────────────────────────────────────────────────────────────┘  │
+│                                                                                                         │
+│  ┌── Ingestion & Orchestration tier ─────────────────────────────────────────────────────────────────┐  │
+│  │   Kafka (MSK) lineage/CDC bus ──► Spark Structured Streaming ──► staging Parquet on S3            │ </pre>
+    </div>
+</body>
+</html>

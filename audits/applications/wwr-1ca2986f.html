@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Full-Stack Developer - Marketplace Web & Mobile Platform at Adventure Travel 365</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Full-Stack Developer - Marketplace Web & Mobile Platform</h2>
+        <p><strong>Company:</strong> Adventure Travel 365 | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/adventure-travel-365-senior-full-stack-developer-marketplace-web-mobile-platform" target="_blank">https://weworkremotely.com/remote-jobs/adventure-travel-365-senior-full-stack-developer-marketplace-web-mobile-platform</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Full-Stack Developer - Marketplace Web & Mobile Platform at Adventure Travel 365
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+I build two-sided marketplaces end-to-end — and the specific failure modes that kill contractor-referral platforms (cold-start liquidity, lead-quality disputes, payment trust, spam inquiries) are problems I've architected against in production, not theoretical ones.
+
+**Why this matches Adventure Travel 365's problem space:**
+
+- **Domain adjacency:** Thumbtack/Angi-class platforms are fundamentally *lead-delivery systems with payment trust layers*. I've built the equivalent core loops: service request → matching/ranking → provider attribution → escrowed payment → review, with the operational tooling (admin moderation, dispute handling, payout reconciliation) that turns a demo into a business.
+- **Two-sided by design, not by accident:** The hard part of your platform isn't the CRUD — it's *supply-side quality*, *request intent capture*, and *conversion attribution*. My proposals below are structured around those, because they determine whether contractors actually pay for leads.
+- **Full lifecycle ownership:** I take projects through architecture → build → hardening → launch → iteration, and I communicate in product outcomes, not framework jargon, for non-technical stakeholders. That's exactly the "big picture + ask the right questions" profile you described.
+- **AI where it earns its keep:** AI-assisted development in my day-to-day workflow (spec-driven codegen, review, test synthesis), plus in-product AI features that are cheap to run and genuinely useful here: request-description → structured lead categorization, provider-match ranking, review-signal summarization, and admin anomaly detection.
+
+**Recommended stack (and why):** **Next.js (TypeScript) + React Native/Expo** on the front, **NestJS (TypeScript) modular monolith** on the back, **PostgreSQL + PostGIS + Redis**, **Stripe Connect** for marketplace payments, **AWS (ECS Fargate)** or **Cloudflare/Vercel-adjacent** hosting. One language across web/mobile/API minimizes context-switching for a small team; a modular monolith scales further than people assume and avoids premature microservice tax; Postgres gives you transactions, JSONB flexibility, and full-text/geo search in one operational surface. Details in §2.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural Approach — Modular Monolith First, Extract by Pain
+
+```
+                       ┌─────────────────────────────────────────────┐
+                       │                Cloud Edge                   │
+                       │   CloudFront / Cloudflare  (WAF, bot mgmt)  │
+                       └──────────────────┬──────────────────────────┘
+                                          │
+            ┌─────────────────────────────┼─────────────────────────────┐
+            │                             │                             │
+   ┌────────▼────────┐          ┌────────▼────────┐           ┌────────▼────────┐
+   │  Next.js Web    │          │  React Native   │           │  Admin Portal   │
+   │  (SSR/ISR, SEO) │          │  Expo App (iOS/ │           │ (internal, SSO) │
+   │                 │          │  Android/Web)   │           │                 │
+   └────────┬────────┘          └────────┬────────┘           └────────┬────────┘
+            │            REST/JSON + OpenAPI 3.1 contract               │
+            └─────────────────────────────┬─────────────────────────────┘
+                                          │
+                             ┌────────────▼─────────────┐
+                             │   API Gateway / BFF      │
+                             │  rate-limit, authn/z,    │
+                             │  request-id, schema val. │
+                             └────────────┬─────────────┘
+                                          │
+      ┌───────────────────────────────────▼───────────────────────────────────┐
+      │                 NestJS Modular Monolith (one deployable)             │
+      │                                                                       │
+      │  ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌─────────┐  │
+      │  │ identity  │ │ listings  │ │  leads    │ │ payments  │ │  ads    │  │
+      │  │ accounts, │ │ search,   │ │ requests, │ │ Connect,  │ │ slots,  │  │
+      │  │ roles, 2FA│ │ geo/full- │ │ routing,  │ │ payouts,  │ │ billing │  │
+      │  │ sessions  │ │ text      │ │ attrib.   │ │ ledger    │ │         │  │
+      │  └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └────┬────┘  │
+      │  ┌─────▼─────┐ ┌─────▼─────┐ ┌─────▼─────┐ ┌─────▼─────┐           │
+      │  │ reviews   │ │  jobs     │ │ messaging │ │  notify   │  ... more │
+      │  └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘           │
+      └────────┼─────────────┼─────────────┼─────────────┼──────────────────┘
+               │             │             │             │
+      ┌────────▼─────────────▼─────────────▼─────────────▼──────────────────┐
+      │  PostgreSQL 16 (primary + replica)   │  Redis (cache, queue, lock) │
+      │  row-level tenancy, JSONB, PostGIS,  │  BullMQ for async jobs     │
+      │  full-text + trigram search          │  rate limiting, sessions   │
+      └───────────────────────────────────────┴─────────────────────────────┘
+               │
+      ┌────────▼─────────┐   ┌──────────────────┐   ┌─────────────────────┐
+      │ S3 + CloudFront  │   │ Stripe Connect   │   │ OpenTelemetry →     │
+      │ (media/avatars)  │   │ (marketplace pay)│   │ Grafana/Prometheus  │
+      └──────────────────┘   └──────────────────┘   └─────────────────────┘
+```
+
+**Key decisions:**
+
+| Decision | Rationale |
+|---|---|
+| **Modular monolith, not microservices** | A pre-PMF marketplace has one team and chaotic requirements. Modules with hard boundaries (enforced via lint rules + dependency graph) let you extract `payments` or `search` into services *when load or team size demands it* — without paying distributed-systems tax on day one. |
+| **Next.js for web** | Marketplace = SEO surface (contractor profiles, service-category pages are your top-of-funnel organic acquisition). SSR/ISR + structured data (LocalBusiness/Service schema) is table stakes. |
+| **React Native/Expo for mobile** | One codebase, OTA updates via EAS, native modules available (push, deep links, camera for profile photos). Faster than two native stacks for a team your size. |
+| **Postgres as the system of record** | Transactions across lead assignment + payment holds + notification dispatch are non-negotiable. Postgres gives you ACID + JSONB (flexible service schemas) + PostGIS (geo matching) + pg_trgm/FTS (search) in one system. |
+| **Stripe Connect (destination charges / separate charges & transfers)** | Marketplace payments without becoming a money transmitter. Escrow-like authorization → capture flow for lead fees or job deposits, platform fee on connect accounts, instant payouts optional. |
+| **Redis + BullMQ** | Async fan-out (notifications, email/SMS, search indexing, payment webhooks retries) without a Kafka cluster you don't need yet. |
+
+### 2.2 API Design
+
+**Style:** REST with an explicit OpenAPI 3.1 contract, versioned at `/v1`. Contract-first: the OpenAPI spec is the source of truth, codegen'd into TypeScript clients for web/mobile (no drift between docs and reality).
+
+**Core conventions:**
+
+- **Resource-oriented, sub-nested where it aids clarity:** `GET /v1/service-requests/{id}/leads` (bids/interest on a request), `POST /v1/listings/{id}/suspend`
+- **Cursor pagination everywhere** (`?cursor=...&limit=25`) — offset pagination breaks on hot lists.
+- **Problem+JSON (RFC 9457) errors** — machine-readable `type`, human `detail`, field-level `errors[]`.
+- **Idempotency keys on all mutations that touch money or create leads** (`Idempotency-Key` header, stored in Redis/Postgres 24h) — network retries must not double-charge or double-assign a lead.
+- **ETag/If-None-Match on read-heavy dashboards.**
+- **Auth:** short-lived JWT access tokens (15 min) + rotating refresh tokens (httpOnly, SameSite cookies on web; secure storage on mobile). RBAC claims (`client`, `provider`, `admin`), with resource-level authorization checked server-side on every request.
+- **Webhooks out:** signed (`Stripe-Signature`-style HMAC + timestamp), at-least-once with exponential-backoff redelivery and a dead-letter view in admin.
+
+**Representative endpoints:**
+
+```
+POST   /v1/auth/register                POST  /v1/service-requests
+POST   /v1/auth/login                   GET   /v1/service-requests/{id}
+POST   /v1/auth/refresh                 POST  /v1/service-requests/{id}/leads
+POST   /v1/auth/mfa/verify              POST  /v1/leads/{id}/accept | /decline
+GET    /v1/me                           POST  /v1/jobs/{id}/milestones
+GET    /v1/providers?geo&category&rating POST  /v1/jobs/{id}/milestones/{m}/fund
+GET    /v1/providers/{slug}             POST  /v1/reviews
+POST   /v1/listings                     GET   /v1/notifications
+GET    /v1/search/listings?q&near       POST  /v1/ads/impressions | /clicks
+POST   /v1/payments/intents             GET   /v1/admin/reports/leads
+```
+
+### 2.3 Data Modeling (PostgreSQL highlights)
+
+```
+users ──┬── profiles (role: client | provider | admin)
+        ├── provider_profiles (services[], service_area geography, verification_status)
+        ├── listings (category_id, geo, price_model, status)
+        ├── service_requests (category, budget_range, status, geo_point)
+        │        └── leads (request_id, provider_id, price_quote, status, expires_at)
+        ├── jobs (request_id, provider_id, escrow_balance, status)
+        │        └── milestones (amount, status: pending|funded|released|disputed)
+        ├── reviews (author_id, target_id, rating, moderation_status)
+        ├── ad_campaigns ── ad_placements (slot, geo, dates, pricing)
+        └── transactions (type: charge|transfer|refund|payout, immutable ledger)
+```
+
+Design points that matter:
+
+- **Status machines as CHECK constraints + guarded transitions** (service request: `draft → published → lead_gen → in_review → closed`; leads: `sent → viewed → accepted/declined/expired`). Illegal transitions fail at the DB, not just the app layer.
+- **Immutable financial ledger** — `transactions` rows are append-only; balances are derived (`SUM` or materialized view), never mutated in place. Reconciliation and audit become trivial.
+- **Lead attribution & expiry:** `leads(provider_id, request_id)` with `UNIQUE` partial index so a provider can't bid twice; `expires_at` + a sweeper job converts expired leads to `expired` and releases any holds.
+- **Search:** Postgres FTS (`tsvector` + GIN) + `pg_trgm` for fuzzy names, `PostGIS`/`earthdistance` for "near me." At later scale, outbox → Meilisearch/Typesense for typo-tolerant, faceted search.
+- **Row-Level Security** for tenant scoping as defense-in-depth (users can only `SELECT` their own rows even if an app query has a bug).
+- **Partitioning:** `transactions` and `notifications` by month once volume warrants.
+
+### 2.4 Concurrency Control
+
+Marketplaces are concurrency games. Specific controls:
+
+1. **Lead assignment race → row lock.** Multiple providers accepting a limited-slot lead: `SELECT ... FOR UPDATE SKIP LOCKED` on the lead row inside a transaction; loser gets a clean 409.
+2. **Escrow funding race → optimistic versioning.** `jobs.version` column; `UPDATE ... SET version = version + 1 WHERE id = $1 AND version = $expected` — 0 rows affected → 409 Conflict with a re-fetch hint.
+3. **Double-charge protection → idempotency keys** (§2.2) + Stripe idempotent API + a `webhook_events` table with a `UNIQUE(event_id)` so replayed webhooks are no-ops.
+4. **Search/filter consistency:** read-your-writes on dashboards via `?consistency=read-your-writes` (route to primary or wait for replica LSN).
+5. **Cache stampede protection:** per-key mutex in Redis + `stale-while-revalidate` with jittered TTLs.
+6. **Rate limiting:** token bucket in Redis (sliding window per IP + per account), stricter buckets on `POST /service-requests` and lead-accept endpoints</pre>
+    </div>
+</body>
+</html>

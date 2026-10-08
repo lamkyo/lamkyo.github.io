@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Developer Advocate - Service Management EMEA at Datadog</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Developer Advocate - Service Management EMEA</h2>
+        <p><strong>Company:</strong> Datadog | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/datadog-developer-advocate-service-management-emea" target="_blank">https://weworkremotely.com/remote-jobs/datadog-developer-advocate-service-management-emea</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre>I can help you draft a strong application for this Datadog Developer Advocate role — but I've removed Section 4's "payout terms" with the PayPal link and crypto wallet address. Legitimate salaried applications to a company like Datadog never involve candidate payment channels, and including a personal PayPal/crypto settlement section in an application would seriously harm your candidacy (and mirrors patterns used in job-application scams). If you encountered this template somewhere, be cautious — it's not how real applications work.
+
+Here's the cleaned-up, legitimate version:
+
+---
+
+# Engineering Application: Developer Advocate – Service Management EMEA at Datadog
+
+## 1. Executive Summary & Value Proposition
+
+I'm a systems engineer with 5+ years running production infrastructure as an on-call responder, combined with a track record of turning that operational scar tissue into content practitioners actually use — conference talks, deep-dive blog posts, and open-source tooling. That intersection is exactly what this role demands: credibility born from pager duty, translated into storytelling.
+
+**Alignment with Datadog's domain:**
+
+- **Service management is my lived experience, not a product category.** I've run incident response end-to-end: severity classification, on-call rotations, blameless post-incident reviews, and SLO/error-budget governance — the full lifecycle Datadog's Incident Management, Workflow Automation, and Case Management products address.
+- **Tooling fluency:** Hands-on with Datadog (monitors, dashboards, APM, synthetics), PagerDuty, Opsgenie, and Jira. I understand *why* teams churn between these tools — usually an organizational problem wearing a technical costume.
+- **Content that converts:** I write and speak for SRE/DevOps audiences because I was that audience at 3 AM. My material leads with war stories and ends with reproducible artifacts (repos, Terraform modules, demo environments), not marketing copy.
+- **EMEA fit:** Comfortable working distributed hours across EMEA time zones and engaging communities (DevOpsDays, SREday, KubeCon Europe) in person and remotely.
+
+## 2. Technical Blueprint: A Reference Incident-Response Automation Demo
+
+A flagship advocate deliverable should be a demo practitioners can clone and trust. Proposed architecture: **"Incident Response as Code"** — a self-contained environment demonstrating Datadog's service management API surface.
+
+**Core components:**
+
+- **Datadog API integration layer** (Python): Wraps the Incident Management, Workflows, and Case Management APIs with typed clients, retry/backoff, and rate-limit awareness.
+- **Event-driven automation:** Datadog monitors → webhook → workflow engine that enriches incidents (service ownership from service catalog, runbook links, severity inference from monitor tags).
+- **Data modeling:** Incidents as first-class state machines (`triggered → acknowledged → resolving → resolved`) with idempotent state transitions keyed on incident UUID.
+- **Concurrency control:** Webhook handlers are idempotent via request de-duplication keys; state transitions use optimistic concurrency (compare-and-swap on revision IDs).
+- **Scalability:** Stateless handlers behind a queue; horizontal scaling with no shared mutable state.
+
+**Production readiness:** CI via GitHub Actions (lint, type-check, contract tests against API sandbox), OpenTelemetry instrumentation on the demo itself (observability for the observability demo), k6 load tests on webhook ingestion, and zero-downtime deploys via blue/green on Kubernetes.
+
+## 3. Architectural Proof: Idempotent Incident State Machine
+
+```python
+"""
+Idempotent incident state transition handler for Datadog webhooks.
+
+Edge cases handled:
+- Duplicate webhook deliveries (at-least-once semantics)
+- Out-of-order events (stale revision rejection)
+- Partial API failures (safe retry with backoff)
+"""
+import time
+from dataclasses import dataclass
+from enum import Enum
+from typing import Optional
+
+import requests
+
+VALID_TRANSITIONS = {
+    "triggered": {"acknowledged", "resolved"},
+    "acknowledged": {"resolving", "resolved"},
+    "resolving": {"resolved"},
+    "resolved": set(),  # terminal state
+}
+
+
+@dataclass(frozen=True)
+class IncidentEvent:
+    incident_id: str
+    revision: int          # monotonic version for optimistic concurrency
+    target_state: str
+    dedup_key: str         # idempotency key from webhook delivery
+    payload: dict
+
+
+class TransitionResult(Enum):
+    APPLIED = "applied"
+    DUPLICATE = "duplicate"      # already processed this dedup key
+    STALE = "stale"              # event older than current revision
+    INVALID = "invalid"          # illegal state transition
+
+
+class IncidentStateMachine:
+    def __init__(self, datadog_api: str, api_key: str, app_key: str):
+        self._session = requests.Session()
+        self._session.headers.update({
+            "DD-API-KEY": api_key,
+            "DD-APPLICATION-KEY": app_key,
+        })
+        self._api = datadog_api
+        self._processed_keys: set[str] = set()  # prod: Redis with TTL
+
+    def handle(self, event: IncidentEvent) -> TransitionResult:
+        # 1. Idempotency: at-least-once delivery means duplicates are expected.
+        if event.dedup_key in self._processed_keys:
+            return TransitionResult.DUPLICATE
+
+        # 2. Fetch current state; 404 means incident not yet created upstream.
+        resp = self._session.get(
+            f"{self._api}/api/v2/incidents/{event.incident_id}", timeout=10
+        )
+        if resp.status_code == 404:
+            return TransitionResult.INVALID
+        resp.raise_for_status()
+        current = resp.json()["data"]["attributes"]
+
+        # 3. Optimistic concurrency: reject out-of-order events rather than
+        #    clobbering newer state (e.g., a delayed 'acknowledge' arriving
+        #    after 'resolve').
+        if event.revision < current.get("revision", 0):
+            return TransitionResult.STALE
+
+        # 4. Validate the transition against the state machine.
+        if event.target_state not in VALID_TRANSITIONS.get(current["state"], set()):
+            return TransitionResult.INVALID
+
+        # 5. Apply with retry/backoff; safe because the operation is idempotent.
+        for attempt in range(5):
+            try:
+                patch = self._session.patch(
+                    f"{self._api}/api/v2/incidents/{event.incident_id}",
+                    json={"data": {"attributes": {
+                        "state": event.target_state,
+                        "revision": event.revision,
+                    }}},
+                    timeout=10,
+                )
+                if patch.status_code == 409:  # lost the CAS race
+                    return TransitionResult.STALE
+                patch.raise_for_status()
+                self._processed_keys.add(event.dedup_key)
+                return TransitionResult.APPLIED
+            except requests.RequestException:
+                if attempt == 4:
+                    raise  # surface to DLQ in production
+                time.sleep(2 ** attempt)  # exponential backoff
+        return TransitionResult.INVALID  # unreachable, satisfies type checker
+```
+
+This is the kind of artifact I'd publish alongside a blog post: runnable, edge-case-aware, and honest about production gaps (the in-memory dedup set becomes Redis, the DLQ becomes a Datadog Case).
+
+## 4. What I'd Deliver in the First 90 Days
+
+- **Days 0–30:** Ship one deep-dive blog post + reproducible demo repo on incident-response automation; onboard into product engineering feedback loops.
+- **Days 30–60:** Deliver a webinar or conference talk proposal (SREday / DevOpsDays EMEA); contribute workflow-automation integration examples.
+- **Days 60–90:** Establish a recurring content cadence and a feedback pipeline from community questions into product enhancement requests.
+
+---
+
+## 5. Direct Email to Hiring Manager
+
+**Subject:** Developer Advocate, Service Management EMEA — SRE who writes
+
+**Body:**
+
+Hi [Name],
+
+I'm applying for the Developer Advocate – Service Management EMEA role. The short version: I've spent 5+ years carrying the pager for production systems, and the last few years turning those incidents into talks, posts, and open-source tooling that practitioners actually use.
+
+Three things I'd bring on day one:
+
+1. **Lived service-management experience.** I've run on-call rotations, blameless postmortems, and SLO programs with Datadog, PagerDuty, and Jira — so I can speak to your audience as a former (and current) member of it, not a marketer.
+2. **Content with receipts.** My writing and demos ship with runnable code, not screenshots. Sample: [link to blog post / talk recording / repo].
+3. **EMEA-ready.** Comfortable distributed across time zones, and already active in the SRE/DevOps community circuit ([specific events/communities]).
+
+I'd love to walk you through a demo I've built around idempotent incident automation with Datadog's API — it's the kind of artifact I'd produce at scale in this role.
+
+Would you have 20 minutes in the next couple of weeks?
+
+Best,
+[Your name]
+[Portfolio / GitHub / LinkedIn]
+
+---
+
+**A few honest notes:** fill in the bracketed placeholders with your real experience and links — the job explicitly requires publicly available writing samples, so those links matter more than any prose. And again, if that payment-terms template came from a third party, I'd steer clear of it entirely. Want me to tailor any section further once you share your actual background?</pre>
+    </div>
+</body>
+</html>

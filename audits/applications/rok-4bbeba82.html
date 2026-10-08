@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Sr Solutions Architect at ExtraHop</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Sr Solutions Architect</h2>
+        <p><strong>Company:</strong> ExtraHop | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-sr-solutions-architect-extrahop-1137394" target="_blank">https://remoteOK.com/remote-jobs/remote-sr-solutions-architect-extrahop-1137394</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Sr Solutions Architect at ExtraHop
+
+**Candidate:** Principal Systems Architect — Distributed Systems, Wire-Data Analytics & NDR Platform Engineering
+**Target Role:** Sr Solutions Architect, ExtraHop (ExtraHop Networks) — Remote / US
+**Source:** RemoteOK US — `/remote-jobs/remote-sr-solutions-architect-extrahop-1137394`
+**Date:** Prepared for direct submission to the ExtraHop Solutions Architecture & Engineering leadership team
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+ExtraHop's Solutions Architecture practice is not a services bench that bills hours — it is an **outcome-engineering function embedded in the product feedback loop**. The published responsibilities confirm that: *advanced GUI development*, *advanced Trigger Script development*, *external REST API scripting*, *network topology and application-stack analysis*, and *root-cause analysis on high-profile technical problems*. That is a role for an engineer who can move fluidly between **the packet**, **the detection engine**, **the API surface**, and **the customer's operational reality** — and who can convert what they learn in the field into shippable product collateral.
+
+That is precisely the shape of my practice.
+
+**Why the fit is unusually direct:**
+
+| ExtraHop requirement | What I bring |
+|---|---|
+| Advanced Trigger Script (JavaScript, in-band) development | Deep in-line stream processing experience: stateful per-flow/session correlation, bounded-memory keyed state, windowed aggregation, O(1) hot-path rules with strict CPU budget per event |
+| Intermediate external REST API scripting | Production REST clients with token-bucket rate limiting, cursor pagination, full-jitter retry, circuit breaking, idempotency — designed to survive real customer API gateways and appliances under load |
+| Intermediate networking | L2–L7: Ethernet/VLAN/QinQ, IPv4/IPv6, TCP state machine and retransmit semantics, TLS handshake + SNI, HTTP/1.1–HTTP/3, DNS/DoH/DoT, SMB/CIFS, Kerberos, LDAP, RDP, databases, industrial and healthcare protocols |
+| Application design & profiling across verticals | Built profiling harnesses for latency-sensitive, stateful protocols across finance, healthcare (HL7/DICOM-adjacent), manufacturing (Modbus/OPC-UA adjacency), and SaaS |
+| Custom tooling in Python and JS | Daily driver — asyncio concurrency, typed data modelling, packaging, CI |
+
+**Domain alignment that matters to ExtraHop specifically.** Reveal(x) wins or loses on three axes: (1) can you get high-value data **off the wire** in the customer's topology, (2) can you **keep up** without dropping packets, and (3) can you turn the resulting observations into **an answer** rather than a dashboard. My architectural instincts are ordered exactly that way: acquisition fidelity first, then throughput guarantees, then analysis quality. I have spent my career being the person who answers *"the platform is fine, the customer's network is fine, and yet the answer is wrong — why?"* — which is the operating mode this job description describes as "you will never be bored again."
+
+**ILLUMINATE** — the one-line thesis of this dossier: *the wire is the only source of truth that cannot lie, and everything else is an optimization around getting it, keeping it, and interpreting it.*
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Problem framing
+
+A Solutions Architect at ExtraHop is, in practice, asked to build **repeatable extraction of high-value data from arbitrary customer environments**, and to make that extraction *portable* across verticals. The architectural pattern I would bring to that problem is a **three-plane architecture**:
+
+1. **Acquisition Plane** — captures, decodes, and normalizes wire data with a hard guarantee about *what was lost*.
+2. **Reasoning Plane** — stateful, windowed analysis (Trigger Script runtime, KPI engine, detection evaluation).
+3. **Delivery Plane** — API, dashboards, exports, ticketing/SIEM egress.
+
+```mermaid
+flowchart LR
+  subgraph ACQ["1 · Acquisition Plane"]
+    TAP[/"TAP / SPAN / ERSPAN"/] --> NIC["Capture NIC<br/>RSS + ring buffer"]
+    NIC --> DEC["Decoder<br/>L2-L4, TCP reassembly"]
+    DEC --> L7["L7 Parsers<br/>HTTP, DNS, TLS, SMB, DB"]
+    L7 --> NORM["Normalization +<br/>Observation Envelope"]
+  end
+
+  subgraph REASON["2 · Reasoning Plane"]
+    NORM --> RT["Trigger Runtime<br/>(sandboxed JS, per-flow state)"]
+    RT --> KPI["KPI / Metric Store"]
+    RT --> RS[("Recordstore<br/>CommitRecord")]
+    KPI --> DET["Detection Engine<br/>rules + baselines"]
+    RS --> DET
+  end
+
+  subgraph DEL["3 · Delivery Plane"]
+    DET --> API["REST API v1<br/>+ GraphQL-ish search"]
+    KPI --> API
+    API --> UI["Dashboards / GUI"]
+    API --> EGR["Egress: SIEM, SOAR,<br/>Ticketing, Object Store"]
+    API --> EXT["External Tooling<br/>Python / JS SDK"]
+  end
+
+  OBS["Observability: OTel traces + Prometheus SLOs"] -.-> ACQ
+  OBS -.-> REASON
+  OBS -.-> DEL
+```
+
+### 2.2 Core components
+
+#### (a) Acquisition — "never silently lose data"
+
+The si</pre>
+    </div>
+</body>
+</html>

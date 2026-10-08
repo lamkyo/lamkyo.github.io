@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Software Developer Security Analytics at RedMimicry</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Software Developer Security Analytics</h2>
+        <p><strong>Company:</strong> RedMimicry | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-software-developer-security-analytics-redmimicry-1137417" target="_blank">https://remoteOK.com/remote-jobs/remote-software-developer-security-analytics-redmimicry-1137417</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Software Developer Security Analytics at RedMimicry
+
+**Reference token:** CONTINUITY · `RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+The job post describes a capability that turns *fragmented, noisy security logs* into usable signal. That sentence is the whole problem statement, and it is a data-engineering problem wearing a security badge. Detection content is cheap; the expensive, failure-prone part is the pipeline underneath it — schema evolution across a dozen heterogeneous sources, late-arriving events, clock skew, replay and idempotency, and a query layer that stays fast while volume grows 10x.
+
+My background fits where this role actually hurts:
+
+- **Streaming ingestion at scale.** I have designed Kafka-based pipelines (Redpanda-compatible) with exactly-once semantics via transactional producers plus idempotent sink writes — the difference between a detection firing twice at 03:00 and a SOC analyst trusting the alert queue.
+- **Normalization as a first-class schema.** Rather than treating ECS/OCSF mapping as glue code, I treat it as a versioned, tested contract: every source gets an adapter, every adapter gets a golden-file test corpus, and the normalized model is versioned so dashboards don't silently break when a vendor renames a field.
+- **Query performance under adversarial data shapes.** Security telemetry is the worst case for columnar stores: high-cardinality dimensions (process hashes, user agents, FQDNs), skewed hot tenants, and bursty ingestion during incident storms. I've done partition pruning, bloom-filter index design, and materialized rollups to keep p95 dashboard latency flat.
+- **Detection-as-code.** Rules, tests, and expected-firing fixtures live in the repo, run in CI, and block merge on regression. This is the only way a detection library survives contact with reality.
+- **European remote discipline.** A fixed-term, mostly-remote contract with monthly Berlin anchor days suits me: asynchronous written design docs, code review turnaround measured in hours not days, and in-person days reserved for the high-bandwidth conversations (threat-model walkthroughs, architecture forks) that genuinely need a room.
+
+**Domain alignment with RedMimicry.** RedMimicry's core artifact is a Windows/Active Directory adversary emulation toolkit — meaning the logs in scope are predominantly **Windows Security Event Log, Sysmon, and AD/DC telemetry**, with Linux/cloud sources added opportunistically. That matters architecturally: Windows event data is verbose, inconsistently encoded (EVTX vs. XML vs. Syslog-forwarded variants), and heavy on nested `EventData` maps, which defeats naive flattening. My blueprint below assumes Windows-first sources and designs the normalizer accordingly instead of pretending everything is clean JSON.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural stance
+
+I would build this as a **three-plane system**, deliberately decoupled so that each plane can fail independently:
+
+| Plane | Responsibility | Failure mode tolerated |
+|---|---|---|
+| **Ingest plane** | Collect, buffer, deduplicate, persist raw | Backpressure, producer restarts, source outages |
+| **Normalize plane** | Map raw → canonical schema, enrich, redact | Schema drift, malformed records, enrichment provider downtime |
+| **Serve plane** | Query, detect, correlate, expose API | Read-path latency spikes, hot-partition skew |
+
+The invariant: **raw events are immutable and always persisted before normalization is attempted.** If the normalizer is wrong or a vendor changes a field name, you re-derive from raw. Any design that discards the source record is a design that eventually requires the customer to re-ship history.
+
+### 2.2 Core components
+
+**Ingestion.** Sources write to a Kafka/Redpanda topic keyed by `(tenant_id, source_id)` to preserve per-source ordering without forcing global ordering (which would be a throughput ceiling). Producers are transactional; consumers commit offsets only after downstream acknowledgement. Deduplication uses a `(tenant_id, source_id, event_hash, bucket_minute)` key in Redis with a short TTL — bounded memory, and collisions across tenants are impossible by construction.
+
+**Canonical data model** (simplified, ECS/OCSF-influenced):
+
+```python
+@dataclass(frozen=True, slots=True)
+class NormalizedEvent:
+    # Identity & provenance
+    event_id: str                    # UUIDv7 — time-sortable, no coordination needed
+    tenant_id: str
+    source_id: str
+    source_type: Literal["windows_security", "sysmon", "linux_auditd", "cloudtrail", "custom"]
+    ingested_at: datetime            # pipeline wall clock
+    occurred_at: datetime            # source-asserted time, may be skewed/untrusted
+    time_confidence: Literal["high", "medium", "low"]  # drives latency vs. correctness tradeoff
+
+    # Classification
+    action: str                      # "process_start", "auth_failure", "registry_modify"
+    outcome: Literal["success", "failure", "unknown"]
+    severity: int                    # 0-100, normalized, not vendor-native
+
+    # Actor / target graph — the part detections actually join on
+    actor: ActorRef                  # user, process, or service identity
+    target: ActorRef | None
+    host: HostRef
+    network: NetworkRef | None
+
+    # Escape hatch, queryable but not indexed by default
+    raw_ref: str                     # pointer into cold storage
+    unmapped: dict[str, Any]        # fields we saw but have no canonical home for
+```
+
+Two design decisions worth flagging:
+
+1. **`time_confidence` is a first-class field, not a warning log.** With monthly in-person cadence and remote sources, a forwarder with a wrong clock can poison a 24-hour detection window. Rather than rejecting skewed events, I mark them and let detections opt into strict or lenient time handling. Rejecting log data is almost always the wrong answer.
+2. **`unmapped` exists on purpose.** When a new source field appears, it lands there rather than being dropped. A weekly job reports unmapped-field frequency, which becomes the backlog for adapter improvements. This is how normalization converges instead of rotting.
+
+**Storage.** Hot tier in ClickHouse (or Timescale if the team prefers Postgres-adjacent ops) — partitioned by `toYYYYMMDD(occurred_at)`, ordered by `(tenant_id, source_type, occurred_at, event_id)`. Tenant first in the sort key because the overwhelmingly common query shape is tenant-scoped. Cold raw in object storage with a lifecycle policy; `raw_ref` resolves through a pre-signed URL issued by the API, never by direct bucket exposure.
+
+**API design.** FastAPI (or Go/Chi if the team's runtime is Go — the contract is what matters, not the framework):
+
+```
+POST   /v1/events/search        # structured query, cursor pagination, no offset
+GET    /v1/events/{event_id}    # single event + raw_ref pre-signed URL
+GET    /v1/detections           # paginated detection catalog
+POST   /v1/detections/{id}/test # dry-run a detection against a time range
+POST   /v1/rules                # detection-as-code ingest from CI
+GET    /healthz /readyz /metrics
+```
+
+Contract rules:
+
+- **Cursor pagination only.** Offset pagination over a stream that's actively ingesting produces duplicate and skipped rows; that is unacceptable in an evidence-bearing system.
+- **Every query carries an explicit tenant scope**, enforced at the repository layer, not by caller discipline. Cross-tenant reads are a security defect, and the only reliable defense is a query builder that cannot emit a tenant-less statement.
+- **Time bounds are mandatory** on `/events/search`. Unbounded scans are the classic way a security analytics API takes down its own database.
+
+### 2.3 Concurrency and consistency
+
+- **Exactly-once end-to-end** via Kafka transactional producers + idempotent ClickHouse inserts keyed on `event_id` (ReplacingMergeTree with `event_id` in the sort key, so retries collapse rather than duplicate).
+- **Optimistic concurrency on detection edits** — `ETag`/`If-Match` on rule updates. Two analysts editing the same rule during an incident is a real scenario, and last-write-wins silently destroys someone's work.
+- **Advisory locks only for schema migration**, never for the query path. Long-held locks on a live telemetry store cause exactly the outage you're trying to detect.
+
+### 2.4 Production readiness
+
+- **CI/CD:** GitHub Actions. Stages — lint/type-check → unit → golden-file normalizer tests → integration against ephemeral Kafka + ClickHouse (Testcontainers) → schema-migration dry run → container scan (Trivy) → deploy. Detection rules are tested in the same pipeline; a rule that fires on the benign corpus fails the build.
+- **Observability:** OpenTelemetry traces spanning ingest→normalize→persist with a propagated `event_id` as the correlation key — so "why didn't this alert fire" becomes a single trace query. Prometheus metrics: `ingest_events_total{source,status}`, `normalize_duration_seconds` (histogram), `unmapped_field_total{source,field}`, `query_p95_seconds{endpoint}`, `detection_evaluations_total{rule,result}`. Alerting on *pipeline silence* (`rate(ingest_events_total) == 0` for a source that normally reports) is as important as alerting on errors — an adversary's first move is often to stop the logs.
+- **Load testing:** k6 or Locust against a synthetic corpus sized to 10x projected peak, with the specific adversarial shapes called out — high-cardinality dimension queries, bursty ingest during simulated incident storms, and cold-cache dashboard loads.
+- **Zero-downtime deploys:** rolling with readiness gates; expand/contract schema migrations (add column → backfill → switch reads → drop old, never in one release); feature flags for detection changes so a bad rule can be disabled without a deploy.
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+The piece I'd most want to be judged on is the **normalizer**, because it's where correctness is hardest and where a reviewable artifact proves the most. Below is an idiomatic, defensive Python implementation covering the Windows/Sysmon path with realistic edge cases: nested `EventData` maps, missing or skewed timestamps, reordered fields, and unknown event IDs.
+
+```python
+"""
+normalizer.py — Canonical event normalization for heterogeneous security sources.
+
+Design principles:
+  1. NEVER drop an event because it is malformed. Persist it with reduced
+     confidence and an explicit reason. Dropped telemetry is invisible failure.
+  2. Never raise from a per-event path. A single bad record must not stall a
+     partition; failures are counted and quarantined.
+  3. Unmapped fields are preserved, not discarded — they are the schema backlog.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import logging
+import uuid
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
+from typing import Any, Final, Mapping, Protocol
+
+log = logging.getLogger(__name__)
+
+# Clock skew beyond this is flagged, not rejected.
+MAX_TRUSTED_SKEW: Final = timedelta(minutes=15)
+
+# Windows event IDs -> canonical action. Extend as the detection library grows.
+WINDOWS_EVENT_MAP: Final[dict[int, tuple[str, str]]] = {
+    4624: ("auth_success", "success"),
+    4625: ("auth_failure", "failure")</pre>
+    </div>
+</body>
+</html>

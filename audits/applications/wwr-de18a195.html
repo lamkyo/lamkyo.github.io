@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Abuse Research Engineer at Stripe</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Abuse Research Engineer</h2>
+        <p><strong>Company:</strong> Stripe | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/stripe-abuse-research-engineer" target="_blank">https://weworkremotely.com/remote-jobs/stripe-abuse-research-engineer</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Abuse Research Engineer at Stripe
+
+**Candidate:** Principal Software Engineer / Systems Architect
+**Target Role:** Abuse Research Engineer — Abuse Research Group (ARG), Stripe
+**Location:** Remote (US) · **Source:** WeWorkRemotely (Fullstack)
+**Applied Research Stack:** Python · SQL · Trino/Databricks/Spark · PySpark · Pandas · scikit-learn · LLM agent orchestration · OpenTelemetry
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Stripe's Abuse Research Group is not a detection team. It is an **offensive research function that produces falsifiable, machine-checkable claims about how money is moved through Stripe's APIs by adversaries** — and then turns those claims into controls and regression tests that make the abuse path structurally unprofitable. That is a systems-engineering problem before it is a security problem: the hard parts are telemetry schema stability, taxonomy versioning, deterministic replay of adversary behavior, and translating research artifacts into CI artifacts.
+
+My background maps onto that problem in three specific ways:
+
+**1. Kill-chain modeling as a first-class data model.** I have spent my career treating multi-stage adversarial processes — not single events — as the unit of analysis. The recurring failure mode in fraud infrastructure is *monolithic risk labels*: a `machine_learning_score > 0.87` attached to a transaction, which tells you nothing about which stage of the exploit was reachable and which control failed to interrupt it. FT3's decomposition of fraud into structured kill chains is architecturally the right move, and my instinct is to immediately model it as a **versioned, queryable graph with immutable TTP identifiers** so that every downstream advisory, control recommendation, and regression test is traceable to a taxonomy node and a taxonomy version.
+
+**2. Agentic simulation with hard guardrails.** The role explicitly centers on agentic automated testing to simulate adversary TTPs. I have built LLM-driven agent loops — planner + tool executor + verifier — and I know where they break: non-determinism in replay, runaway tool budgets, silent egress of production-adjacent data, and unverifiable "the control worked" assertions. The blueprint in §2 treats the simulator as a **sandboxed, budget-metered, idempotency-keyed state machine with a deterministic seed**, so that a simulated kill chain is a *reproducible artifact* you can diff across control deploys.
+
+**3. Research → CI pipeline.** The most valuable output of a research group is not a PDF; it is a test that fails when someone regresses a control. I build for the "advisory → regression scenario → control validation gate" path natively, in the same repositories engineers already ship from.
+
+**Domain alignment:** I work fluently in the exact failure classes named in the preferred qualifications — Account Takeover (session/device-binding anomalies, credential-stuffing bursts across ASN rotation), Card Testing (low-value authorization storms on BIN ranges, `issuer_declined` ratio shifts, velocity across `payment_method` fingerprints), and the onboarding-to-monetization transition that most controls miss entirely because ownership of that path is split across Fraud Ops, Risk, and Onboarding. That cross-functional seam is precisely where FT3 earns its keep.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Proposal: The Kill-Chain Research Platform (KRP)
+
+I propose a five-plane architecture that makes ARG's workflow reproducible end-to-end. It is deliberately **additive to Stripe's existing stack** (Trino/Iceberg lakehouse, Databricks for heavy feature work, Kafka-based event backbone, Python-first services) rather than a re-platforming exercise.
+
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│  PLANE 1 — SIGNAL FABRIC                                                  │
+│  Kafka ─► Iceberg (raw) ─► dbt/Spark normalize ─► abuse_event_v3 (Trino)  │
+│  External: TIPs, OSINT feeds, breach corpora ─► intel_raw (append-only)   │
+└───────────────────────────────┬───────────────────────────────────────────┘
+                                │
+┌───────────────────────────────▼───────────────────────────────────────────┐
+│  PLANE 2 — FT3 TAXONOMY SERVICE  (versioned, immutable, cached)           │
+│  ttp_registry │ kill_chain_topology │ signal_bindings │ control_bindings  │
+│  gRPC (in-cluster) + GraphQL (analyst UI) · L1 in-process LRU + L2 Redis   │
+└───────────────────────────────┬───────────────────────────────────────────┘
+                                │
+┌───────────────────────────────▼───────────────────────────────────────────┐
+│  PLANE 3 — HUNT ORCHESTRATOR                                              │
+│  Hypothesis DSL ─► dedupe (embedding) ─► lease queue (SKIP LOCKED)        │
+│  ─► distributed hunt execution (Trino/Spark) ─► finding ledger            │
+└───────────────────────────────┬───────────────────────────────────────────┘
+                                │
+┌───────────────────────────────▼───────────────────────────────────────────┐
+│  PLANE 4 — AGENTIC ADVERSARY SIMULATOR + CONTROL ORACLE                   │
+│  Planner (LLM) ─► Tool Executor (sandbox-only) ─► Telemetry Emitter       │
+│  ─► Control Oracle replay ─► interruption points / gaps / regressions     │
+└───────────────────────────────┬───────────────────────────────────────────┘
+                                │
+┌───────────────────────────────▼───────────────────────────────────────────┐
+│  PLANE 5 — ADVISORY COMPILER & CONTROL VALIDATION GATE                    │
+│  Find</pre>
+    </div>
+</body>
+</html>

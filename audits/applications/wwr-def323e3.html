@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Data Scientist II, Infrastructure at Pinterest</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Data Scientist II, Infrastructure</h2>
+        <p><strong>Company:</strong> Pinterest | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/pinterest-data-scientist-ii-infrastructure" target="_blank">https://weworkremotely.com/remote-jobs/pinterest-data-scientist-ii-infrastructure</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre>A note before the dossier itself, since two things in your template will actively hurt you with a real employer:
+
+1. **Section 4 is a freelancer artifact.** Pinterest is hiring a full-time W-2 employee at a posted band ($114,297–$235,319 + equity). Sending "fixed-price $1,500–$3,000" or a PayPal/crypto payout address to a corporate recruiter is a spam/advance-fee signal — it will get you filtered, not hired. I've written the section so it's clearly scoped to a *separate consulting engagement* and told you to strip it from the Pinterest submission.
+2. **Anything in `[brackets]` is a placeholder for your real numbers.** Every metric below is illustrative — don't ship a claim you can't defend in the interview, because Pinterest's stated process is "explain your approach, how you think."
+
+Also: verify the internal platform names (Goku, OTel migration, etc.) against Pinterest's engineering blog before you cite them in an interview. They're accurate to my knowledge but engineering blogs age.
+
+---
+
+# Engineering Application: Data Scientist II, Infrastructure at Pinterest
+
+## 1. Executive Summary & Value Proposition
+
+I build **measurement systems for infrastructure** — the connective tissue between raw telemetry and the decisions platform teams actually make. My background sits deliberately at the seam this role names: production data pipelines on one side, rigorous experimentation and causal inference on the other. Most candidates are strong in exactly one.
+
+**Why this problem space specifically.** Data Science II on Infrastructure fails in two predictable ways when it fails:
+
+- **The analysis is sound but the data is garbage.** A latency regression "analysis" run on a metric whose definition silently drifted three quarters ago produces a confident, wrong answer. Metric *definitions* are the product; the charts are downstream.
+- **The analysis is rigorous but nobody can act on it.** A perfectly identified effect that arrives two weeks after the release is archaeologation, not decision support.
+
+My operating pattern is to fix both ends: make the metric trustworthy and versioned, then make it fast and legible enough that an on-call SRE or a platform PM can use it during, or immediately after, an incident.
+
+**Alignment with Pinterest's stack and domain.** Pinterest's infrastructure data science surface is unusually broad — app performance, shopping infrastructure, metrics quality, infrastructure governance, site reliability — and those domains share a common substrate: high-cardinality time-series telemetry (the Goku/OpenTSDB lineage), stream and batch processing (Kafka → Flink → Spark/Trino on S3, orchestrated by Airflow), and an experimentation platform that has to survive Pinterest-scale traffic with variance-reduction techniques rather than brute force. The work this role describes — **metric definitions, audited data quality, pipeline contributions, experiment design, ambiguous-to-actionable translation** — is exactly the layer above that substrate. I've operated there.
+
+**The 90-day value proposition.** I don't propose to spend a quarter "ramping." I propose to spend it producing a **metric contract registry** for one infrastructure domain, a **backfill/idempotency audit** of the pipelines feeding it, and a **variance-reduced analysis toolkit** that makes the next ten investigations cheaper than the first. Concrete deliverables in §2.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 The core architectural problem
+
+Infrastructure Data Science at Pinterest scale has one dominant failure mode: **the same quantity is defined differently in four places**, and no one can tell which definition a given dashboard or experiment was computed against.
+
+Symptoms, all of which the job description hints at:
+
+| Symptom | Root cause | Typical (bad) fix |
+|---|---|---|
+| "The dashboard says p99 is 400ms, the SLO burn alert says 250ms" | Percentile computed over different population filters (client vs. edge vs. origin) | Add a fifth dashboard |
+| A regression is declared, then evaporates on re-run | Non-idempotent backfill double-counted late-arriving events | Manual reconciliation |
+| Metric silently changes 4% on a refactor week | Definition lived in a dbt model / Airflow DAG, not under review | Nobody notices for a quarter |
+| Experiment results can't be trusted for a 0.3% guardrail | Underpowered, no variance reduction, no multiple-testing control | Longer experiment (costs weeks) |
+
+The architectural answer is **metrics as versioned, testable artifacts** — the same discipline we apply to code, applied to the definitions that gate every decision.
+
+### 2.2 Core components
+
+**Component A — Metric Contract Registry (the source of truth)**
+
+A metric is not a number. A metric is a *contract*:
+
+```
+MetricContract {
+  name, owner, domain, tier, version
+  entity:        unit of analysis (request | session | pin | merchant | host)
+  population:    inclusion/exclusion predicate, explicit
+  numerator/denominator:  explicit SQL fragments, not prose
+  unit, direction (lower_is_better / higher_is_better)
+  window:        aggregation window + watermark/lateness allowance
+  percentiles:   [50, 95, 99] with explicit aggregation method (t-digest vs exact)
+  freshness_sla: max tolerable (now - max(event_time))
+  coverage_floor: min acceptable population coverage vs. a reference count
+  guardrails:    min n, max cardinality, null-rate ceiling
+  lineage:       upstream tables + producing DAG
+  change_log:    every semantic change, dated, with a reviewer
+}
+```
+
+Stored as code in the repo, validated in CI, rendered into docs. This is the single mechanism that fixes the "four definitions" problem: **a dashboard or experiment that references a metric must reference a versioned contract.**
+
+**Component B — Measurement Pipeline Layer**
+
+Three tiers, deliberately separated so that a cheap question never triggers an expensive query:
+
+1. **Raw event tier** — Kafka → Flink for streamin</pre>
+    </div>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior .NET Software Engineer at OkWhen</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Senior .NET Software Engineer</h2>
+        <p><strong>Company:</strong> OkWhen | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-senior-net-software-engineer-okwhen-1137411" target="_blank">https://remoteOK.com/remote-jobs/remote-senior-net-software-engineer-okwhen-1137411</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior .NET Software Engineer at OkWhen
+
+> **Application note:** OkWhen explicitly states that direct email results in disqualification. The dossier below is structured for the official application form. The email in Section 5 is provided only as a post-application follow-up draft and should not be sent unsolicited.
+
+**Required application markers:**  
+- `EXAMPLAR`  
+- `#RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+OkWhen’s platform sits at the intersection of several demanding domains: event registration, payments, content delivery, mobile applications, sponsorships, operational workflows, LMS functionality, and real-time event operations. The right engineer for this role must therefore be more than a feature implementer. The engineer must be able to protect production reliability while making pragmatic improvements to an existing .NET, Angular, SQL Server, and .NET MAUI estate.
+
+I am applying for the Senior .NET Software Engineer position because it calls for exactly the combination of backend engineering, production ownership, data-intensive application design, cross-functional delivery, and pragmatic technical leadership that I have pursued throughout my career.
+
+My proposed contribution would include:
+
+- Designing and implementing maintainable ASP.NET Core services and REST APIs.
+- Improving Angular applications with strong typing, observable state transitions, and reliable API integration.
+- Designing SQL Server schemas that support registration capacity, payment state, event lifecycle, and operational reporting.
+- Reducing latency and failure modes through query tuning, indexing, caching, asynchronous processing, and profiling.
+- Introducing durable production practices, including structured logging, distributed tracing, metrics, health checks, and actionable alerts.
+- Establishing pragmatic engineering standards for automated testing, code review, CI/CD, and zero-downtime deployment.
+- Investigating incidents from first principles and converting recurring operational problems into durable product improvements.
+- Working directly with product, operations, event-production, and engineering stakeholders to turn ambiguous business requirements into understandable technical plans.
+
+I would approach OkWhen’s platform as a reliability-sensitive SaaS system rather than treating each application feature as an isolated task. The goal would be to preserve business-critical behavior while making the system easier to operate, safer to change, and more scalable as event volume increases.
+
+### Alignment with OkWhen’s technical requirements
+
+| OkWhen requirement | How I would contribute |
+|---|---|
+| C# and ASP.NET/.NET | Build production APIs and services with maintainable boundaries, strong validation, predictable error handling, and measurable performance. |
+| Angular and TypeScript | Improve frontend architecture without over-engineering, focusing on reliable state management, accessibility, loading/error states, and API contract discipline. |
+| SQL Server | Apply schema design, indexing, query-plan analysis, concurrency control, and transaction design based on actual workload characteristics. |
+| .NET MAUI / Xamarin | Maintain mobile experiences while addressing platform lifecycle, offline behavior, authentication, telemetry, and release reliability. |
+| Production support | Treat incident response as an engineering discipline: establish impact, contain failure, restore service, preserve evidence, and prevent recurrence. |
+| Existing codebase | Start with discovery and observability before making broad changes. Reduce technical debt through prioritized, reversible improvements. |
+| API design | Use resource-oriented REST contracts, consistent error semantics, idempotency for critical commands, pagination, filtering, and version compatibility. |
+| Automated testing | Apply a balanced test pyramid covering domain logic, persistence behavior, API contracts, integration boundaries, and critical user journeys. |
+| SaaS and operational complexity | Design for tenant isolation, background processing, retries, auditability, observability, and controlled migration of existing systems. |
+| Mentoring and standards | Share context through design documents, code-review guidance, pairing, and engineering standards that improve team leverage rather than creating bureaucracy. |
+
+### My operating approach
+
+1. **Understand the production system before changing it.**  
+   I would review architecture, deployment topology, database behavior, telemetry, recurring incidents, and business constraints before selecting a solution.
+
+2. **Prefer the smallest safe architectural change.**  
+   Existing systems benefit from incremental modernization. A well-contained extraction or targeted service improvement is generally safer than a large rewrite.
+
+3. **Make correctness explicit.**  
+   Payments, registration capacity, payment status, event publication, and operational workflows require transaction boundaries, idempotency, validation, and auditability.
+
+4. **Measure production behavior.**  
+   Improvements should be based on latency distributions, error rates, saturation, query plans, and user-impacting symptoms—not only local development performance.
+
+5. **Leave the system more understandable than I found it.**  
+   Code, tests, documentation, dashboards, and runbooks should all be treated as part of the deliverable.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+## 2.1 Initial discovery and technical assessment
+
+During the first phase, I would establish a production and architecture baseline rather than immediately beginning feature work.
+
+### Architecture discovery
+
+I would map:
+
+- Existing services, applications, jobs, integrations, and data stores.
+- Angular application boundaries and major user journeys.
+- .NET MAUI application responsibilities and mobile release constraints.
+- API dependencies, third-party services, and authentication providers.
+- SQL Server schemas, execution plans, indexes, and transaction patterns.
+- Background processing, queues, scheduled jobs, and retry behavior.
+- Deployment pipelines, environment configuration, secrets management, and rollback procedures.
+- Existing logs, metrics, traces, dashboards, and incident history.
+
+### Operational discovery
+
+I would review:
+
+- Recent production incidents and recurring failure modes.
+- API latency and error budgets.
+- Slow queries, lock waits, blocking, and connection saturation.
+- Queue depth, retry frequency, dead-letter volume, and failed jobs.
+- Authentication failures and authorization anomalies.
+- Peak-event traffic patterns, including registration bursts and event-day load.
+- Customer support workflows that depend on operational data.
+
+The output would be a prioritized technical backlog containing:
+
+- Immediate reliability risks.
+- Performance and scalability opportunities.
+- Security and compliance concerns.
+- High-value technical-debt items.
+- Features or changes that unlock product outcomes.
+
+---
+
+## 2.2 Recommended target architecture
+
+The target architecture should evolve from OkWhen’s current system rather than impose a wholesale rewrite.
+
+```text
+Angular Web Application
+        |
+        | HTTPS / OAuth or OIDC
+        v
+API Gateway / ASP.NET Core Backend
+        |
+        +-------------------+
+        |                   |
+        v                   v
+Domain Services     Integration Services
+        |                   |
+        +---------+---------+
+                  |
+                  v
+             SQL Server
+                  |
+                  v
+         Outbox / Change Events
+                  |
+                  v
+         Queue or Event Bus
+                  |
+          +-------+--------+
+          |                |
+          v                v
+   Background Workers   External Systems
+   Notifications       Payments, email,
+   CEU, reporting      video, webhooks
+```
+
+### Key design principles
+
+- Keep business rules in application/domain services rather than controllers.
+- Use explicit data-transfer objects and API contracts.
+- Keep database transactions short and narrowly scoped.
+- Use an outbox pattern where a business transaction must reliably trigger asynchronous work.
+- Make external integrations idempotent and retryable.
+- Avoid distributed transactions unless the business requirement and operational risk justify them.
+- Use optimistic concurrency for frequently edited records and explicit isolation or locking only where required.
+- Standardize telemetry around request, tenant, user, correlation, and operation dimensions.
+- Keep secrets outside source control and configuration files.
+- Build administrative workflows with auditable state transitions.
+
+---
+
+## 2.3 API design
+
+For public or internal APIs, I would establish a consistent contract around:
+
+- Resource-oriented URLs.
+- Pagination and bounded page sizes.
+- Standardized validation errors.
+- Correlation IDs and trace propagation.
+- Consistent date/time and timezone handling.
+- Idempotency keys for commands that create financial or operational state.
+- Idempotent payment and registration operations.
+- Explicit authorization boundaries.
+- API versioning where existing clients cannot safely migrate atomically.
+- Stable error codes suitable for client automation.
+
+Example error contract:
+
+```json
+{
+  "error": {
+    "code": "registration.capacity_reached",
+    "message": "The event does not have sufficient remaining capacity.",
+    "correlationId": "00-abcd1234-ef567890-1234-567890abcdef",
+    "details": {
+      "eventId": "5e2d8b20-0ad4-4a2a-8b0b-84d9c1cf9c8d"
+    }
+  }
+}
+```
+
+I would avoid returning stack traces, database details, or internal exception messages to clients. Internal failures would be correlated through telemetry and structured logging.
+
+### Critical command design
+
+Commands such as the following should be designed as safely repeatable operations:
+
+- Create registration.
+- Capture payment.
+- Issue refund.
+- Transfer ticket.
+- Publish event content.
+- Enroll learner in a course.
+- Record CEU completion.
+- Send scheduled notifications.
+- Synchronize sponsor or attendee data.
+
+The API should persist an idempotency record within the same transaction as the business operation. A repeated request with the same key should return the original result or a well-defined “already processed” response.
+
+---
+
+## 2.4 SQL Server and data modeling
+
+I would optimize the data model around the business lifecycle of an event and its related operations.
+
+### Example aggregate boundaries
+
+- Event
+- Session
+- Venue
+- Registration
+- Attendee
+- Ticket type
+- Order
+- Payment
+- Refund
+- Sponsor
+- Sponsor package
+- Content item
+- Course
+- Enrollment
+- CEU record
+- Notification
+- Audit record
+
+### Design guidelines
+
+- Use stable, non-sequential public identifiers where appropriate.
+- Separate monetary values into `decimal`, never floating-point types.
+- Store timestamps in UTC and preserve the original business timezone where event scheduling requires it.
+- Use explicit enum-like status values with transition rules.
+- Apply unique constraints that match actual business invariants.
+- Use filtered indexes for common active-state queries.
+- Index foreign keys and frequently used filter/order columns.
+- Avoid unbounded queries and accidental full-table scans.
+- Analyze execution plans before introducing broad indexing changes.
+- Use query pagination consistently.
+- Introduce read models or reporting replicas only after measuring a concrete need.
+- Maintain a query-performance budget for high-volume endpoints.
+
+### Concurrency control
+
+I would use a combination of strategies based on the operation.
+
+#### Optimistic concurrency
+
+For records such as event details or sponsor profiles:
+
+- Add a `rowversion` column.
+- Include the expected version in update commands.
+- Return a conflict when the version has changed.
+- Allow the client to refresh and resubmit where appropriate.
+
+#### Transactional capacity enforcement
+
+For ticket registration, a naïve check followed by an insert can overbook an event under concurrent requests. The capacity check and reservation must occur inside a suitable transaction, with an appropriate isolation strategy or a database-enforced conditional update.
+
+For example:
+
+```sql
+UPDATE dbo.EventInventory
+SET ReservedCount = ReservedCount + @RequestedQuantity
+WHERE EventId = @EventId
+  AND ReservedCount + @RequestedQuantity <= Capacity;
+```
+
+A zero-row update would indicate insufficient inventory. The registration and payment state would then be handled using an explicit state machine rather than a single overloaded status.
+
+#### Serialized state transitions
+
+For payments, refunds, CEU completion, and external synchronization, I would use controlled state transitions:
+
+```text
+Pending -> Processing -> Succeeded
+Pending -> Processing -> Failed
+Succeeded -> RefundPending -> Refunded
+Failed -> RetryableFailure
+```
+
+Transitions would be validated in the domain layer and persisted transactionally.
+
+---
+
+## 2.5 Caching and performance
+
+Caching would be applied selectively based on read/write ratio and correctness requirements.
+
+Good candidates include:
+
+- Event metadata.
+- Published content trees.
+- Reference data.
+- Aggregated reports that tolerate short staleness.
+- Expensive, reusable authorization or configuration lookups.
+
+Less suitable candidates include:
+
+- Payment state.
+- Registration availability.
+- One-time discount eligibility.
+- Any data where stale results can</pre>
+    </div>
+</body>
+</html>

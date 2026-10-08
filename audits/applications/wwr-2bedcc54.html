@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Integration Engineer for Enterprise API & Integration Products at Toptal</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Integration Engineer for Enterprise API & Integration Products</h2>
+        <p><strong>Company:</strong> Toptal | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/toptal-senior-integration-engineer-for-enterprise-api-integration-products" target="_blank">https://weworkremotely.com/remote-jobs/toptal-senior-integration-engineer-for-enterprise-api-integration-products</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Integration Engineer for Enterprise API & Integration Products at Toptal
+
+## 1. Executive Summary & Value Proposition
+
+The core engineering challenge in this role is not simply connecting Salesforce, SAP, and a carrier data lake. It is designing a reliable integration fabric that prevents system-to-system coupling, makes failures diagnosable, and allows the business to evolve without accumulating fragile point-to-point dependencies.
+
+I would approach the engagement as an API-led integration platform with a canonical enterprise data model, explicit system-of-record boundaries, idempotent event processing, contract-first testing, and production ownership from discovery through recovery. The design would support:
+
+- **Salesforce:** Composite API, REST, Bulk API, Platform Events, Change Data Capture, or an event-streaming pattern where appropriate.
+- **SAP:** OData APIs where available, BAPI/RFC for transactional operations, and IDoc processing for batch-oriented or legacy flows.
+- **Carrier data lake:** Decoupled ingestion through a durable event or file-delivery layer, schema validation, deduplication, lineage tracking, and replayable processing.
+- **MuleSoft:** API-led orchestration, reusable connectors, DataWeave transformations, policies, error handling, monitoring, and deployment through MuleSoft CI/CD.
+- **Production operations:** OpenTelemetry and Prometheus-compatible telemetry, structured logs, distributed correlation IDs, SLOs, alerting, retry automation, dead-letter handling, and runbook-driven recovery.
+- **AI-assisted delivery:** AI copilots and agents used for mapping drafts, API stubs, fixture generation, documentation, test generation, and incident triage, with mandatory human validation against production standards.
+
+My operating principle would be:
+
+> **Every integration must be observable, replayable, idempotent, contract-tested, and removable without destabilizing its consumers.**
+
+This approach directly supports the role’s stated goals: avoiding new integration debt, owning production issues, reducing MTTR, and improving reliability continuously.
+
+### Alignment with Toptal’s stack and domain challenges
+
+| Toptal requirement | Engineering response |
+|---|---|
+| Reliable Salesforce–SAP–data lake integrations | Canonical business model and asynchronous, event-driven integration boundaries |
+| MuleSoft/API design | API-led architecture with reusable contracts, policies, and orchestration |
+| IDoc, BAPI, API experience | Adapter-specific handling, transactional boundaries, acknowledgment semantics, and reconciliation |
+| Data lake ingestion | Durable landing zones, schema enforcement, partition-aware processing, deduplication, and replay |
+| Production ownership | Observability, SLOs, runbooks, retry/replay automation, and incident RCA |
+| Avoiding integration debt | No system-to-system shortcuts; canonical contracts and anti-corruption layers |
+| AI-assisted engineering | Controlled AI use with review gates, tests, security checks, and traceability |
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Target architecture
+
+```text
+                         ┌─────────────────────────────┐
+                         │       API / Event Gateway   │
+                         │  versioning, auth, rate limit │
+                         └──────────────┬──────────────┘
+                                        │
+                         ┌──────────────▼──────────────┐
+                         │     Integration Control     │
+                         │  orchestration, correlation, │
+                         │  idempotency, orchestration  │
+                         │  state, retries, compensation│
+                         └───────┬─────────┬─────────┬───┘
+                                 │         │         │
+                 ┌───────────────▼─┐ ┌─────▼───────┐ ┌▼────────────────┐
+                 │ Salesforce      │ │ SAP         │ │ Carrier Lake    │
+                 │ Adapter          │ │ Adapter     │ │ Ingestion       │
+                 │                  │ │             │ │                 │
+                 │ REST/Composite   │ │ OData/BAPI  │ │ Events/Files    │
+                 │ CDC/Platform     │ │ IDoc/RFC    │ │ Schema Registry │
+                 │ Events           │ │             │ │ Partitioning    │
+                 └───────────────┬─┘ └─────┬───────┘ └──────┬──────────┘
+                                 │         │                │
+                 ┌───────────────▼─────────▼────────────────▼──────────┐
+                 │              Canonical Integration Model            │
+                 │        validation, mapping, provenance, lineage     │
+                 └───────────────────────┬────────────────────────────┘
+                                         │
+                         ┌───────────────▼────────────────┐
+                         │  Operational / Platform Layer  │
+                         │ OpenTelemetry, Prometheus, logs │
+                         │ alerts, DLQ, replay, runbooks   │
+                         └────────────────────────────────┘
+```
+
+### 2.2 Integration principles
+
+#### A. Use canonical contracts, not direct system coupling
+
+Each integration flow should communicate through a stable business contract rather than exposing Salesforce or SAP structures throughout the platform.
+
+For example:
+
+```text
+Canonical: Shipment
+  shipmentId
+  carrierCode
+  serviceLevel
+  originLocation
+  destinationLocation
+  plannedPickupAt
+  plannedDeliveryAt
+  trackingNumber
+  status
+  sourceSystem
+  sourceVersion
+  correlationId
+```
+
+Salesforce IDs, SAP customer numbers, carrier-specific status codes, and lake partitioning fields remain adapter concerns.
+
+This prevents a Salesforce schema change from propagating into every downstream integration and makes it possible to replace a source system without redesigning the entire platform.
+
+#### B. Separate synchronous commands from asynchronous facts
+
+Not every integration should be implemented as a synchronous request/response call.
+
+Use:
+
+- **Synchronous APIs** for user-initiated queries and narrowly scoped commands where immediate confirmation is required.
+- **Events** for state changes, completed business transactions, and data-lake ingestion.
+- **Batch files** for legacy extraction, IDoc processing, scheduled reconciliation, and high-volume historical loads.
+
+A typical command flow would be:
+
+1. Receive an authenticated request.
+2. Validate the payload against the versioned schema.
+3. Assign a correlation ID and idempotency key.
+4. Persist the command to a durable outbox.
+5. Execute the orchestration through MuleSoft or a service adapter.
+6. Publish success/failure state to an event stream.
+7. Reconcile external acknowledgments and terminal state.
+8. Alert on unresolved or partially completed transactions.
+
+#### C. Make every write operation idempotent
+
+External APIs and event streams can produce duplicates. Each operation should therefore have a stable idempotency key derived from:
+
+```text
+businessKey + operation + sourceVersion
+```
+
+Examples:
+
+- Shipment creation: `SHIPMENT:{salesforceId}:CREATE`
+- SAP material update: `MATERIAL:{sapMaterialId}:v{version}`
+- Lake ingestion: `CARRIER:{carrierCode}:{fileName}:{fileHash}`
+
+The idempotency record should contain:
+
+- Key
+- Request payload hash
+- External operation identifier
+- Processing state
+- Timestamps
+- Result reference
+- Retry count
+- Error classification
+
+A repeated request with the same key and same payload should return the previous result. A repeated request with the same key and a different payload should be rejected as a conflict.
+
+### 2.3 Salesforce integration design
+
+Salesforce should be modeled according to the business capability, not merely by copying objects into another system.
+
+#### Read paths
+
+Use the appropriate Salesforce integration pattern:
+
+- **REST API** for normal CRUD and focused queries.
+- **Composite API** for related records and multiple operations.
+- **Bulk API 2.0** for high-volume extraction.
+- **Change Data Capture or Platform Events** for incremental change propagation.
+- **External IDs and upsert semantics** for repeatable synchronization.
+
+Salesforce API limits, governor limits, sharing rules, field permissions, and object-specific validation must be considered explicitly.
+
+#### Write paths
+
+For outbound writes:
+
+- Use idempotent upsert operations where possible.
+- Batch only when the downstream contract supports it.
+- Treat partial batch success as a first-class outcome.
+- Store Salesforce record IDs and API versions for traceability.
+- Avoid retrying non-transient validation failures indefinitely.
+
+#### Salesforce-specific controls
+
+- Enforce least-privilege connected app permissions.
+- Rotate credentials through the approved secrets manager.
+- Separate integration users by function and environment.
+- Monitor API consumption and daily limits.
+- Use selective field retrieval rather than querying entire objects.
+- Capture request IDs and correlation IDs for supportability.
+
+### 2.4 SAP integration design
+
+SAP integration requires explicit treatment of synchronous and asynchronous transaction semantics.
+
+#### API/OData
+
+Use OData for:
+
+- Master-data reads
+- Business-document queries
+- Supported CRUD operations
+- Metadata-driven synchronization
+
+#### BAPI/RFC
+
+Use BAPI or RFC for operations not exposed cleanly through OData, provided that:
+
+- The business transaction is validated server-side.
+- Return codes are interpreted as structured results.
+- Commit or rollback behavior is explicit.
+- Idempotency is enforced upstream.
+- Sensitive configuration is stored outside source control.
+
+#### IDoc
+
+IDoc processing should be modeled as a durable batch workflow:
+
+1. Receive or retrieve the IDoc.
+2. Persist the raw payload.
+3. Validate structure and business keys.
+4. Deduplicate using document type, company code, document number, and version.
+5. Transform into the canonical model.
+6. Apply business validations.
+7. Persist the result and acknowledgment.
+8. Route errors to a replayable error queue.
+
+The system must distinguish:
+
+- Technical failure: safe to retry.
+- Business validation failure: requires correction.
+- Duplicate: acknowledge without reapplying.
+- Partial failure: compensate, reconcile, or route to manual resolution.
+
+### 2.5 Carrier data lake ingestion
+
+The exact carrier data lake technology is not specified, so the design should remain infrastructure-neutral while enforcing the same operational properties.
+
+#### Ingestion layers
+
+```text
+Raw landing zone
+    ↓
+Validated staging zone
+    ↓
+Deduplicated canonical records
+    ↓
+Curated/domain-ready tables
+    ↓
+Analytics and downstream consumers
+```
+
+#### Required controls
+
+- Immutable raw retention for auditability.
+- File checksum and source metadata.
+- Schema validation before promotion.
+- Reject records with invalid business keys.
+- Deduplicate using event time, source version, and stable identifiers.
+- Use partition keys based on access patterns, not arbitrary convenience.
+- Track late-arriving and out-of-order data.
+- Maintain lineage from carrier source to canonical record.
+- Support replay from raw or validated staging layers.
+- Quarantine malformed files without blocking valid batches.
+
+For streaming ingestion, use:
+
+- Durable event buffering.
+- Consumer offsets or checkpoints.
+- Schema compatibility checks.
+- Dead-letter topics or queues.
+- Exactly-once effects through idempotent processing rather than relying solely on transport guarantees.
+
+### 2.6 Data Modeler and mapping governance
+
+Mappings should be maintained as versioned, reviewable artifacts rather than embedded transformations.
+
+Each mapping should define:
+
+```text
+Source system
+Source object/entity
+Source field
+Canonical entity
+Canonical field
+Transformation
+Validation rule
+Direction
+Handling strategy
+Owner
+Version
+```
+
+A mapping should distinguish:
+
+- Direct mappings
+- Default values
+- Lookup mappings
+- Conditional transformations
+- One-to-many expansions
+- Null and absent-value semantics
+- Unit and timezone normalization
+- Enum/code translation
+- Data quality classifications
+
+Example:
+
+| Source | Source field | Canonical field | Rule |
+|---|---|---|---|
+| Salesforce | `Shipment__c` | `shipment.shipmentId` | Required; trim; preserve as string |
+| Salesforce | `Carrier_Code__c` | `shipment.carrierCode` | Uppercase; validate against carrier registry |
+| SAP IDoc | `VBELN` | `shipment.sapDeliveryNumber` | Preserve leading zeros |
+| Carrier | `status_code` | `shipment.status` | Explicit code-map lookup |
+| Carrier | `event_time` | `shipment.statusChangedAt` | Convert timezone to UTC |
+
+Mapping changes should be versioned and tested against both valid and invalid fixtures.
+
+### 2.7 Reliability, retries, and recovery
+
+Retries must be classified rather than implemented as a generic loop.
+
+#### Retryable
+
+- Network timeouts
+- HTTP</pre>
+    </div>
+</body>
+</html>

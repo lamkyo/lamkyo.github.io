@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Director of Media Strategy &amp; Activation (Paid Media) at Dropbox</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: 5,000 USD</div>
+    <div class="card">
+        <h2>Director of Media Strategy &amp; Activation (Paid Media)</h2>
+        <p><strong>Company:</strong> Dropbox | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/dropbox-director-of-media-strategy-activation-paid-media" target="_blank" rel="noopener noreferrer">https://weworkremotely.com/remote-jobs/dropbox-director-of-media-strategy-activation-paid-media</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Director of Media Strategy &amp; Activation (Paid Media) at Dropbox
+
+&gt; **A note on framing before we begin.** I want to be direct with you, because a dossier that pretends otherwise wastes your time. The role you posted is a **marketing leadership position** — Director of Media Strategy &amp; Activation — not a software engineering role. I&#x27;m Claude, a large language model made by Anthropic, and I&#x27;m not a human candidate with a résumé, a media career, or a bank account. I can&#x27;t be hired into this seat, and I won&#x27;t fabricate a work history to imply I can.
+&gt;
+&gt; What I *can* do — and what I&#x27;ve done below — is give you something genuinely useful: a rigorous, technically deep **architecture and operating blueprint** for the exact problems this role owns (unified media investment, measurement rigor, AI-enabled media operations, connecting media to revenue). If you&#x27;re a hiring team, treat this as a reference design and a thinking tool. If you&#x27;re an engineer or operator building in this space, treat it as a buildable spec. I&#x27;ve kept the structure you asked for, but I&#x27;ve replaced the fictional &quot;engineering candidate&quot; framing with an honest one.
+
+---
+
+## 1. Executive Summary &amp; Value Proposition
+
+**The problem space.** Dropbox is asking one leader to unify two historically siloed investment pools — brand and performance — under a single thesis, a single operating model, and a single measurement spine. The hard part is not media buying. The hard part is that **brand and performance are two different data systems with two different clocks**:
+
+- Performance media is *fast-loop, high-cardinality, deterministic-ish*: daily spend, CPC, CAC, ROAS, per-channel, per-audience, per-creative.
+- Brand media is *slow-loop, low-cardinality, probabilistic*: reach, frequency, brand lift, aided/unaided recall, measured over weeks.
+
+Any &quot;unified&quot; strategy that doesn&#x27;t reconcile these two clocks at the **data layer** will collapse back into two budgets the moment a quarter gets tight. So the real deliverable is an **investment thesis that is executable as software** — a system where a dollar moved from brand to performance (or back) is a first-class, auditable, forecastable operation.
+
+**Why a systems-architecture lens is the right one here.** The job description is, read carefully, a distributed-systems problem wearing a marketing hat:
+
+| JD language | Actual systems problem |
+|---|---|
+| &quot;Own planning, forecasting, pacing, in-quarter reallocation&quot; | A control loop with feedback, constraints, and latency budgets |
+| &quot;Attribution, incrementality testing, MMM/MTA&quot; | Causal inference over observational + experimental data |
+| &quot;Agentic and AI-enabled workflows... where machine judgment outperforms human&quot; | Human-in-the-loop automation with explicit confidence gates |
+| &quot;Connect media signals to downstream outcomes&quot; | Identity resolution + event streaming across a revenue graph |
+| &quot;Agency + in-house operating model&quot; | Build-vs-buy as a capability-allocation problem |
+
+**Alignment with Dropbox&#x27;s domain.** Dropbox&#x27;s growth motion is famously **self-serve + product-led, with a sales-assisted mid-market/enterprise layer**. That means media doesn&#x27;t terminate at a click — it terminates at *activation, PQL, expansion, retention*. The measurement spine therefore has to reach past the ad platform&#x27;s conversion pixel into product telemetry. That&#x27;s the single most important architectural constraint, and it&#x27;s where most media orgs fail.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Reference architecture: the Unified Media Investment Platform (UMIP)
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         PRESENTATION / DECISION LAYER                       │
+│   Exec dashboards · Scenario planner · Reallocation console · Alerts        │
+└───────────────▲──────────────────────────────────────────▲─────────────────┘
+                │                                           │
+┌───────────────┴───────────────┐          ┌────────────────┴─────────────────┐
+│   INVESTMENT THESIS ENGINE     │          │      MEASUREMENT ENGINE           │
+│  • Budget allocator (LP/MPC)   │◄────────►│  • MMM (Bayesian)                 │
+│  • Pacing controller           │  priors  │  • Geo/holdout incrementality     │
+│  • Scenario simulator          │          │  • MTA (probabilistic)            │
+│  • Constraint solver           │          │  • Brand-lift ingestion           │
+└───────────────▲───────────────┘          └────────────────▲─────────────────┘
+                │                                           │
+┌───────────────┴───────────────────────────────────────────┴─────────────────┐
+│                    UNIFIED MEDIA DATA MODEL (semantic layer)                 │
+│   spend · impressions · clicks · conversions · cost · reach/freq · lift      │
+│   normalized across channels, currencies, timezones, identity graphs         │
+└───────────────▲───────────────────────────────────────────▲─────────────────┘
+                │                                           │
+┌───────────────┴───────────────┐          ┌────────────────┴─────────────────┐
+│   CHANNEL INGESTION ADAPTERS   │          │   REVENUE / PRODUCT TELEMETRY     │
+│  Google · Meta · LinkedIn ·    │          │  Activation · PQL · Expansion ·   │
+│  TikTok · Programmatic · DSP   │          │  Retention · Billing (warehouse)  │
+└────────────────────────────────┘          └───────────────────────────────────┘
+```
+
+### 2.2 Core components
+
+**A. Unified Media Data Model (the semantic layer).**
+Everything downstream depends on a single normalized fact table. The non-negotiable design decisions:
+
+- **Grain:** `(date, channel, campaign_id, ad_group_id, creative_id, geo, device, audience_segment)`. Resist the urge to pre-aggregate; you will always need a cut you didn&#x27;t plan for.
+- **Currency &amp; timezone normalization at ingest**, not at query time. Store `spend_local`, `spend_usd`, `fx_rate`, `fx_date`. Media orgs lose weeks to FX reconciliation.
+- **Idempotent ingestion.** Ad platform APIs deliver overlapping windows and retroactively restate conversions. Every adapter writes with a `(source, report_date, ingested_at)` upsert key so re-pulls are safe.
+- **Late-arriving data handling.** Conversions restate for up to 30 days. The model must support *as-of* queries: &quot;what did we believe on day X?&quot; — this is essential for honest pacing and for not fooling yourself in post-mortems.
+
+**B. Investment Thesis Engine (the control loop).**
+This is the piece that makes &quot;one investment thesis&quot; real rather than aspirational.
+
+- **Allocator:** a constrained optimization — maximize expected downstream value (not ROAS) subject to budget, channel minimums/maximums, and brand reach floors. Formally:
+
+  ```
+  maximize   Σ_c  f_c(x_c)          # expected incremental value per channel
+  subject to Σ_c  x_c ≤ B           # total budget
+             L_c ≤ x_c ≤ U_c        # channel floors/ceilings
+             Σ_{c∈brand} reach_c(x_c) ≥ R_min   # brand reach floor
+  ```
+  where `f_c` is a **response curve** (diminishing-returns, typically saturating power or Hill function) fit from MMM + incrementality priors, *not* from platform-reported ROAS.
+
+- **Pacing controller:** a PID-style loop that compares realized spend/outcome against plan and emits reallocation deltas. Critically, it operates on a **latency budget** — you do not reallocate on 24-hour noise. Damp the controller; require N days of signal before acting.
+
+- **Scenario simulator:** &quot;If we shift $2M from brand to paid social in Q3, what happens to reach, CAC, and pipeline?&quot; This is the executive-communication surface — it turns a complicated performance picture into a defensible recommendation.
+
+**C. Measurement Engine.**
+Three methods, deliberately triangulated, because no single one is trustworthy:
+
+1. **MMM (Bayesian, e.g. a hierarchical/geo-level model):** slow, strategic, handles brand + offline. Provides the *priors* for the allocator.
+2. **Incrementality testing (geo holdouts / switchback):** the ground truth. Calibrates MMM. Runs continuously on a rotating subset of channels.
+3. **MTA (probabilistic, e.g. Markov-chain removal effects):** fast, tactical, per-path. Used for *relative* channel comparison, never for absolute budget truth.
+
+The architectural rule: **MTA informs tactics, incrementality calibrates MMM, MMM drives the thesis.** Anyone who lets MTA set the budget is buying their own attribution model.
+
+**D. AI-Enabled Media Operations layer.**
+The JD explicitly asks for a *point of view* on where agentic workflows belong. The honest answer is a **confidence-gated autonomy spectrum**:
+
+| Workflow | Autonomy | Why |
+|---|---|---|
+| Creative variant generation &amp; testing | High (auto-deploy to test cells) | Cheap to be wrong, fast feedback |
+| Audience modeling / lookalike seeding | Medium (human approves seed logic) | Bias risk, brand-safety risk |
+| Budget/bid optimization *within* a channel | Medium (bounded deltas, human-set guardrails) | Fast loop, but compounding errors |
+| Cross-channel budget reallocation | Low (human-in-the-loop, agent recommends) | High blast radius, slow feedback |
+| Brand positioning / creative direction | None (human) | Judgment, taste, accountability |
+
+The design principle: **automate where the feedback loop is fast and the blast radius is small; gate where the opposite is true.** This is the same principle as progressive delivery in software.
+
+### 2.3 Production readiness
+
+- **CI/CD:** every model, response curve, and allocator config is versioned and deployed through the same pipeline as code. A budget plan is a *release artifact* with a changelog.
+- **Observability (OpenTelemetry + Prometheus):** instrument ingestion freshness, model drift, pacing deviation, and forecast error. Alert on *data staleness* first — most &quot;media problems&quot; are actually &quot;the pipeline broke three days ago.&quot;
+- **Load testing:** ingestion spikes at month-end and quarter-end; the allocator runs nightly over the full portfolio. Load-test the reallocation path specifically, since it&#x27;s the one that touches money.
+- **Zero-downtime deployment:** the allocator and pacing controller run as versioned services with shadow-mode rollout — new logic runs alongside old, outputs are diffed, and only then promoted. Never let a model change silently move budget.
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+Below is an idiomatic, runnable Python implementation of the two most load-bearing pieces: the **response-curve allocator** and the **idempotent, as-of-aware ingestion model**. It&#x27;s deliberately self-contained (stdlib + numpy) so it can be dropped into a notebook or a service.
+
+```python
+&quot;&quot;&quot;
+umip.py — Unified Media Investment Platform: core allocation + ingestion primitives.
+
+Design goals:
+  * Response curves are fit from MMM/incrementality priors, NOT platform ROAS.
+  * Allocation is a constrained optimization with brand reach floors.
+  * Ingestion is idempotent and supports as-of (point-in-time) queries.
+  * Everything is deterministic and testable; no hidden global state.
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field
+from datetime import date
+from typing import Iterable, Literal
+
+import numpy as np
+
+
+# ---------------------------------------------------------------------------
+# 1. Response curves
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class HillCurve:
+    &quot;&quot;&quot;
+    Saturating response curve: value(x) = Vmax * x^h / (K^h + x^h)
+
+    Chosen over linear/power because media response is empirically S-shaped:
+    near-zero at tiny spend (no signal), saturating at high spend (audience
+    exhaustion). h controls steepness; K is the half-saturation spend.
+
+    Vmax is expressed in *downstream value units* (e.g. expected incremental
+    LTV-weighted activations), never in platform-reported conversions.
+    &quot;&quot;&quot;
+    Vmax: float          # asymptotic incremental value
+    K: float             # spend at half of Vmax
+    h: float = 1.0       # steepness (&gt;1 = more S-shaped)
+
+    def value(self, x: float) -&gt; float:
+        if x &lt;= 0:
+            return 0.0
+        xh = x ** self.h
+        return self.Vmax * xh / (self.K ** self.h + xh)
+
+    def marginal(self, x: float) -&gt; float:
+        &quot;&quot;&quot;d(value)/dx — used by the allocator&#x27;s greedy/Karush-Kuhn-Tucker step.&quot;&quot;&quot;
+        if x &lt;= 0:
+            # limit as x-&gt;0+ is 0 for h&gt;1, Vmax/K for h==1
+            return 0.0 if self.h &gt; 1 else self.Vmax / self.K
+        xh = x ** self.h
+        Kh = self.K ** self.h
+        return self.Vmax * self.h * Kh * (x ** (self.h - 1)) / ((Kh + xh) ** 2)
+
+
+# ---------------------------------------------------------------------------
+# 2. Channel definitions and constraints
+# ---------------------------------------------------------------------------
+
+ChannelKind = Literal[&quot;performance&quot;, &quot;brand&quot;]
+
+@dataclass
+class Channel:
+    name: str
+    kind: ChannelKind
+    curve: HillCurve
+    floor: float = 0.0          # contractual / strategic minimum spend
+    ceiling: float =</pre>
+    </div>
+</body>
+</html>

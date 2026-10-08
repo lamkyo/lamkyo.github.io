@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Application Security Engineer at Glean</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Application Security Engineer</h2>
+        <p><strong>Company:</strong> Glean | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/glean-application-security-engineer" target="_blank">https://weworkremotely.com/remote-jobs/glean-application-security-engineer</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Application Security Engineer at Glean
+
+**Candidate:** Principal Software Engineer / Systems Architect
+**Target Role:** Application Security Engineer — Glean (US Remote, $185K–$260K)
+**Source:** WeWorkRemotely
+**Focus Areas:** Vulnerability Management Lifecycle · Software Supply Chain Security · Base Image Hardening · CI/CD Security Automation · Google Assured OSS
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Glean's security problem is not a typical AppSec problem. Most companies run a web application and worry about OWASP Top 10 in a monolith. Glean runs a **Work AI platform with 100+ enterprise SaaS connectors, a multi-tenant Enterprise Graph, LLM inference paths, and agentic execution** — which means the attack surface is:
+
+1. **Extremely wide** — hundreds of OSS dependencies across Python, Go, TypeScript, and Rust services, plus a long tail of connector-specific SDKs, each with its own transitive dependency graph.
+2. **Continuously mutating** — agentic features ship weekly; new dependencies enter the graph faster than any manual review cadence can track.
+3. **Enterprise-trust-critical** — Glean sells to Fortune 500 security teams who will ask for an SBOM, a VEX document, a penetration test summary, and a documented vulnerability SLA *before* the first invoice. A single unpatched CVE in a base image is a deal blocker, not a ticket.
+
+My background maps to this directly:
+
+| Glean Requirement | My Corresponding Depth |
+|---|---|
+| Own vulnerability management lifecycle | Built and operated end-to-end CVE ingestion → dedup → prioritization → remediation → SLA reporting pipelines; I have *been* the on-call owner of a vuln SLA, not just a consumer of dashboards. |
+| Harden base OS images | Distroless/Chainguard/golden-AMI pipelines, CIS Benchmark hardening, immutable image promotion by digest, SLSA Level 3 provenance. |
+| Secure OSS dependencies & supply chain | SBOM generation (Syft/CycloneDX), Sigstore/cosign signing, SLSA attestation, dependency-confusion and typosquat defenses, Assured OSS evaluation. |
+| SAST / DAST / dependency scanning in CI/CD | Semgrep, CodeQL, Trivy, Grype, Snyk, Dependabot, OWASP ZAP, Burp Enterprise — integrated as **blocking gates**, not advisory reports. |
+| AWS + GCP, containers, K8s, microservices | Multi-cloud hardening, EKS/GKE admission control (OPA Gatekeeper, Kyverno), Falco runtime detection, K8s RBAC/PSA, IRSA/Workload Identity. |
+| Lead cross-functional adoption | Ran engineering-wide secure-coding programs; drove remediation coverage from ~40% to >95% by making the secure path the *fast* path, not by filing tickets. |
+| AI-First Mindset | I already use LLMs to do reachability triage, exploitability summarization, and automated remediation PR generation — which is exactly the leverage Glean's AI-first culture is built around. |
+
+**The single sentence version:** I do not treat vulnerability management as a compliance reporting exercise — I treat it as a **distributed systems problem** (idempotent ingestion, deduplication, prioritization under uncertainty, and closed-loop remediation) that has to be engineered to scale with the velocity of the engineering org it protects.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Target Architecture: The Vulnerability Management Platform (VMP)
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  DISCOVERY LAYER                                                             │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐             │
+│  │ CI Scanners│  │ Image Reg. │  │ eBPF/Runtime│  │ Cloud CSPM │             │
+│  │ Semgrep    │  │ Trivy scan │  │ Falco       │  │ Wiz/AWS    │             │
+│  │ CodeQL     │  │ on push    │  │ Tetragon    │  │ SecurityHub│             │
+│  │ ZAP/Burp   │  │ (digest)   │  │             │  │            │             │
+│  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘             │
+└────────┼───────────────┼───────────────┼───────────────┼────────────────────┘
+         │               │               │               │
+         └───────────────┴───────┬───────┴───────────────┘
+                                 ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  INGESTION BUS — Kafka topics, keyed by resource_id (ordering guarantee)     │
+│  Partitioned by (cloud_account | repo | cluster)/resource-hash               │
+└──────────────────────────────────┬───────────────────────────────────────────┘
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  NORMALIZATION + DEDUP SERVICE (Go)                                          │
+│  • Stable finding fingerprint (SHA-256 over normalized identity tuple)       │
+│  • CVE/GHSA alias graph union-find (GHSA→CVE→OSV→vendor advisories)          │
+│  • VEX ingestion (suppresses false positives from transitive deps)           │
+└──────────────────────────────────┬───────────────────────────────────────────┘
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  ENRICHMENT + PRIORITIZATION (Python)                                        │
+│  EPSS v3 · CISA KEV · CVSS v3.1/v4 vectors · reachability (call-graph)       │
+│  internet-exposure · data-classification · patch-availability               │
+│  → composite r</pre>
+    </div>
+</body>
+</html>

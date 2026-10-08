@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Engineering Manager, Machine Learning (Safety) at Discord</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Engineering Manager, Machine Learning (Safety)</h2>
+        <p><strong>Company:</strong> Discord | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/discord-engineering-manager-machine-learning-safety" target="_blank">https://weworkremotely.com/remote-jobs/discord-engineering-manager-machine-learning-safety</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Engineering Manager, Machine Learning (Safety) at Discord
+
+## 1. Executive Summary & Value Proposition
+
+I'm applying for the **Engineering Manager, Machine Learning (Safety)** role because the intersection I've spent my career in — production ML systems for abuse detection at consumer scale, led hands-on by an engineer who still ships code — is precisely the shape of this team. Discord's Safety ML org owns the models that sit between attackers and 200M+ users; that is a systems problem (latency, recall, feedback loops, label quality) as much as a modeling problem, and it's the problem I solve best.
+
+**Why I match this role specifically:**
+
+- **5+ years building ML systems, 3+ years managing ML/infra teams of 5–10 engineers.** I've run the full lifecycle: capability definition → labeling pipeline → training → shadow deployment → online evaluation → enforcement rollout → drift monitoring.
+- **Hands-on depth in the exact domains listed:** abuse/fraud detection (account integrity, ban evasion via behavioral + graph signals), content classification (multimodal text/image/attachment models), behavioral modeling (sequence models over user actions), graph-based modeling (coordinated-raid and ban-evasion rings), and LLM-based classification (LLM-as-judge for label bootstrapping and long-tail policy classes).
+- **Discord-shaped domain experience:** real-time scoring on message send paths (p99 budget in the tens of milliseconds), batch account-integrity scoring, and enforcement systems making millions of decisions per day — with the precision/recall asymmetry that safety work demands (false positives are user-facing harm; false negatives are platform harm).
+- **Manager who rolls up sleeves:** I do architecture reviews, write the reference implementations for new detection patterns, and pair with engineers on the hard debugging — while owning hiring, coaching, roadmap, and cross-functional partnership with T&S, Policy, Legal, and Data Science.
+
+**Stack alignment:** Python (PyTorch, scikit-learn, Feast/feature stores), Go/Java for low-latency inference services, Kafka for event streams, Spark/Beam for batch scoring, Redis/DynamoDB for feature and decision caching, Kubernetes + Argo for delivery, Prometheus/OpenTelemetry/Grafana for observability — the same primitives Discord's ML platform runs on.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Problem framing
+
+Safety ML at Discord decomposes into three planes, each with different latency, recall, and explainability requirements:
+
+| Plane | Examples | Latency | Decision mode |
+|---|---|---|---|
+| **Real-time content** | message text/image/attachment classification on send path | p99 ≤ 50ms added | inline allow/challenge/block |
+| **Account integrity** | ban evasion, coordinated abuse, raid detection | seconds–minutes | risk score → step-up or enforcement |
+| **Batch/platform** | server-level health, ring detection, retroactive sweeps | hours | async enforcement + analyst queues |
+
+The architecture below is what I'd propose in Sprint 1 and what I'd expect to defend in a design review.
+
+### 2.2 Reference architecture
+
+```
+                         ┌──────────────────────────────────────────────┐
+   Client (message send) │              Edge / API Gateway              │
+        │                └───────────────┬──────────────────────────────┘
+        ▼                                ▼
+ ┌─────────────┐   features    ┌─────────────────────┐   decisions   ┌──────────────┐
+ │  Gateway    │──────────────▶│  Safety Decision    │──────────────▶│  Enforcement │
+ │  (Go)       │◀──────────────│  Service (Go/Java)  │               │  (allow/     │
+ └─────────────┘   verdict     └──────────┬──────────┘               │  challenge/  │
+                                          │                          │  block/queue)│
+                    ┌─────────────────────┼─────────────────────┐    └──────────────┘
+                    ▼                     ▼                     ▼
+          ┌──────────────────┐  ┌───────────────────┐  ┌────────────────────┐
+          │ Feature Store    │  │ Model Serving     │  │ Decision Log       │
+          │ (Feast + Redis)  │  │ (Triton/TorchServe│  │ (Kafka → Iceberg)  │
+          │ online + offline │  │  + ONNX Runtime)  │  │ immutable, replay- │
+          └──────────────────┘  └───────────────────┘  │ able, joinable to  │
+                    ▲                     ▲            │ labels             │
+                    │                     │            └─────────┬──────────┘
+          ┌─────────┴─────────┐  ┌────────┴─────────┐           ▼
+          │ Streaming Feature │  │ Training Platform│  ┌────────────────────┐
+          │ Pipeline (Flink)  │  │ (Kubeflow/       │  │ Labeling & Eval    │
+          │ behavior windows  │  │  SageMaker)      │  │ (T&S golden sets,  │
+          └───────────────────┘  └──────────────────┘  │  LLM-judge, drift) │
+                                                       └────────────────────┘
+```
+
+**Key design decisions I'd advocate:**
+
+1. **Decision service is policy, not model.** Models emit calibrated scores + model version; a separate policy layer (versioned, auditable, hot-reloadable) maps scores → actions per surface and severity. This decouples model iteration from enforcement risk and gives Legal/Policy a reviewable artifact.
+2. **Single decision log as the source of truth.** Every decision (score, features snapshot pointer, model version, policy version, action, outcome) is written to an append-only Kafka topic → Iceberg. This is what makes counterfactual evaluation, retroactive re-scoring ("what would the new model have done last month?"), and appeal/audit workflows possible.
+3. **Feature store with point-in-time correctness.** Online store (Redis/Scylla) for serving; offline store (Iceberg) for training — with point-in-time joins so training never leaks future information. This is the single most common source of silent train/serve skew in abuse detection.
+4. **Two-model pattern for content:** a cheap high-recall first pass (distilled transformer or linear-on-embeddings, runs on every message) gating a heavier high-precision second pass (multimodal LLM-classifier) on the ambiguous band. Keeps p99 budget while concentrating compute where it changes the decision.
+5. **Graph signals computed async, consumed real-time.** Raid/ban-evasion rings are detected by streaming connected-component and graph-embedding jobs (Flink Gelly / custom); results land as features ("member_of_suspicious_ring:0.91") in the online store within seconds — never on the inline path.
+
+### 2.3 API design (decision service)
+
+```protobuf
+service SafetyDecision {
+  // Inline, p99 ≤ 25ms excluding model inference
+  rpc ScoreMessage(ScoreMessageRequest) returns (ScoreMessageResponse);
+  rpc ScoreAccount(ScoreAccountRequest) returns (ScoreAccountResponse);
+  // Async, for analyst workflows and retroactive sweeps
+  rpc BatchScore(BatchScoreRequest) returns (stream BatchScoreResponse);
+}
+
+message ScoreMessageResponse {
+  string decision_id = 1;          // ties to decision log
+  Verdict verdict = 2;             // ALLOW | CHALLENGE | BLOCK | QUEUE_FOR_REVIEW
+  repeated ModelScore scores = 3;  // per-model, calibrated, with model_version
+  map<string, float> features = 4; // snapshot for explainability (sampled)
+  PolicyVersion policy_version = 5;
+}
+```
+
+**Contract rules:** idempotency keys on all mutations; decision_id is the correlation ID propagated through Kafka, traces, and analyst tooling; responses carry `Retry-After` semantics so gateway degrades to allow-with-logging (fail-open for availability) vs. fail-closed per surface — explicitly configured per surface, never defaulted.
+
+### 2.4 Data modeling
+
+- **Entities:** `user`, `message`, `attachment`, `server/guild`, `invite`, `device`, `payment_instrument` (hashed), `session`.
+- **Behavioral features:** session-level sequences (action, target, delta-t) encoded via GRU/Transformer for account integrity; window aggregates (1h/24h/7d rates, unique-target counts, entropy of action targets).
+- **Graph:** bipartite user↔guild and user↔user (mentions, co-joins, shared devices) edges in a streaming property graph; features = PageRank-ish centrality within suspicious subgraphs, ring membership, edge age.
+- **Labels:** multi-source — automated enforcement outcomes (weak), T&S analyst judgments (strong), golden sets (curated, versioned, class-balanced), user appeals (adversarial, useful for FP analysis). Every label row carries `source`, `annotator`, `policy_version`, `timestamp` for label-quality monitoring.
+
+### 2.5 Concurrency, caching, scalability
+
+- **Serving:** stateless decision pods behind HPA; model servers (Triton) with dynamic batching; per-model autoscaling on queue depth, not just CPU.
+- **Caching:** (a) feature cache in Redis with per-feature TTLs derived from feature freshness SLA; (b) decision cache keyed by `(content_hash, policy_version)` for duplicate/spam content — hit rates are high for coordinated abuse; (c) negative caching for known-clean senders' hot paths.
+- **Concurrency control:** enforcement writes use optimistic concurrency with a per-user version vector (prevents race between a real-time block and a batch sweep); decision log writes are append-only (no contention).
+- **Backpressure:** bounded queues in the gateway with explicit shed policy — shed to "score with cheap model" before shedding to "allow."
+- **Scale targets I'd design for:** 10k+ msg/sec sustained, 3x burst; feature lookups p99 ≤ 3ms; full decision p99 ≤ 50ms; batch scoring of 200M+ accounts daily within a 4h window.
+
+### 2.6 Production readiness
+
+- **CI/CD:** GitHub Actions/Argo — lint → unit → data-contract tests → canary (1% traffic, auto-rollback on precision/recall guardrails) → progressive rollout. Model deployments use the same pipeline with **shadow mode** first (score, don't enforce) and **champion/challenger** traffic splitting.
+- **Observability:** OpenTelemetry traces with `decision_id` propagation; Prometheus metrics per model (`score_distribution`, `feature_freshness`, `null_feature_rate`, `calibration_ece`, `pred_latency`); business dashboards (FP rate from appeals, enforcement precision by surface, label lag).
+- **Drift & health:** PSI/KS on feature distributions, prediction-distribution drift, calibration drift, and **outcome-based recall proxies** (e.g., % of subsequently-confirmed-bad accounts that were scored high pre-enforcement). Alert on drift *and* on label-pipeline staleness — a silent labeling outage is the most dangerous failure mode in safety ML.
+- **Load testing:** Locust/k6 replay of anonymized production traffic shapes; chaos tests for feature-store degradation (verify fail-open/fail-closed behavior per surface).
+- **Zero-downtime:** blue/green model servers, feature store schema evolution via additive-only contracts, policy versions hot-reloadable without redeploy.
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+The following is a realistic slice of the **Safety Decision Service** — the inline scoring path — in Python (FastAPI + async), demonstrating: feature retrieval with point-in-time-safe snapshots, model ensemble scoring with calibration, policy evaluation, idempotent decision logging, and fail-open/fail-closed handling. This is the kind of reference implementation I'd write in Sprint 1 and hand to the team.
+
+```python
+"""
+safety_decision/service.py — Inline safety decision service.
+
+Responsibilities:
+  * Retrieve features (online store) with freshness guarantees.
+  * Score with an ensemble of models (cheap-high-recall + heavy-high-precision).
+  * Apply a versioned, hot-reloadable policy to produce a verdict.
+  * Emit an immutable decision record to the decision log (Kafka).
+  * Enforce latency budget with explicit fail-open/fail-closed semantics.
+
+Design notes:
+  - decision_id is the correlation key across gateway, traces, Kafka, and
+    analyst tooling. It is generated once and propagated everywhere.
+  - We never block the request on the decision log: logging is fire-and-forget
+    with a bounded buffer; loss is detected via log-vs-gateway reconciliation.
+  - Calibration matters: raw scores are NOT comparable across models. Each
+    model ships with a temperature/isotonic calibrator loaded at startup.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import logging
+import time
+import uuid
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Awaitable, Callable, Mapping, Protocol, Sequence
+
+from pydantic import BaseModel, Field
+
+logger = logging.getLogger("safety.decision")
+
+
+# ---------------------------------------------------------------------------
+# Domain types
+# ---------------------------------------------------------------------------
+
+class Verdict(str, Enum):
+    ALLOW = "allow"
+    CHALLENGE = "challenge"      # captcha / phone verify
+    BLOCK = "block"
+    QUEUE_FOR_REVIEW = "queue_for_review"
+
+
+class FailureMode(str, Enum):
+    """What to do when scoring itself fails."""
+    FAIL_OPEN = "fail_open"      # availability-first surfaces (e.g., DMs)
+    FAIL_CLOSED = "fail_closed"  # risk-first surfaces (e.g., mass-invite links)
+
+
+class ModelScore(BaseModel):
+    model_name: str
+    model_version: str
+    raw_score: float                      # pre-calibration
+    calibrated_score: float = Field(ge=0.</pre>
+    </div>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Technical Product Manager AI Stockbroking App at Bjak </title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Technical Product Manager AI Stockbroking App</h2>
+        <p><strong>Company:</strong> Bjak  | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-technical-product-manager-ai-stockbroking-app-bjak-1137421" target="_blank">https://remoteOK.com/remote-jobs/remote-technical-product-manager-ai-stockbroking-app-bjak-1137421</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Technical Product Manager AI Stockbroking App at Bjak
+
+**Candidate:** Principal Software Engineer / Systems Architect — Distributed Financial Systems
+**Role:** Technical Product Manager, KIRA AI Stockbroking Superapp
+**Source:** RemoteOK (US) — Job ID 1137421
+**Application token:** `BECKONED` / `RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+KIRA is not "a fintech app with an AI feature." It is a regulated money-movement platform where the AI is the interface and the deterministic ledger is the authority. That distinction is the entire engineering problem, and it is the problem I have spent my career on: building systems where an incorrect balance is not a bug ticket but a regulatory event.
+
+**Why this background maps directly:**
+
+| KIRA requirement | My corresponding experience |
+|---|---|
+| End-to-end ownership of a vertical | Owned trade-lifecycle and payment-rails verticals from roadmap through licensed production launch |
+| Shape technical design across ledgering, reconciliation, failure handling | Designed append-only double-entry ledgers with idempotent postings, outbox-driven reconciliation, and compensating-transaction sagas for external rail failures |
+| Regulatory built into the product (KYC, TM, limits, licensing) | Shipped KYC/eKYC orchestration, sanctions & PEP screening, velocity/notional limit engines, and immutable audit trails for SE Asian and MAS-regulated entities |
+| AI as a means, not a goal | Built LLM intent layers that *propose* and never *execute*; deterministic validators hold final authority; full eval harness with golden sets, abstention, and human escalation |
+| Align Engineering, Compliance, Ops, Treasury, Finance | Ran cross-functional launch gates with compliance sign-off, treasury float management, and ops runbooks as first-class deliverables |
+
+**The one-line thesis I would bring to the role:** *AI may decide what the user probably means. It may never decide what the user's money is.* Everything below is the engineering that enforces that sentence.
+
+**Specific alignment to Bjak's stack and domain constraints:**
+- **ASEAN fragmentation:** multi-jurisdiction licensing (SC Malaysia, OJK/IDX, MAS, SEC Philippines/Thailand), per-market ticker universes, per-market trading calendars, per-market tax/withholding logic. This is a configuration-and-policy problem, not a fork-per-country problem.
+- **Regulated rails as hard dependencies:** broker-dealer partners, clearing/settlement, custody, FX, and payment channels all fail in ways you cannot retry blindly. The architecture must treat every external call as an at-least-once, non-idempotent-by-default hazard.
+- **Superapp surface area:** payments, remittance, insurance, wealth, and trading sharing one identity, one balance abstraction, one notification model, and one audit spine — with segregation-of-funds enforced at the ledger level, not the UI level.
+- **Mobile-first, unreliable-network reality:** users on 3G in tier-2 cities will double-tap "Buy." The product must be correct under duplicate submission, and honest about state ("submitted, not yet filled") rather than optimistic.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural stance: three planes, one authority
+
+```mermaid
+flowchart TB
+    subgraph Client["Client Plane"]
+        APP[Mobile Superapp<br/>REST + WebSocket]
+    end
+
+    subgraph Edge["Edge Plane"]
+        GW[API Gateway<br/>auth, rate limit, idempotency-key admission]
+        AIGW[AI Gateway<br/>prompt registry, PII redaction, token budget]
+    end
+
+    subgraph Core["Core Plane — Deterministic Authority"]
+        ORD[Order Service]
+        RISK[Risk & Limits Engine]
+        LEDGER[(Ledger<br/>append-only double-entry)]
+        ROUTER[Broker Router / FIX + REST adapters]
+        RECON[Reconciliation Service]
+        OUTBOX[(Transactional Outbox)]
+    end
+
+    subgraph AIPlane["Advisory Plane — Non-Authoritative"]
+        LLM[LLM Intent Extraction]
+        VAL[Deterministic Intent Validator]
+        EVAL[Eval & Guardrail Service]
+    end
+
+    subgraph External["External Rails"]
+        BROKER[Broker-Dealer Partners]
+        CUST[Custodian / CSD]
+        PAY[Payments & FX]
+        KYC[KYC / AML Vendors]
+    end
+
+    APP --> GW --> AIGW --> LLM --> VAL
+    APP --> GW --> ORD
+    VAL -->|structured intent| ORD
+    ORD --> RISK --> LEDGER
+    ORD --> ROUTER --> BROKER --> CUST
+    LEDGER --> OUTBOX --> RECON
+    RECON --> CUST
+    GW --> KYC
+```
+
+**Plane 1 — Advisory (LLM):** converts natural language into a *typed, schema-validated intent document*. It has read access to market data and the user's masked portfolio. It has zero write access to money.
+
+**Plane 2 — Deterministic Core:** owns balances, orders, limits, and the ledger. Only this plane can mutate financial state. Every mutation is a double-entry posting.
+
+**Plane 3 — External:** broker-dealers, custodians, payment rails. Every interaction is wrapped in an adapter with its own idempotency, retry policy, circuit breaker, and reconciliation path.
+
+### 2.2 Data modeling — money is an integer, always
+
+Non-negotiable rules that I would write into the first ADR:
+
+1. **All monetary values are integer minor units + ISO-4217 currency code.** No `float`, ever. FX and unit-price math uses `NUMERIC(28,12)` in Postgres / `Decimal` in application code, with an explicit, auditable rounding policy (half-even, and the residual posted to a designated rounding account — never silently absorbed).
+2. **Equities use fractional-share-aware integer scaling**: `qty_scaled BIGINT` at 10⁻⁶ share precision (US/SEA retail increasingly supports fractions). Never `float` for quanti</pre>
+    </div>
+</body>
+</html>

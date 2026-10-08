@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Independent Software Developer ($90-$170/hr) at A.Team</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Independent Software Developer ($90-$170/hr)</h2>
+        <p><strong>Company:</strong> A.Team | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/a-team-senior-independent-software-developer-90-170-hr" target="_blank">https://weworkremotely.com/remote-jobs/a-team-senior-independent-software-developer-90-170-hr</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Independent Software Developer ($90-$170/hr) at A.Team
+
+## 1. Executive Summary & Value Proposition
+
+I am a principal-level independent engineer who has spent the last decade building the exact class of systems A·Team's members ship for its 500+ clients: multi-tenant SaaS platforms, real-time collaboration tools, AI/LLM product features, and greenfield 0→1 products delivered by small, autonomous teams. My background maps directly onto three things this role demands:
+
+- **Small-team, high-autonomy delivery.** I have led 3–4 person squads shipping production systems end-to-end — scoping, architecture, implementation, security, and handoff — with no PM overhead. That is precisely A·Team's operating model ("scope, strategize, and execute, often guiding clients who need direction").
+- **Full-stack breadth with architectural depth.** TypeScript/Node (NestJS, Next.js), Go for latency-sensitive services, Python (FastAPI, Django) for data/ML-adjacent work, Postgres as the system of record, Redis/Kafka for hot paths, and EVM/Solidity when the product touches on-chain settlement. I default to boring, provable technology and defend it in RFCs.
+- **0→1 under ambiguity.** A·Team's clients (a16z/YC/Insight-backed startups through Google X/HCA-scale enterprises) don't need a ticket-taker; they need someone who can walk into a vague brief and leave behind an architecture, a CI/CD pipeline, observability, and a codebase a client team can inherit.
+
+**Why this is a fit for A·Team's specific problem space:** A·Team's platform itself is a matching + engagement + payments system — a two-sided marketplace with reputation, availability, and money movement. I have built and operated exactly this shape of product: marketplace ledgers, idempotent payment flows, matching/ranking services, and the internal tooling (concierge-style admin) needed to run it. I can both *use* A·Team as a builder and, when the mission calls for it, contribute to A·Team's own platform engineering.
+
+**Rate positioning:** I am targeting the $130–$160/hr band, justified by ownership of architecture decisions and production accountability, not just feature throughput.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+The most representative "primary system requirement" for an A·Team-style engagement — and the one I'd use as the reference architecture in a first client conversation — is a **real-time, multi-tenant collaboration platform** (document/state sync + marketplace-style matching + billing). This is the shape of work A·Team members repeatedly ship. Below is how I'd build it.
+
+### 2.1 Architectural Overview
+
+```
+                        ┌──────────────────────────────────────────────┐
+                        │                  Edge Layer                  │
+                        │  Cloudflare / AWS ALB → WAF → Rate Limiter   │
+                        └──────────────────────┬───────────────────────┘
+                                               │
+              ┌────────────────────────────────┼───────────────────────────────┐
+              │                                │                               │
+   ┌──────────▼──────────┐        ┌────────────▼────────────┐   ┌──────────────▼─────────────┐
+   │  API Gateway (Go)   │        │  WebSocket Gateway (Go) │   │  Static / SSR (Next.js)   │
+   │  REST + GraphQL     │        │  Presence, CRDT fanout  │   │  Vercel / CloudFront      │
+   │  AuthZ (RBAC+ReBAC) │        │  sticky via consistent  │   └────────────────────────────┘
+   └──────────┬──────────┘        │  hashing + Redis pubsub │
+              │                   └────────────┬────────────┘
+              │                                │
+   ┌──────────▼───────────────────────────────▼───────────────┐
+   │                  Service Mesh (internal)                │
+   │  ┌────────────┐ ┌─────────────┐ ┌────────────────────┐  │
+   │  │ Matching   │ │ Engagement/ │ │ Billing & Ledger   │  │
+   │  │ Service    │ │ Project Svc │ │ Service (Go)       │  │
+   │  │ (Python)   │ │ (NestJS)    │ │ double-entry, idem │  │
+   │  └────────────┘ └─────────────┘ └────────────────────┘  │
+   │  ┌────────────┐ ┌─────────────┐ ┌────────────────────┐  │
+   │  │ Notification│ │ Search     │ │ Audit / Compliance │  │
+   │  │ (Go)        │ │ (Meilisearch│ │ (append-only)      │  │
+   │  └────────────┘ └─────────────┘ └────────────────────┘  │
+   └───────┬───────────────┬──────────────────┬──────────────┘
+           │               │                  │
+   ┌───────▼──────┐ ┌──────▼───────┐  ┌───────▼────────────┐
+   │ PostgreSQL 16│ │ Redis Cluster│  │ Kafka (event log)  │
+   │ + Citus for  │ │ cache, locks,│  │ outbox → consumers │
+   │   tenancy    │ │ pubsub, rate │  └────────────────────┘
+   └──────────────┘ └──────────────┘
+   ┌──────────────────────────────────────────────────────────┐
+   │ S3-compatible object store │ OpenTelemetry → Tempo/Grafana│
+   └──────────────────────────────────────────────────────────┘
+```
+
+**Key architectural decisions and their justification:**
+
+1. **Postgres as system of record, Kafka via transactional outbox for events.** Avoids dual-write bugs. Every state change emits an event in the same transaction; a relay publishes to Kafka; projections rebuild read models. This gives me auditability (marketplace/payments need it) and lets search/analytics lag safely.
+2. **Go for the hot path (gateway, WS fanout, billing).** Predictable p99, low GC pressure under 100k concurrent sockets, single static binary for boring deploys. TypeScript/Node where the domain is CRUD-shaped and team velocity matters. Python where ranking/LLM orchestration lives. *Language follows the problem, not the resume.*
+3. **Multi-tenancy via row-level tenancy + Postgres RLS.** Every table carries `tenant_id`; RLS policies enforce isolation at the database, so a forgotten `WHERE` clause in application code cannot leak data across clients. For Citus-sharded deployments, shard key = `tenant_id`.
+4. **Idempotency everywhere money or side effects move.** Client-supplied `Idempotency-Key` → Redis `SETNX` with TTL → request journal. Ledger writes are double-entry and immutable; corrections are compensating transactions, never `UPDATE`.
+
+### 2.2 API Design
+
+**Principles:** REST for resource CRUD with explicit versioning (`/v1`), cursor pagination, and problem+json errors; GraphQL only where the client has genuinely heterogeneous read shapes (avoided by default); gRPC internally for service-to-service; OpenAPI generated from code as the source of truth.
+
+```
+POST /v1/engagements
+  Idempotency-Key: 8f14e45f-ceea-467f-a1d4-...
+  { "mission_id": "msn_7f3a", "team": ["usr_a","usr_b"], "rate_cents": 13500, "currency": "USD" }
+→ 201 { "id": "eng_...", "status": "pending_signature", "version": 1 }
+
+GET  /v1/engagements?cursor=eyJpZCI6...&limit=25&status=active
+GET  /v1/engagements/{id}            # ETag / If-None-Match supported
+PATCH /v1/engagements/{id}           # If-Match: "3" → optimistic concurrency
+POST /v1/engagements/{id}:complete   # RPC-style verb for state transitions
+```
+
+Error contract (RFC 9457 problem+json):
+
+```json
+{
+  "type": "https://api.example.com/problems/version-conflict",
+  "title": "Optimistic concurrency check failed",
+  "status": 409,
+  "detail": "Resource version 3 expected, received 5.",
+  "instance": "/v1/engagements/eng_7f3a",
+  "trace_id": "01HX..."
+}
+```
+
+### 2.3 Data Modeling (core entities)
+
+```sql
+-- Tenant isolation enforced at the DB, not just the ORM
+ALTER TABLE engagements ENABLE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON engagements
+  USING (tenant_id = current_setting('app.tenant_id')::uuid);
+
+CREATE TABLE engagements (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id      uuid NOT NULL,
+  mission_id     uuid NOT NULL REFERENCES missions(id),
+  status         engagement_status NOT NULL DEFAULT 'draft',
+  rate_cents     integer NOT NULL CHECK (rate_cents BETWEEN 9000 AND 17000),
+  currency       char(3) NOT NULL DEFAULT 'USD',
+  version        integer NOT NULL DEFAULT 1,          -- optimistic locking
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  updated_at     timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_engagements_tenant_status ON engagements (tenant_id, status, updated_at DESC);
+
+-- Transactional outbox: atomic with the business write
+CREATE TABLE outbox (
+  id            bigserial PRIMARY KEY,
+  aggregate_type text NOT NULL,
+  aggregate_id   uuid NOT NULL,
+  event_type     text NOT NULL,
+  payload        jsonb NOT NULL,
+  created_at     timestamptz NOT NULL DEFAULT now(),
+  published_at   timestamptz
+);
+CREATE INDEX idx_outbox_unpublished ON outbox (id) WHERE published_at IS NULL;
+```
+
+### 2.4 Concurrency Control
+
+- **Optimistic (default):** `version` column + `If-Match` ETag. `UPDATE ... SET version = version + 1 WHERE id = $1 AND version = $2`; zero rows → 409 with current state. No lock contention, ideal for human-paced edits.
+- **Pessimistic (rare, short):** `SELECT ... FOR UPDATE SKIP LOCKED` for job/queue claiming — workers pull work without stepping on each other.
+- **Distributed (payments):** idempotency keys + a Postgres advisory lock scoped per `idempotency_key`, held only for the duration of the ledger write (milliseconds).
+- **Presence/fanout:** Redis Lua scripts for atomic presence set updates; consistent-hash WS connections across gateway nodes; cross-node fanout via Redis pub/sub (NATS if fanout volume demands it).
+
+### 2.5 Caching Strategy (and its invalidation)
+
+| Layer | What | TTL / Invalidation |
+|---|---|---|
+| CDN | Static assets, public profiles | `immutable`, content-hashed filenames |
+| App-local (ristretto / LRU) | Hot config, permission graphs | 30–60s TTL, tolerate staleness |
+| Redis | Sessions, rate limits, idempotency journal | TTL by semantics |
+| Redis (read-through) | Engagement detail, mission detail | Write-through on outbox event; version-tagged keys |
+| Postgres | `shared_buffers`, `pg_stat` tuning | Materialized views for analytics |
+
+**Invalidation rule I hold to:** cache keys embed a resource version (`eng:eng_7f3a:v3`). A write bumps the version → old keys age out naturally; no thundering-herd delete fanout. On miss storms I use single-flight + short probabilistic early expiration.
+
+### 2.6 Scalability Guarantees
+
+- **Stateless app tier** behind ALB; horizontal pod autoscaling on p95 latency + queue depth (not just CPU).
+- **Postgres:** read replicas with `pgbouncer`; Citus for tenant-based sharding beyond ~10k QPS/write-heavy tenants; partition `events`/`outbox` by month.
+- **WebSocket tier:** sticky sessions via consistent hashing; presence state externalized to Redis so any node can rehydrate after a deploy.
+- **Kafka consumers:** consumer groups with `max.poll` hygiene; exactly-once *effect* via idempotent handlers (natural keys), not broker-level EOS complexity.
+- **SLOs as contracts:** availability 99.9% for API; p95 < 200ms for engagement reads; p99 < 50ms for WS fanout within region. Error budget drives release cadence.
+
+### 2.7 Production Readiness
+
+**CI/CD:**
+- GitHub Actions: lint → unit (pytest/jest/go test, ≥80% changed-line coverage) → integration (testcontainers: Postgres/Redis/Kafka) → build signed images (Cosign) → staging → canary (5% → 50% → 100%) with automated rollback on SLO burn-rate alert.
+- Migrations via `atlas`/`golang-migrate`, forward-only, expand-contract pattern for zero-downtime schema changes.
+- IaC in Terraform; environments are disposable and reproducible.
+
+**Observability (OpenTelemetry-first):**
+- Traces: OTel SDK → Tempo; every request carries `trace_id` in logs and error payloads (as shown above).
+- Metrics: Prometheus + recording/alerting rules; RED metrics per service, saturation signals (pool usage, consumer lag).
+- Logs:</pre>
+    </div>
+</body>
+</html>

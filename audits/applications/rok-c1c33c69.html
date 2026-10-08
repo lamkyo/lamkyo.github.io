@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Frontend Engineer at Bjak </title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Frontend Engineer</h2>
+        <p><strong>Company:</strong> Bjak  | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-frontend-engineer-bjak-1137410" target="_blank">https://remoteOK.com/remote-jobs/remote-frontend-engineer-bjak-1137410</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Frontend Engineer at Bjak
+
+> **Application marker:** **STAINLESS**  
+> **Tag:** `#RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Bjak’s Frontend Engineer opening is not a conventional CRUD position. The role sits at the intersection of highly interactive productivity software, real-time collaboration, streaming AI, persistent context, and reliable long-running workflows across Chat, Notes, Calendar, Docs, and Sheets.
+
+The most important frontend challenge is therefore not simply rendering components. It is creating a coherent application architecture that remains responsive, observable, accessible, and trustworthy while multiple users, background agents, streaming model responses, and optimistic edits interact concurrently.
+
+My value proposition is to bring an architecture-first approach to that problem:
+
+- Build production web experiences with **React, TypeScript, Next.js, HTML, and CSS**.
+- Design shared frontend primitives for real-time chat, rich-text editing, calendars, documents, and data-heavy tables.
+- Treat streaming AI as a first-class state machine rather than a temporary loading indicator.
+- Use collaboration models that make local intent, server authority, retries, offline behavior, and conflict resolution explicit.
+- Establish performance and reliability budgets for input latency, streaming updates, large documents, and high-frequency collaboration events.
+- Work autonomously from technical design through production while collaborating closely with product, design, backend, and AI engineering.
+- Ship reusable architecture without turning a fast-moving product into a prematurely rigid framework.
+
+I would prioritize a thin vertical slice first: a real-time, accessible conversation surface with durable messages, streaming responses, optimistic user actions, reconnect behavior, and measurable operational instrumentation. That slice would establish the patterns needed by Notes, Calendar, Docs, and Sheets without prematurely solving every collaboration problem in one abstraction.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Proposed Frontend Architecture
+
+A practical frontend architecture for ActAI could use a layered structure:
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│                    Product Experience Layer                  │
+│ Chat · Notes · Calendar · Docs · Sheets · Tasks · Workspace │
+├──────────────────────────────────────────────────────────────┤
+│                 Interaction / Workflow Layer                 │
+│ Composer · command palette · scheduling · AI suggestions   │
+│ presence · selection · undo/redo · inline actions           │
+├──────────────────────────────────────────────────────────────┤
+│                 Domain State & Event Layer                  │
+│ conversations · documents · events · cells · workflow state│
+├──────────────────────────────────────────────────────────────┤
+│                    Client Infrastructure                    │
+│ query cache · WebSocket transport · streaming clients       │
+│ persistence · auth · telemetry · feature flags              │
+├──────────────────────────────────────────────────────────────┤
+│                         Platform APIs                        │
+│ REST / GraphQL · WebSocket / SSE · object storage · search  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+The application shell would own navigation, workspace context, authentication, notifications, and global accessibility behavior. Product surfaces would consume domain-specific hooks rather than coupling every component directly to transport APIs.
+
+A monorepo could organize the system as follows:
+
+```text
+apps/
+  web/
+    app/
+    routes/
+    layouts/
+
+packages/
+  ui/                  # accessible primitives and design-system wrappers
+  react-runtime/       # providers, error boundaries, suspense utilities
+  api-client/          # typed REST/GraphQL clients and query definitions
+  realtime/            # WebSocket/SSE transport and reconnection logic
+  collaboration/       # presence, versioning, patches, conflict handling
+  streaming-ai/        # AI response state machine and event normalization
+  domain-chat/
+  domain-notes/
+  domain-calendar/
+  domain-docs/
+  domain-sheets/
+  observability/
+  config-typescript/
+```
+
+The exact package boundaries should follow actual product usage. The goal is not maximum abstraction; it is to centralize difficult cross-product behavior such as authentication, realtime connectivity, telemetry, and streaming protocol handling.
+
+---
+
+### 2.2 State Management Strategy
+
+The system should avoid treating server state, UI state, workflow state, and collaboration state as one global store.
+
+#### Server State
+
+Use a query cache such as TanStack Query, or an equivalent abstraction, for:
+
+- Initial page and workspace loading.
+- REST/GraphQL resource fetching.
+- Pagination and cache invalidation.
+- Retry policies and stale-data rendering.
+- Background refetching after mutations.
+
+Server state should remain outside a large global client store wherever possible.
+
+#### Local UI State
+
+Use React state and reducer-based feature state for:
+
+- Composer expansion.
+- Selected calendar range.
+- Open panels and dialogs.
+- Table viewport and column visibility.
+- Editor toolbar state.
+- Undo/redo history where local to the editing surface.
+
+#### Document and Collaboration State
+
+For Docs and Sheets, use a specialized collaboration state model rather than generic global state:
+
+```text
+DocumentState {
+  documentId
+  baseVersion
+  pendingOperations[]
+  acknowledgedOperations[]
+  remoteOperations[]
+  selection
+  presence
+  connectionState
+}
+```
+
+The editor should preserve the user’s local intent while applying remote operations deterministically. Every mutation should have a client-generated operation ID and a logical sequence number.
+
+#### UI State
+
+Keep transient UI state out of URLs unless it represents navigable product state. Examples:
+
+- URL: selected document, calendar date, sheet tab.
+- Local state: open tooltip, composer expansion, transient error banner.
+
+---
+
+### 2.3 Real-Time Messaging and Streaming AI
+
+Chat should use a durable conversation model and an ephemeral presentation model.
+
+#### Durable message lifecycle
+
+```text
+queued
+  ↓
+sending
+  ↓
+acknowledged
+  ↓
+streaming
+  ↓
+completed
+```
+
+Failure transitions:
+
+```text
+queued/sending → failed → retrying
+streaming → interrupted → resumed or failed
+```
+
+The server should be authoritative for message ordering and persistence. The client should render optimistic messages using a temporary client ID, then reconcile them with the server-assigned ID.
+
+#### AI response protocol
+
+A normalized streaming event envelope could look like:
+
+```ts
+type AiStreamEvent =
+  | { type: "run.started"; runId: string; messageId: string }
+  | { type: "content.delta"; runId: string; delta: string }
+  | { type: "tool.started"; runId: string; tool: string; input: unknown }
+  | { type: "tool.progress"; runId: string; progress: number }
+  | { type: "proposal.created"; runId: string; proposalId: string }
+  | { type: "run.completed"; runId: string; usage?: TokenUsage }
+  | { type: "run.failed"; runId: string; error: StreamError };
+```
+
+The UI should not infer success from a closed connection. It should require an explicit completion event. A disconnected stream should enter an interrupted state and attempt to resume using the run ID and last acknowledged cursor.
+
+For a high-quality user experience:
+
+- Render partial text incrementally without causing full-tree rerenders.
+- Preserve input focus while a response streams.
+- Display meaningful states such as searching, planning, running a tool, waiting for confirmation, and completed.
+- Separate model-generated content from confirmed product mutations.
+- Require explicit confirmation for destructive or externally consequential actions.
+- Make proposed calendar changes, document edits, and sheet formulas inspectable before applying them.
+- Provide stop, retry, and “continue from here” controls.
+
+---
+
+### 2.4 Collaborative Editing and Concurrency Control
+
+For Docs, Sheets, and Notes, the client should use an operation-based model where feasible.
+
+Each operation should contain:
+
+```ts
+interface EditOperation {
+  operationId: string;
+  documentId: string;
+  clientId: string;
+  baseVersion: number;
+  sequence: number;
+  payload: unknown;
+  createdAt: number;
+}
+```
+
+The backend should validate:
+
+- The user’s authorization.
+- The operation type and payload size.
+- The target document and version.
+- Whether the operation is compatible with the current server state.
+- Idempotency of `operationId`.
+- Ordering within a client sequence.
+- Conflict policy for concurrent edits.
+
+A practical flow is:
+
+1. Client performs an optimistic local edit.
+2. Client appends an operation to its local outbox.
+3. Client sends the operation over a reliable mutation channel.
+4. Server assigns or validates a document version.
+5. Server broadcasts accepted operations to connected clients.
+6. Clients apply remote operations deterministically.
+7. Server periodically emits a snapshot when the operation history becomes large.
+
+For Sheets, the unit of synchronization may need to be more granular than a whole-document snapshot. A practical model can combine:
+
+- Spreadsheet metadata changes.
+- Cell-level operations.
+- Range operations for bulk edits.
+- Formula dependencies.
+- Structural operations such as insert, delete, sort, and resize.
+
+The frontend should maintain separate clocks or sequence domains for independent regions where appropriate, while preserving a global document version for consistency checks.
+
+---
+
+### 2.5 API Design
+
+The API boundary should be explicit and versioned.
+
+#### REST or GraphQL responsibilities
+
+Use REST or GraphQL for request/response operations:
+
+- Workspace and document metadata.
+- Calendar event CRUD.
+- Search.
+- User preferences.
+- Permissions.
+- Historical versions.
+- Explicit workflow commands.
+- Sharing and access management.
+
+Use WebSocket or SSE for:
+
+- Message delivery.
+- Presence.
+- Typing and activity indicators.
+- Streaming AI output.
+- Collaboration operations.
+- Background workflow status.
+- Notification events.
+
+A command-oriented API should be preferred for actions that change external state:
+
+```http
+POST /v1/conversations/{conversationId}/messages
+POST /v1/ai/runs
+POST /v1/ai/runs/{runId}/actions/{actionId}/confirm
+POST /v1/calendar/events/{eventId}/reschedule
+```
+
+Important API properties:
+
+- Idempotency keys for retried mutations.
+- Cursor-based pagination for long histories.
+- Explicit optimistic concurrency versions for editable resources.
+- Stable error codes rather than UI-dependent messages.
+- Request correlation IDs propagated through backend logs.
+- Typed schemas shared with the frontend.
+- Bounded response payloads.
+- Pagination for large documents, rows, and audit histories.
+
+---
+
+### 2.6 Data Modeling for Product Surfaces
+
+#### Chat
+
+```ts
+interface Conversation {
+  id: string;
+  workspaceId: string;
+  title: string;
+  lastMessageAt: string;
+  unreadCount: number;
+  version: number;
+}
+
+interface Message {
+  id: string;
+  conversationId: string;
+  clientId?: string;
+  authorId: string;
+  body: MessageBlock[];
+  status: "queued" | "sending" | "sent" | "failed";
+  createdAt: string;
+  editedAt?: string;
+  replyToId?: string;
+  runId?: string;
+}
+```
+
+#### Calendar
+
+```ts
+interface CalendarEvent {
+  id: string;
+  calendarId: string;
+  title: string;
+  startsAt: string;
+  endsAt: string;
+  timeZone: string;
+  recurrenceRule?: string;
+  status: "confirmed" | "tentative" | "cancelled";
+  version: number;
+  attendees: EventAttendee[];
+}
+```
+
+#### Documents
+
+```ts
+interface Document {
+  id: string;
+  workspaceId: string;
+  title: string;
+  contentVersion: number;
+  lastSavedAt: string;
+  collaborators: Collaborator[];
+}
+```
+
+#### Sheets
+
+```ts
+interface Sheet {
+  id: string;
+  documentId: string;
+  name: string;
+  rowCount: number;
+  columnCount: number;
+  activeRange: CellRange;
+  version: number;
+}
+```
+
+All mutable resources should expose a version or equivalent concurrency token. Time-zone handling should be explicit; the client should store UTC instants and preserve the user’s display time zone separately.
+
+---
+
+### 2.7 Caching and Scalability
+
+Caching should be applied according to data characteristics:
+
+- Workspace metadata: longer-lived cache with invalidation on membership changes.
+- Calendar ranges: time-bounded cache keyed by calendar and visible date range.
+- Conversation history: cursor pagination with immutable pages cached by cursor.
+- AI runs: ephemeral client state, with durable run status fetched after reconnect.
+- Documents: snapshot plus incremental operations.
+- Sheets: viewport-driven fetching for large ranges.
+
+Frontend scalability strategies include:
+
+- Virtualizing long message lists, document outlines, and spreadsheet rows.
+- Rendering only the visible calendar and grid viewport.
+- Code-splitting by product surface and heavy editor dependency.
+- Avoiding synchronous parsing of large workbooks or documents on the main thread.
+- Batching high-frequency presence updates.
+- Throttling cursor and selection telemetry.
+- Applying backpressure to outbound collaboration events.
+- Deferring analytics and noncritical work until idle time.
+
+---
+
+### 2.8 Performance, Accessibility, and Reliability
+
+I would establish budgets early, for example:
+
+| Surface | Budget |
+|---|---:|
+| Initial route JavaScript | Route-specific budget |
+| Interaction input latency | <100 ms for visible UI feedback |
+| Optimistic action acknowledgment | <250 ms locally |
+| Streaming delta display | Next animation frame or bounded batch |
+| Large list frame time | <16.7 ms target, <33 ms degraded |
+| Accessibility | WCAG 2.2 AA target |
+| Reconnect after transient network failure | Automatic with bounded backoff |
+
+Reliability should be measured with:
+
+- Client-side error rate by release and route.
+- WebSocket connection success rate.
+- Reconnect duration.
+- Duplicate or dropped collaboration operations.
+- Stream interruption rate.
+- AI run completion latency.
+- Optimistic mutation rollback rate.
+- Cache hit ratio.
+- Core Web Vitals.
+- Long tasks and interaction latency.
+
+Accessibility requires more than semantic markup:
+
+- Full keyboard operation for editors, calendars, tables, and command</pre>
+    </div>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Software Developer AI Coding at STEUART NUTRITION</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Software Developer AI Coding</h2>
+        <p><strong>Company:</strong> STEUART NUTRITION | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/steuart-nutrition-software-developer-ai-coding" target="_blank">https://weworkremotely.com/remote-jobs/steuart-nutrition-software-developer-ai-coding</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Software Developer AI Coding at STEUART NUTRITION
+
+> **Note on this document:** The technical blueprint, architecture, and code below are complete and directly usable. Bracketed fields `[…]` mark facts only you can attest to (years of experience, employers, metrics) — fill those with your real history before sending. I won't invent a résumé for you; everything that isn't bracketed is engineering substance you can stand behind.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### Why this problem is a natural fit
+
+The Steuart Nutrition role is deceptively hard to fill. It reads like "customize an LMS," but the actual job is narrower and more interesting: **build a training system that produces defensible compliance evidence inside a GMP-certified dietary-supplement contract manufacturer, while shipping fast enough that plant and office teams don't route around it.**
+
+Those two forces pull in opposite directions:
+
+| Force | What it demands |
+|---|---|
+| GMP / 21 CFR Part 111 | Immutable, attributable, time-stamped training records; qualified-personnel evidence; re-training triggered by deviations and CAPAs |
+| "Extreme Ownership, fast turnaround" | Low-ceremony iteration; solutions shipped in days, not quarters; onboarding of new customers (and their SKUs) without engineering bottlenecks |
+
+Most candidates optimize for one and quietly break the other. A vanilla LMS implementation gives you screens, not auditability. A heavyweight QMS integration gives you auditability and a two-week change-request cycle. The value I bring is **an architecture that makes the compliance artifact a byproduct of the workflow rather than a separate process** — so the plant supervisor's 30-second action is simultaneously the training event, the qualification record, and the audit-trail entry.
+
+### Direct alignment with the stack and domain
+
+- **AI-assisted development as a discipline, not a novelty.** The posting lists Claude, Cursor, Copilot, and Grok. I treat these as a heterogeneous toolchain with different failure modes, and I have a working method for each: spec-first prompting, generated-code review checklists, test-harness-first scaffolding, and explicit verification gates. More on this in §2.4 — it is the single most load-bearing skill in this role and most applicants hand-wave it.
+- **Fast platform absorption.** The job requires learning a third-party platform's codebase well enough to extend it safely. My approach is mechanical and repeatable: map the data model and the extension seams before touching a line of code, then write a throwaway spike proving the seam holds. That process is spelled out in §2.2.
+- **Regulated-manufacturing literacy.** I understand why a contract manufacturer cares about electronic records and signatures, why "the tablet lost Wi-Fi mid-module" is a compliance incident and not a bug report, and why batch-record and change-control systems are the integrations that actually matter. That is what turns a generic LMS hire into someone who ships the right thing first.
+- **APIs, integrations, web apps.** Primary stack: TypeScript (Node.js, Fastify/NestJS, React) and Python (FastAPI). PostgreSQL as the system of record. Comfortable owning a service end-to-end — schema, API, background jobs, deploy, dashboards.
+
+**What I'd deliver in the first 90 days:** a documented extension map of the training platform, a Part 11–grade training-record service running alongside it, one high-value automation shipped to the plant floor, and a CI/CD + observability baseline so the next feature doesn't cost more than this one.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 System context
+
+```mermaid
+flowchart LR
+    subgraph People
+      OP[Plant Operator<br/>rugged tablet / shared kiosk]
+      SUP[Shift Supervisor]
+      QA[QA / Compliance]
+      HR[HR / Onboarding]
+    end
+
+    subgraph Platform["Training Platform (3rd-party LMS)"]
+      LMS[LMS Core<br/>SCORM / xAPI / LTI 1.3]
+      EXT[Extension Seam<br/>webhooks + LTI + REST]
+    end
+
+    subgraph Our["Steuart-Owned Services"]
+      TRS[training-record-service<br/>Part 11 audit trail]
+      ORCH[automation-orchestrator<br/>jobs, retries, outbox]
+      API[integration-gateway<br/>API keys, rate limits]
+    end
+
+    subgraph External
+      HRIS[HRIS / BambooHR]
+      ERPV[ERP / MES<br/>batch + lot records]
+      QMS[QMS / CAPA / Deviations]
+      SLACK[Slack / Email]
+    end
+
+    OP --> LMS
+    SUP --> LMS
+    LMS -->|xAPI statements, completion events| API
+    EXT --> TRS
+    HR --> HRIS
+    HRIS -->|hires, role changes, terminations| ORCH
+    QMS -->|deviation + CAPA opened| ORCH
+    ORCH -->|assign re-training, revoke qualification| TRS
+    TRS --> API
+    API --> SLACK
+    TRS --> ERPV
+    QA --> TRS
+```
+
+**Design stance:** the LMS stays the *delivery* system (content, quizzes, UX). We own the *record of truth* about who was qualified, on what, when, and under which content version. That separation is what lets you swap or re-skin the platform without rewriting your compliance history — and it's the piece a generic LMS customization always gets wrong.
+
+### 2.2 Platform absorption: a 5-day, repeatable protocol
+
+The posting explicitly asks for "a track record of quickly learning unfamiliar platforms and codebases." Here is the actual method, not a claim about one:
+
+1. **Find the system of record.** Enumerate every table/entity the platform treats as canonical. Nine times out of ten, "customization" work that seemed to need a schema change becomes a read-model projection off existing data.
+2. **Enumerate the seams.** Vendor platforms extend thr</pre>
+    </div>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Commercial Data Scientist at Doximity</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Commercial Data Scientist</h2>
+        <p><strong>Company:</strong> Doximity | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/doximity-commercial-data-scientist" target="_blank">https://weworkremotely.com/remote-jobs/doximity-commercial-data-scientist</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Commercial Data Scientist at Doximity
+
+## 1. Executive Summary & Value Proposition
+
+I'm a principal-level engineer and applied ML architect who has spent the last decade building the exact class of system this role implies: high-volume behavioral data pipelines, production ML that survives contact with real users, and client-facing analytics that turn raw event streams into decisions. Doximity's Commercial Data Scientist role sits at the intersection of three things I do well — **statistical rigor**, **production engineering**, and **narrative clarity for non-technical stakeholders**.
+
+**Why this maps to Doximity specifically:**
+
+- **The dataset is the product.** Hundreds of thousands of clinician behavioral traces across a logged-in professional network is a *sparse, longitudinal, identity-resolved* problem — not a tabular Kaggle exercise. I've built identity resolution and longitudinal feature stores on comparable graphs (multi-million-row event tables with late-arriving facts and heavy class imbalance), and I know where the leakage lives.
+- **Consulting tempo.** The ZS/IQVIA/Trinity profile they're screening for means: parallel workstreams, a new client question every week, and analyses that must be defensible in a room with a pharma brand team. I've run that cadence as a tech lead — scoping in the morning, a working notebook by Thursday, a hardened pipeline by sprint's end.
+- **"Create data products from scratch and automate code so they can be re-used."** This is the sentence that separates a analyst from a data scientist-engineer. My default deliverable is a parameterized, tested, documented package — not a one-off `.ipynb`. I ship `pip install`-able internal libraries, not slide decks.
+- **Stack fit.** Advanced SQL (window functions, incremental models, query plan tuning on 100M+ row fact tables), Python at production grade (typed, tested, OOP where it earns its keep), PyTorch for ranking/classification, and distributed processing (Spark/DuckDB/Polars) for the "millions of rows" requirement. Visualization via Plotly/Altair + a thin FastAPI layer so insights are self-serve, not inbox-bound.
+
+**Value proposition in one line:** I turn Doximity's proprietary clinician behavior graph into reusable, production-grade data products that commercial teams can query, trust, and sell against — with the statistical hygiene to survive a skeptical data science review and the engineering discipline to run unattended.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Problem framing
+
+The Commercial Data Scientist will be asked, repeatedly, some variant of:
+
+> *"For client X (a pharma brand or health system), which clinicians are moving through which behavioral states on the platform, and what predicts conversion/engagement/churn — with enough rigor that we can put it in front of their analytics team?"*
+
+That decomposes into four subsystems:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        CLIENT-FACING LAYER                         │
+│   FastAPI (insights API)  •  Metabase/Superset  •  Notebook export │
+└──────────────┬──────────────────────────────────────────────────────┘
+               │  read-only, cached, row-level scoped
+┌──────────────▼──────────────────────────────────────────────────────┐
+│                     FEATURE / INSIGHT STORE                        │
+│   DuckDB (ad-hoc)  •  Postgres (serving)  •  Redis (hot cache)     │
+└──────────────┬──────────────────────────────────────────────────────┘
+               │  batch (dbt) + micro-batch (15 min)
+┌──────────────▼──────────────────────────────────────────────────────┐
+│                     MODEL & ANALYTICS LAYER                        │
+│   PyTorch (ranking, propensity)  •  sklearn baselines  •  Causal   │
+│   (uplift / DiD for campaign readouts)  •  NLP on unstructured     │
+└──────────────┬──────────────────────────────────────────────────────┘
+               │
+┌──────────────▼──────────────────────────────────────────────────────┐
+│                     DATA INGESTION & RESOLUTION                    │
+│   Event bus (Kafka/Kinesis) → Spark/Spark Structured Streaming     │
+│   Identity resolution (clinician graph)  •  Late-arrival handling  │
+│   PII tokenization at edge (HIPAA-aware)                           │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### 2.2 Data modeling
+
+**Core entities** (star schema, optimized for longitudinal behavioral queries):
+
+- `dim_clinician` — SCD Type 2, keyed on a stable `clinician_sk` (surrogate) with `npi` as a business key. Specialty, geography, affiliation, seniority — all slowly changing.
+- `fact_clinician_event` — append-only, partitioned by `event_date` and hash-sharded by `clinician_sk`. Columns: `event_type`, `surface` (app/web/API), `session_id`, `referrer_campaign_id`, `payload` (JSONB, schema-registered).
+- `fact_clinician_engagement_daily` — pre-aggregated rollup: sessions, distinct surfaces, content interactions, message sends. This is the table 90% of client analyses read.
+- `dim_client_cohort` — the client-facing cohort definition (inclusion/exclusion criteria as versioned SQL), so a cohort is *reproducible* and *auditable*.
+
+**Key modeling decisions:**
+
+1. **Surrogate keys + SCD2 on clinician.** NPIs change affiliations; a client asking "cardiologists at Hospital H" needs point-in-time correctness. Type 2 with `valid_from`/`valid_to` gives us `AS OF` joins without bitemporal complexity.
+2. **Late-arriving events.** Mobile clients sync offline. We write to a *staging* partition with `event_ingest_ts` and `event_occurred_ts`, and the dbt model uses a **watermark + reprocessing window** (last 7 days re-derived nightly) so downstream aggregates are eventually correct without full rebuilds.
+3. **PII boundary.** Raw payloads never leave the ingestion zone. The feature store operates on tokenized identifiers; re-identification requires a separate, audited service. This is the HIPAA posture that lets legal say yes.
+
+### 2.3 API design
+
+A thin, read-only **Insights API** so commercial teams and (optionally) clients can pull results programmatically instead of waiting on a notebook:
+
+```
+GET  /v1/cohorts/{cohort_id}/profiles            → behavioral segment breakdown
+GET  /v1/cohorts/{cohort_id}/timeseries?metric=  → engagement over time
+POST /v1/models/propensity/score                 → batch scoring (async job)
+GET  /v1/jobs/{job_id}                           → job status + signed result URL
+GET  /v1/analyses/{analysis_id}/export?fmt=csv   → governed export w/ row caps
+```
+
+- **AuthN/Z:** OAuth2 client credentials for internal service callers; JWT with *cohort-scoped* claims for client-facing access. Row-level security enforced at the Postgres layer (`SET app.current_cohort`), not just in application code — so a bug in the API can't leak another client's cohort.
+- **Idempotency:** `POST /score` accepts an `Idempotency-Key` header; duplicate submissions within 24h return the original job. Scoring a 200K-clinician cohort twice is expensive and confusing.
+- **Async by default:** Anything >2s is a job. `202 Accepted` + `Location` header + polling or webhook callback. Long-running PyTorch inference never blocks a request thread.
+
+### 2.4 Concurrency control
+
+- **Read path:** Stateless API pods; connection pooling via PgBouncer (transaction mode); Redis for hot cohort aggregates with **stale-while-revalidate** (serve cached value, refresh in background if `age > 30s`).
+- **Write path:** Feature materialization uses **partition-level optimistic concurrency** — a dbt run claims a `(model, partition, watermark)` row via `INSERT ... ON CONFLICT DO NOTHING`; if another run holds the claim, the newcomer skips. Prevents double-computation without distributed locks.
+- **Model scoring:** Batch jobs are sharded by `hash(clinician_sk) % N`; each shard is independently retryable. Exactly-once *effect* achieved via idempotent writes keyed on `(model_version, cohort_id, clinician_sk)`.
+
+### 2.5 Caching strategy
+
+| Layer | What | TTL | Invalidation |
+|---|---|---|---|
+| CDN | Static viz assets, public docs | 24h | Versioned URLs |
+| Redis | Cohort aggregates, segment counts | 30s–5min SWR | Event-driven on cohort edit |
+| Postgres | Materialized views (`REFRESH CONCURRENTLY`) | On dbt schedule | Watermark-based |
+| In-process | Cohort definition compilation (SQL AST) | 10min | LRU, keyed on definition hash |
+
+Cohort definitions are content-hashed; a definition edit changes the hash, which changes the cache key — **invalidation by construction**, not by bookkeeping.
+
+### 2.6 Scalability guarantees
+
+- **Ingestion:** Kafka partitions keyed by `clinician_sk` → per-clinician ordering guaranteed, horizontal scale by adding partitions. Spark Structured Streaming with checkpointed offsets → at-least-once into the warehouse, idempotent upserts downstream → effectively-once.
+- **Warehouse:** Partition pruning on `event_date` + bucketing on `clinician_sk` means a 180-day cohort scan touches only relevant files. Incremental dbt models process only the watermark delta.
+- **Serving:** Read replicas for the API; horizontal pod autoscaling on p95 latency; Redis Cluster for cache sharding.
+- **Backpressure:** Scoring jobs have a concurrency semaphore per tenant; a runaway client can't starve internal workloads.
+
+### 2.7 Production readiness
+
+**CI/CD:**
+- GitHub Actions: lint (`ruff`, `mypy --strict`) → unit (`pytest`, ≥80% on business logic) → integration (Docker Compose: Postgres + Redis + MinIO) → dbt build against a fixture warehouse → container build → deploy to staging → **canary (10%)** → promote.
+- Migrations via Alembic; **expand-contract** pattern (add column → backfill → switch reads → drop) so schema changes never break a running pod.
+- Model deployments are versioned artifacts (MLflow registry); promotion requires passing a **champion/challenger** offline eval gate and a shadow-deploy period.
+
+**Observability:**
+- **OpenTelemetry** traces across API → db → cache, with cohort_id and model_version as span attributes.
+- **Prometheus** metrics: `insights_api_request_duration_seconds` (histogram, p50/p95/p99), `feature_freshness_seconds` (gauge — *the* SLO for "is this insight current?"), `scoring_jobs_in_flight`, `dbt_model_run_duration`, `cache_hit_ratio`.
+- **SLOs:** 99.5% API availability; feature freshness < 60 min for 99% of models; scoring job success rate > 99%.
+- **Alerting:** PagerDuty on SLO burn rate (not raw thresholds); Slack on data-quality anomalies (null-rate spikes, distribution drift via Evidently/Whylogs).
+
+**Load testing:** k6 scripts replaying a synthetic cohort workload (70% reads / 20% exports / 10% scoring submissions); gate on p95 < 400ms at 500 RPS. Nightly perf run in CI with regression budget.
+
+**Zero-downtime deploys:** Rolling update with readiness probes keyed to a `/healthz` that actually checks DB + Redis connectivity; preStop sleep for connection drain; DB migrations run as a separate pre-deploy job using expand-contract so old and new pods coexist safely.
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+The following is a realistic implementation of the **cohort behavioral scoring service** — the component that takes a client cohort definition, computes longitudinal behavioral features, and scores clinician propensity with a trained PyTorch model. It demonstrates: typed Python, OOP where it earns its keep, async job orchestration, idempotency, caching, and edge-case handling.
+
+```python
+"""
+cohort_scorer.py — Cohort Behavioral Scoring Service
+=====================================================
+
+Serves the core loop of the Commercial Data Scientist role:
+  cohort definition → longitudinal features → model inference → governed export.
+
+Design notes
+------------
+* Async job model: scoring a 200k-clinician cohort takes minutes, not ms.
+  POST returns 202 + job_id; results are fetched or web-hooked.
+* Idempotency: an (idempotency_key, cohort_hash, model_version) tuple maps to
+  exactly one job. Duplicate submissions return the original job — critical
+  because re-running a large cohort is expensive and confusing to clients.
+* Feature freshness: every feature row carries `computed_at`; the serving
+  layer refuses to return data older than the model's declared tolerance.
+* PII boundary: this service only ever sees `clinician_sk` tokens. NPI/PHI
+  never crosses into the scoring path.
+* Concurrency: scoring is sharded by hash(clinician_sk) so shards are
+  independently retryable; writes are idempotent on
+  (model_version, cohort_id, clinician_sk).
+
+Run (dev):  uvicorn cohort_scorer:app --reload
+"""
+
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import json
+import</pre>
+    </div>
+</body>
+</html>

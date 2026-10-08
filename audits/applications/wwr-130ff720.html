@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Data Engineer – AWS Data Lake & Pipeline Architecture at Toptal</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Data Engineer – AWS Data Lake & Pipeline Architecture</h2>
+        <p><strong>Company:</strong> Toptal | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/toptal-senior-data-engineer-aws-data-lake-pipeline-architecture" target="_blank">https://weworkremotely.com/remote-jobs/toptal-senior-data-engineer-aws-data-lake-pipeline-architecture</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Data Engineer – AWS Data Lake & Pipeline Architecture at Toptal
+
+> **Candidate note:** Replace the bracketed placeholders—particularly `[Name]`, `[years]`, `[email]`, and `[GitHub/LinkedIn]`—with verified experience before submitting. This dossier is intentionally written to demonstrate architectural capability without inventing unverified employment history or credentials.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+I am applying because this role sits at the intersection of the problems I consider most valuable in data engineering: designing durable data contracts, building high-throughput batch and streaming pipelines on AWS, and creating governed access patterns that allow data scientists and business teams to move quickly without compromising correctness or security.
+
+My approach to the Data Intelligence Platform would be to establish a reliable data foundation before optimizing individual workloads:
+
+- **AWS data lake:** S3-backed raw, curated, and serving zones with Glue Data Catalog metadata, partitioned datasets, schema enforcement, encryption, and lifecycle policies.
+- **Pipeline architecture:** Idempotent batch pipelines using EMR and Spark, event-driven ingestion through Kinesis or Kafka, and orchestration through Jenkins, Step Functions, or Airflow where appropriate.
+- **Data modeling:** Conformed dimensional and analytical models with explicit grain, slowly changing dimensions, surrogate keys, late-arriving facts, and lineage.
+- **Reliability:** Exactly-once business effects through deterministic processing, checkpointing, deduplication, replayable events, and atomic dataset publication.
+- **Performance:** Partition pruning, predicate pushdown, file-size management, vectorized or distributed SQL execution, query profiling, and workload-specific clustering or sorting.
+- **Governance and security:** IAM least privilege, KMS encryption, CloudTrail auditing, catalog access controls, data classification, masking, and sensitive-data handling.
+- **Developer experience:** Version-controlled infrastructure, automated tests, reproducible environments, CI/CD validation, and observability using CloudWatch, OpenTelemetry, Prometheus-compatible metrics, and structured logs.
+- **ML and platform support:** Feature datasets and model-serving interfaces designed for reproducibility, point-in-time correctness, and separation between training and production serving paths.
+
+The primary business outcome is not simply moving data into AWS. It is creating a trustworthy, observable, and economically sustainable platform where analytics and data science workloads can evolve without creating uncontrolled infrastructure growth or repeated pipeline incidents.
+
+### Alignment with Toptal’s requirements
+
+| Toptal requirement | Proposed contribution |
+|---|---|
+| Cloud-based data architecture | AWS lakehouse architecture with explicit storage, compute, catalog, orchestration, and serving layers |
+| Structured and unstructured data | Relational ingestion, APIs, log/event data, document extraction, and unstructured content processing |
+| Strong SQL and data modeling | Dimensional modeling, normalization for operational systems, analytical denormalization, and query optimization |
+| Spark, Glue, EMR, Kafka/Kinesis | Batch and streaming architecture using the appropriate AWS-native and open-source components |
+| Java, Python, and Scala | Python for orchestration and services, Scala/Spark for large transformations, Java for service integrations |
+| Performance and scalability | Capacity planning, partition strategy, benchmark-driven tuning, autoscaling, and cost controls |
+| CI/CD and Infrastructure as Code | Terraform modules, Jenkins pipelines, automated validation, and promotion through environments |
+| Security and governance | IAM, KMS, VPC controls, data classification, masking, auditability, and governance metadata |
+| Data science support | Reproducible, versioned, discoverable datasets with documented semantics and lineage |
+| Documentation and training | Architecture decision records, runbooks, data contracts, onboarding material, and operational training |
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Target architecture
+
+The platform should be organized as a governed lakehouse with separate operational, ingestion, transformation, and serving responsibilities.
+
+```text
+                 +-----------------------------+
+                 |       Internal Producers    |
+                 +-----------------------------+
+                              |
+       +----------------------+----------------------+
+       |                      |                      |
+   REST APIs              Databases              Files / SaaS
+       |                      |                      |
+       +----------+-----------+----------------------+
+                  |
+          Ingestion boundary
+       +----------+-----------+
+       |                      |
+   Kinesis / Kafka      Batch Harvesters
+       |                      |
+   Stream ingestion     S3 raw landing zone
+       |                      |
+       +----------+-----------+
+                  |
+        Validation / CDC / parsing
+                  |
+       +----------+-----------+
+       |                      |
+  Replayable       Structured datasets
+  event archive   in raw zone
+       |                      |
+       +----------+-----------+
+                  |
+             EMR / Glue / Spark
+                  |
+       +----------+-----------+
+       |                      |
+   Curated zone           Feature zone
+       |                      |
+       +----------+-----------+
+                  |
+        Glue Data Catalog / Iceberg
+                  |
+       +----------+-----------+
+       |                      |
+   Analytics / BI      Data science / ML
+       |                      |
+       +----------+-----------+
+                  |
+       Governed data APIs
+       |             |
+  Search / recommendations
+```
+
+### 2.2 Storage zones
+
+#### Raw zone
+
+- Immutable or append-only source data.
+- Original payload plus ingestion metadata:
+  - `source_system`
+  - `source_table`
+  - `event_time`
+  - `ingested_at`
+  - `batch_id`
+  - `schema_version`
+  - `content_hash`
+  - `source_offset` or Kafka/Kinesis position
+- Encrypted using AWS KMS.
+- Partitioning chosen around high-volume, frequently queried dimensions, not arbitrary calendar partitions alone.
+- Lifecycle transitions to Glacier or Intelligent-Tiering where retention permits.
+
+#### Curated zone
+
+- Deduplicated, typed, validated, and business-rule-compliant data.
+- Conformed dimensions and facts.
+- Explicit data contracts and schema versions.
+- Deterministic output paths or table versions.
+- Atomic publication using a manifest rename or table metadata commit.
+
+#### Serving zone
+
+- Aggregates, materialized views, feature tables, and low-latency extracts.
+- Optimized for known access patterns.
+- Row-level or column-level controls where required.
+- Separate storage from the raw and curated layers to prevent analytical consumers from depending directly on ingestion artifacts.
+
+### 2.3 Batch ingestion design
+
+Each batch should be represented by a manifest containing:
+
+```json
+{
+  "pipeline": "customer_profile_batch",
+  "source": "crm",
+  "source_object": "customers/2025-02-14",
+  "batch_id": "01JXYZ...",
+  "schema_version": 7,
+  "content_hash": "sha256:...",
+  "row_count": 184233,
+  "partition": {
+    "ingestion_date": "2025-02-14"
+  }
+}
+```
+
+Processing rules:
+
+1. Discover source objects.
+2. Calculate content hashes.
+3. Skip already committed objects.
+4. Validate schema and required fields.
+5. Normalize and transform records.
+6. Write temporary output.
+7. Validate output counts and invariants.
+8. Commit the output atomically.
+9. Emit metrics, lineage, and audit events.
+10. Retain failed batch artifacts for replay.
+
+This makes reruns safe and prevents partial results from becoming visible to consumers.
+
+### 2.4 Streaming ingestion and concurrency control
+
+For Kafka or Kinesis:
+
+- Use consumer groups for horizontal scale-out.
+- Commit offsets only after successful processing or durable checkpointing.
+- Partition records by a stable business key, such as `customer_id`, to preserve per-entity ordering.
+- Use event-time processing with a configurable watermark.
+- Store dead-letter records with the original payload, error classification, source coordinates, and failure timestamp.
+- Make downstream state updates idempotent using:
+  - deterministic event identifiers;
+  - conditional writes;
+  - merge keys;
+  - deduplication windows;
+  - transactional table commits where supported.
+
+For concurrent consumers, correctness should not depend on a single coordinator process. Each event must be safely retryable and must have a stable key.
+
+### 2.5 Data modeling approach
+
+The exact model depends on the source domain, but the following principles apply:
+
+- Define the business grain before choosing physical tables.
+- Use surrogate keys for analytical dimensions.
+- Maintain source-system lineage and transformation metadata.
+- Model slowly changing dimensions explicitly:
+  - Type 1 for corrections and mutable attributes;
+  - Type 2 for historical attribute analysis.
+- Handle late-arriving facts with event time and ingestion time.
+- Separate facts from dimensions and avoid denormalizing operational constraints into analytical tables.
+- Maintain separate keys for source identity and warehouse identity.
+- Enforce uniqueness only where the business grain requires it.
+
+Example analytical grain:
+
+```text
+fct_customer_activity
+-------------------
+one row per customer_id, event_date, event_type, campaign_id
+```
+
+The design should not create a fact table whose grain changes silently between releases. Data contracts should make that failure visible.
+
+### 2.6 API design
+
+The platform should expose governed data products rather than unrestricted table access.
+
+A representative API might support:
+
+```http
+GET /v1/customer-profiles/{customer_id}
+GET /v1/customer-profiles?updated_since=2025-02-01T00:00:00Z
+POST /v1/feature-jobs
+GET /v1/jobs/{job_id}
+GET /v1/datasets/{dataset_name}/versions
+GET /v1/lineage/{dataset_name}
+```
+
+Design requirements:
+
+- Cursor-based pagination for large result sets.
+- Explicit time zones and ISO-8601 timestamps.
+- Idempotency keys for job creation and retryable writes.
+- Versioned contracts.
+- Request correlation IDs.
+- Structured error responses.
+- Authentication through corporate identity federation.
+- Authorization at API, dataset, and optionally row/column level.
+- Asynchronous execution for scans, backfills, and exports.
+- Bounded query execution with timeouts and maximum scanned-byte controls.
+
+### 2.7 Caching and performance
+
+Caching should be applied only where measured value justifies invalidation complexity.
+
+Suitable uses include:
+
+- Frequently requested dimension lookups.
+- Reference data and country/category mappings.
+- Short-lived API response caching.
+- Aggregated serving datasets.
+- Metadata and schema caches.
+- Compiled Spark plans or query templates where supported.
+
+A proposed cache hierarchy is:
+
+1. Glue Data Catalog metadata cache.
+2. Small, bounded application cache for hot lookups.
+3. Materialized serving tables for expensive aggregations.
+4. No cache for correctness-sensitive writes.
+
+Cache keys must include:
+
+- dataset version;
+- relevant filter parameters;
+- authorization context where results vary by user or tenant;
+- schema version.
+
+A cache must never be the only copy of authoritative data.
+
+### 2.8 Scalability and reliability guarantees
+
+The architecture should establish explicit service objectives, for example:
+
+- Pipeline success rate: **99.5% or higher** for scheduled workloads.
+- Ingestion durability: **no acknowledged events lost**.
+- Freshness:
+  - near-real-time feeds: under 15 minutes;
+  - hourly feeds: within the hourly SLA;
+  - daily feeds: before the agreed reporting cutoff.
+- Recovery point objective: determined by source replay capability.
+- Recovery time objective: based on batch volume and infrastructure provisioning time.
+- Zero data loss for acknowledged writes, achieved through durable event archives and replayable source offsets.
+
+Capacity planning should consider:
+
+- input volume and growth rate;
+- peak concurrency;
+- skew across partition keys;
+- transformation cost;
+- data compression and storage efficiency;
+- EMR/Spark shuffle volume;
+- query concurrency;
+- downstream consumer lag;
+- cross-region replication requirements.
+
+### 2.9 Security and governance
+
+Controls should include:
+
+- IAM roles scoped to specific buckets, catalogs, queues, and KMS keys.
+- Separate roles for ingestion, transformation, serving, and operations.
+- Private networking for EMR, ECS services, and databases.
+- Security groups with explicit ingress/egress.
+- KMS encryption at rest and TLS in transit.
+- Secrets Manager or Secrets Manager rotation rather than credentials in source code.
+- CloudTrail and Glue catalog access logging.
+- S3 bucket policies denying unencrypted or public access.
+- PII classification and column-level masking for non-production environments.
+- Data retention and deletion workflows.
+- Schema and data contract approvals.
+- Catalog descriptions, ownership, and lineage metadata.
+
+### 2.10 CI/CD and infrastructure as code
+
+Recommended delivery flow:
+
+```text
+Commit
+  -> lint and unit tests
+  -> static analysis
+  -> Terraform plan
+  -> policy/security scan
+  -> ephemeral test environment
+  -> integration tests
+  -> sample-data pipeline test
+  -> artifact promotion
+  -> staging deployment
+  -> data quality validation
+  -> production approval
+  -> canary or phased deployment
+  -> post-deployment verification
+```
+
+Terraform modules should cover:
+
+- raw, curated, and serving buckets;
+- KMS keys and aliases;
+- Glue database and tables;
+- EMR serverless or EMR on EC2 configuration;
+- ECS/Fargate jobs;
+- IAM roles;
+- Kinesis or Kafka connectivity;
+- CloudWatch dashboards and alarms;
+- lifecycle policies;
+- network and security controls.
+
+</pre>
+    </div>
+</body>
+</html>

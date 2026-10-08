@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Shopify Developer at Sanctuary Computer</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Senior Shopify Developer</h2>
+        <p><strong>Company:</strong> Sanctuary Computer | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-senior-shopify-developer-sanctuary-computer-1137405" target="_blank">https://remoteOK.com/remote-jobs/remote-senior-shopify-developer-sanctuary-computer-1137405</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre>{
+  "document_type": "job_application_dossier",
+  "format": "github_markdown",
+  "role": "Senior Shopify Developer",
+  "company": "Sanctuary Computer (garden3d — worker-owned creative collective)",
+  "source": "https://remoteOK.com/remote-jobs/remote-senior-shopify-developer-sanctuary-computer-1137405",
+  "verification": {
+    "keyword": "GLISTENING",
+    "tag": "RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ=="
+  },
+  "markdown": "# Engineering Application: Senior Shopify Developer at Sanctuary Computer\n\n**Candidate:** Principal Systems Architect — 12 years of production frontend and commerce engineering\n**Engagement target:** garden3d / Sanctuary Computer — contract-based (40h/week, 8+ week blocks, multi-project)\n**Source:** RemoteOK US — remote-senior-shopify-developer-sanctuary-computer-1137405\n**Applicant verification:** GLISTENING — RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==\n\n---\n\n## 1. Executive Summary & Value Proposition\n\nI build commerce frontends the way a print shop builds a magazine: the render pipeline, the asset budget, and the motion timings are decided before the first component is written. Twelve years of frontend engineering, with the last six spent almost entirely inside the Shopify ecosystem — custom Online Store 2.0 themes, plus headless Hydrogen/Remix and Next.js storefronts hitting the Storefront API over GraphQL.\n\nThree things about this posting map cleanly onto how I already work:\n\n- **Performance as a hard constraint, not a phase.** A 95+ Lighthouse score is an architectural outcome, not a cleanup task. I treat Core Web Vitals as a build-time budget enforced in CI (LCP under 2.0s on 4G mobile, INP under 200ms, CLS under 0.05), so regressions fail a pull request instead of surfacing in a client review.\n- **Both ends of the Shopify spectrum.** I can ship a JSON-template Liquid theme with section rendering and native Shopify SEO semantics, and I can ship a Hydrogen storefront on Oxygen with a Sanity-driven editorial layer and a Stripe payment extension — and I will argue honestly for which one a given client actually needs. Headless is not a default; it is a cost/benefit decision.\n- **Design-adjacent craft.** Pixel fidelity and motion design are not afterthoughts. I read Figma specs as contracts — easing curves, optical alignment, hover and focus states, the way a product tile breathes on a 375px viewport. Working with XXIX-style design partners is the part of the job I enjoy most.\n\nThe garden3d model — profit-shared, open source, 150% carbon negative, actively declining work that fails a moral standard — is a materially better fit than a typical agency contract. I have contributed to open source tooling in this exact space and I prefer client-facing autonomy over ticket-queue throughput.\n\n---\n\n## 2. Deep Technical Solution Blueprint\n\n### 2.1 Reference Architecture — Bifurcated Storefront Model\n\nTwo delivery tracks, one shared component library. The decision rule at intake:\n\n- **Track A — Liquid / Online Store 2.0:** merchandiser-heavy catalogues, heavy app dependency, sub-8-week timelines, teams that need to edit content without a deploy. Sections + blocks + JSON templates, metafields for structured merchandising, Shopify Functions for discount and delivery logic.\n- **Track B — Headless (Hydrogen/Remix on Oxygen, or Next.js on Vercel):** content-heavy editorial commerce (Sanity/Contentful/Prismic), multi-market and multi-currency requirements, custom checkout extensibility, or a design system that must be reused across non-Shopify surfaces.\n\nBoth tracks consume the same primitives: a typed Storefront API client, a cart state machine, a token layer, and an image/media pipeline.\n\n```\n                    +--------------------------------------------+\n  Browser  ------>  |  Edge (Oxygen / Vercel Edge / Cloudflare)  |\n                    |  - HTML + RSC/streaming, ISR/route cache    |\n                    |  - stale-while-revalidate, tag-based purge  |\n                    +-----------------+--------------------------+\n                                      |\n                    +-----------------v--------------------------+\n                    |  Storefront API (GraphQL, @inContext)      |\n                    |  Products / Collections / Cart / Search    |\n                    +-----------------+--------------------------+\n                                      |\n        +-----------------------------+-----------------------------+\n        |                             |                             |\n  Admin API (apps)            Webhooks (HMAC)              Integrations\n  Discount/Delivery Functions  orders/paid, refunds        Sanity, Algolia,\n  Checkout Branding API        inventory_levels/update     Klaviyo, Recharge,\n                                                           Stripe, GTM SS\n```\n\n### 2.2 API Design & Data Modeling\n\n- **Query shaping:** every route declares exactly the fields it renders. No `__typename`-only overshoot, no `nodes { ... }` grab-bags. Product and collection payloads are normalized at the loader boundary into view models (`ProductCard`, `ProductDetail`, `VariantMatrix`) so components never touch raw API shapes.\n- **Cost-aware batching:** Shopify's GraphQL cost model is a leaky bucket. The client reads `extensions.cost.throttleStatus` on every response and spaces the next request by the deficit divided by `restoreRate`. Collection pages that need 250 variants use `productVariants` pagination, not one</pre>
+    </div>
+</body>
+</html>

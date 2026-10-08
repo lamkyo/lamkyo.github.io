@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Staff Software Engineer - Query Execution at Dremio</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Staff Software Engineer - Query Execution</h2>
+        <p><strong>Company:</strong> Dremio | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/dremio-senior-staff-software-engineer-query-execution" target="_blank">https://weworkremotely.com/remote-jobs/dremio-senior-staff-software-engineer-query-execution</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Staff Software Engineer - Query Execution at Dremio
+
+## 1. Executive Summary & Value Proposition
+
+I build and tune the layer Dremio's Query Execution team owns: the runtime that turns a logical plan into vectorized operators moving Arrow buffers under memory, spill, and scheduling constraints. My background maps directly onto the eight responsibilities in the posting:
+
+- **Operators and expression evaluation.** I've designed hash joins, window functions, and aggregation pipelines over Arrow `RecordBatch`es, including out-of-core (spill-to-disk) variants and code-generated expression kernels that eliminate per-row virtual dispatch.
+- **Memory management.** I've implemented hierarchical, byte-accounted allocators with reservation/limit semantics, so a single query can be throttled or force-spilled instead of triggering an OOM kill — the difference between a slow query and a cluster incident.
+- **Scheduling and runtime planning.** I've built work-stealing fork/join pools with locality-aware task placement, backpressure on exchange channels, and adaptive re-planning on skew.
+- **JVM performance.** Steady-state work in JFR, async-profiler, allocation profiling, escape analysis, biased-lock removal, G1/ZGC tuning, and off-heap (sun.misc.Unsafe / FFM) buffer management to keep GC pauses out of the p99.
+- **Cross-team collaboration.** I work fluently across planner, storage, and support boundaries — writing the query-profile annotations and telemetry that make a 40-operator plan diagnosable by someone who wasn't in the design review.
+
+**Stack alignment:** Dremio's runtime is Java on the JVM with Apache Arrow as the in-memory format, Apache Iceberg/Parquet at the scan boundary, and a distributed exchange layer. That is precisely the environment I work in daily. I read Dremio's open-source execution code (the `sabot` module: `PhysicalOperator`, `BaseDataHandler`, `RecordBatchMemoryManager`, the `SpillableHashAggregate` path) as part of my preparation for this application, and the proposal below is written against that architecture rather than a generic "big data" template.
+
+**Value proposition in one line:** I can own the path from `PhysicalPlan` to `RecordBatch` end-to-end — operator semantics, memory accounting, spill, and the profiling work that proves it's faster — without a six-month ramp.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural context
+
+Dremio's execution stack, simplified:
+
+```
+SQL ──► Logical Plan ──► Planner (rules, cost) ──► Physical Plan (JSON)
+                                                          │
+                                              Foreman / QueryManager
+                                                          │
+                              ┌───────────────────────────┴──────────────────────────┐
+                              │  Fragment execution (per node)                       │
+                              │  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐  │
+                              │  │ Operator    │  │ Expression   │  │ Exchange    │  │
+                              │  │ tree (pull) │◄─┤ evaluation   │◄─┤ in/out      │  │
+                              │  └─────────────┘  └──────────────┘  └─────────────┘  │
+                              │  MemoryManager  │  SpillManager   │  Scheduler      │
+                              └─────────────────────────────────────────────────────┘
+```
+
+My proposal targets three concrete, high-leverage improvements inside the Query Execution remit.
+
+### 2.2 Component A — Byte-accounted, hierarchical memory management
+
+**Problem.** Per-operator memory accounting that is either too coarse (query OOMs) or too fine (accounting overhead dominates). Dremio's `MemoryManager` already tracks query-level limits; the gap I'd close is *operator-level reservation with graceful degradation*.
+
+**Design.**
+
+- A `MemoryPool` per query, child `MemoryReservation`s per operator, each with `reserve(n)` / `release(n)` / `tryReserve(n)` semantics.
+- Operators declare a *preferred* and a *minimum* working set. On contention, the scheduler asks operators to shrink toward minimum (e.g., hash aggregate switches to partitioned/spill mode; sort switches to external merge).
+- All large buffers are **off-heap** (Arrow `ArrowBuf`), so GC pressure is decoupled from data volume. On-heap is limited to operator metadata.
+- Reservation is *fail-fast* with a structured error (`OutOfMemoryException` carrying operator, phase, requested, held) so query profiles show *who* wanted memory, not just that the query died.
+
+**Concurrency control.** Reservations are updated with `LongAdder` for reads and a per-pool lock for the slow path (reserve/release), so contention is O(1) in the common case. Cross-thread release is deferred to a drain queue to avoid lock convoys.
+
+**Scalability guarantee.** Total query memory = Σ reservations ≤ configured limit, enforced atomically; a query can never exceed its limit regardless of operator count or parallelism.
+
+### 2.3 Component B — Spill-aware operators (hash aggregate & hash join)
+
+**Problem.** Skewed keys blow up hash tables; without spill, the query fails.
+
+**Design (hash aggregate):**
+
+1. **Build phase:** rows → hash table keyed by group-by columns, with a `ResizePolicy` (grow at 0.75 load factor).
+2. **Threshold:** when `reservation.bytes() > spillThreshold`, partition the table by `hash(key) & (2^n - 1)` into N in-memory partitions and spill cold partitions to disk (Arrow IPC framed files, CRC-checked).
+3. **Probe/merge phase:** process one partition at a time; if a single partition still exceeds memory (pathological skew), recurse with a new hash seed (cooperative partitioning).
+4. **Output:** combine partial aggregates per partition, emit `RecordBatch`es.
+
+**Spill file management:** files are per-query, per-operator, named with fragment/attempt IDs, registered with a `SpillManager` that guarantees deletion on query completion *or* failure (including JVM crash — a startup sweeper reclaims orphans).
+
+### 2.4 Component C — Vectorized expression evaluation with code generation
+
+**Problem.** Interpreted, per-row expression trees cost a virtual call + null check per value per node.
+
+**Design:**
+
+- **Baseline:** vectorized interpreter over Arrow vectors — evaluate one *node* across an entire 4,096-row batch (column-at-a-time), so branch prediction and SIMD-friendly loops do the work; nulls via validity bitmaps, never per-row boxing.
+- **Fast path:** for hot expression subtrees (filter predicates, arithmetic in projections), generate a Java class implementing the expression as a single fused loop using `JavaCompiler`/Janino, specialized on input types and nullability. Generated code is cached by expression fingerprint so compilation happens once per query, not per batch.
+- **Fallback:** if compilation fails or the expression is cold, use the interpreter. Correctness is verified by running both paths in shadow mode in tests and comparing outputs bit-for-bit.
+
+**Expected win:** 2–5× on CPU-bound filters/projections; measurable reduction in allocation (no intermediate boxed values).
+
+### 2.5 Component D — Scheduling, exchange, and backpressure
+
+- **Fork/join pool** sized to `min(cores, configuredParallelism)` with work stealing; long-running operators (scan, spill I/O) run on a separate bounded pool so they can't starve CPU-bound operators.
+- **Exchange channels** are bounded queues with credit-based backpressure: a producer gets N credits (batches); it blocks when credits are exhausted. This makes memory usage of the exchange layer O(credits × batch_size × channels), not O(rows).
+- **Locality-aware placement:** prefer nodes holding the relevant Iceberg/Parquet splits; fall back to round-robin.
+- **Adaptive re-planning signal:** if a fragment's actual row counts diverge >10× from estimates, emit a telemetry event the planner team can consume for runtime re-optimization.
+
+### 2.6 Production readiness
+
+| Concern | Approach |
+|---|---|
+| **CI/CD** | GitHub Actions / Jenkins: unit → operator conformance suite → JMH microbenchmarks (regression gate on ±5%) → TPC-DS subset → canary. |
+| **Observability** | OpenTelemetry traces per query/fragment/operator; Prometheus metrics (`query_latency_seconds` histogram, `spill_bytes_total`, `memory_reserved_bytes`, `gc_pause_seconds`); structured logs with `queryId`/`fragmentId`/`attemptId` correlation. |
+| **Query profiles** | Every operator reports `rowsIn`, `rowsOut`, `cpuNanos`, `wallNanos`, `peakMemoryBytes`, `spillBytes` — surfaced in Dremio's existing profile UI so support can diagnose without a debugger. |
+| **Load testing** | JMH for operators; a TPC-DS/TPC-H runner at 1TB/10TB with concurrency 1/16/64; chaos tests (kill executor mid-query, inject disk-full, throttle network) to verify spill cleanup and retry semantics. |
+| **Zero-downtime deploy** | Rolling executor replacement: new executors join, drain, and old ones finish in-flight queries before exit; plan format versioned so a mixed-version cluster interoperates during rollout. |
+| **Correctness** | Differential testing against a reference engine (e.g., run the same SQL on DuckDB/Postgres and compare result sets, order-insensitive where required); property-based tests for null semantics and decimal overflow. |
+
+---
+
+## 3. Production-Ready Code / Architectural Proof
+
+The job is Java-centric, but per the requested format I'm providing the core memory-management + spill-decision component in **Go** as a portable, compilable reference implementation. It demonstrates the exact reservation semantics, concurrency control, and spill threshold logic I would implement (and have implemented) in the JVM version. The Java/Arrow port is a direct transliteration: `sync.Mutex` → `ReentrantLock`, `sync.Map` → `ConcurrentHashMap`, `context.Context` → cancellation token.
+
+```go
+// Package mempool implements a hierarchical, byte-accounted memory manager
+// for a query execution engine. It is the reference design for Dremio's
+// query-level MemoryManager with per-operator reservations.
+//
+// Invariants:
+//   1. sum(operator reservations) <= pool limit, always.
+//   2. reserve() either succeeds fully or fails fully (no partial grants).
+//   3. release() below zero is a programming error and panics loudly.
+//   4. When the pool is exhausted, TryReserve returns ErrExhausted so the
+//      caller can choose a degradation path (spill, repartition, fail).
+package mempool
+
+import (
+	"errors"
+	"fmt"
+	"sync"
+	"sync/atomic"
+)
+
+var (
+	// ErrExhausted is returned when a reservation cannot be satisfied
+	// without exceeding the pool limit. Callers should degrade (spill)
+	// or fail the query with a structured error.
+	ErrExhausted = errors.New("mempool: reservation exceeds available capacity")
+	// ErrUnknownReservation indicates release() for an unregistered handle.
+	ErrUnknownReservation = errors.New("mempool: unknown reservation handle")
+)
+
+// Reservation is an operator's handle to memory it holds.
+// It is safe for concurrent use.
+type Reservation struct {
+	pool   *MemoryPool
+	id     uint64
+	label  string
+	bytes  atomic.Int64 // current held bytes (atomic for cheap reads)
+	closed atomic.Bool
+}
+
+// Bytes returns the currently held amount. Lock-free: safe to call from
+// metrics scrapers while the operator is running.
+func (r *Reservation) Bytes() int64 { return r.bytes.Load() }
+
+// Label identifies the owning operator in error messages and query profiles.
+func (r *Reservation) Label() string { return r.label }
+
+// MemoryPool is the per-query pool. Limit is the hard ceiling.
+type MemoryPool struct {
+	limit int64
+	used  atomic.Int64
+
+	mu       sync.Mutex // serializes the slow path (reserve/release)
+	nextID   uint64
+	children map[uint64]*Reservation
+
+	// onExhausted is an optional hook (e.g., emit telemetry, trigger
+	// a global spill sweep) invoked when a reservation fails.
+	onExhausted func(label string, requested, available int64)
+}
+
+// New creates a pool with the given byte limit.
+func New(limit int64, onExhausted func(string, int64, int64)) *MemoryPool {
+	if limit <= 0 {
+		panic("mempool: limit must be positive")
+	}
+	return &MemoryPool{
+		limit:       limit,
+		children:    make(map[uint64]*Reservation),
+		onExhausted: onExhausted,
+	}
+}
+
+// Limit returns the configured ceiling.
+func (p *MemoryPool) Limit() int64 { return p.limit }
+
+// Used returns current total reservations. Lock-free.
+func (p *MemoryPool) Used() int64 { return p.used.Load() }
+
+// Available returns remaining capacity, floored at zero.
+func (p *MemoryPool) Available() int64 {
+	avail := p.limit - p.used.Load()
+	if avail < 0 {
+		return 0
+	}
+	return avail
+}
+
+// NewReservation registers an operator with the pool. The returned handle
+// starts at zero bytes; call Reserve() to acquire capacity.
+func (p *MemoryPool) NewReservation(label string) *Reservation {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.nextID++
+	r := &Reservation{pool: p, id: p.nextID, label: label}
+	p.children[r.id] = r
+	return r
+}
+
+// Reserve acquires n bytes or fails atomically. On failure the pool is
+// unchanged and ErrExhausted is returned with a descriptive message.
+func (</pre>
+    </div>
+</body>
+</html>

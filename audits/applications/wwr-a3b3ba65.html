@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Software Engineer, Application Security at Discord</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Software Engineer, Application Security</h2>
+        <p><strong>Company:</strong> Discord | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/discord-senior-software-engineer-application-security" target="_blank">https://weworkremotely.com/remote-jobs/discord-senior-software-engineer-application-security</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre>> **Usage note:** This dossier is intentionally written as a high-quality engineering proposal rather than a fabricated résumé. Replace every bracketed field with your verified experience, location, contact details, and evidence before submitting. Do not include payment instructions in the application email or recruiter correspondence; use only an employer-approved procurement or payment process.
+
+# Engineering Application: Senior Software Engineer, Application Security at Discord
+
+## 1. Executive Summary & Value Proposition
+
+I am applying for the Senior Software Engineer, Application Security role because it sits at the intersection of security engineering, distributed-systems design, and user experience—the exact area in which I have built my strongest work: making high-assurance security controls reliable, understandable, and practical enough that product teams can adopt them without creating unacceptable friction.
+
+My approach to application security is grounded in three principles:
+
+1. **Security must be designed into the primary user journey.**  
+   Authentication, session management, recovery, and account protection should be integrated into normal product flows rather than added as isolated security screens.
+
+2. **Correctness is a product feature.**  
+   Account-security systems must fail closed when state is ambiguous, tolerate retries safely, provide clear auditability, and avoid making it easy for a legitimate user to become locked out.
+
+3. **Controls should scale through automation and measurable outcomes.**  
+   Effective protection combines strong cryptographic primitives with automated policy enforcement, risk-aware controls, telemetry, and rapid rollback capabilities.
+
+This alignment is especially relevant to Discord. Discord protects hundreds of millions of users across desktop, mobile, web, and API surfaces, while supporting features such as passkeys, MFA, login and recovery, session management, anti-automation controls, and account-integrity protections. Those systems must remain correct during traffic spikes, cross-device use, partial failures, credential compromise, malicious automation, and rapid product evolution.
+
+I would bring to the team:
+
+- Practical experience securing production applications and shipping security features, controls, frameworks, or guardrails.
+- Hands-on experience with authentication, session lifecycle management, MFA, WebAuthn/passkeys, FIDO2, and account-security workflows.
+- The ability to reason about complex distributed systems and provide engineers with pragmatic, security-preserving implementation guidance.
+- Experience operating production systems in cloud environments and working across application, service, data, and client boundaries.
+- A strong bias toward self-service tooling, measurable controls, automation, and user-centered security experiences.
+- The communication style necessary to lead cross-functional projects with Product, Platform, Detection, and Engineering teams.
+
+My objective as a candidate would be to make stronger authentication **the easiest safe choice** for users while giving Discord’s internal teams reliable mechanisms to investigate suspicious activity, reduce account takeover, and respond to emerging authentication threats.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Proposed Program: Account Security Control Plane
+
+I would propose a unified account-security architecture centered around a security-critical **Account Security Service** that exposes narrowly scoped, strongly authenticated APIs to web, mobile, desktop, and internal product services.
+
+The service would own the security-sensitive state for:
+
+- Authentication ceremonies.
+- Passkey/WebAuthn registration and authentication.
+- MFA enrollment and verification.
+- Session issuance, rotation, revocation, and device binding.
+- Recovery initiation and approval.
+- Authentication risk signals.
+- Account-security events and audit records.
+- Administrative and self-service account-protection actions.
+
+The design should avoid making this service a monolithic synchronous dependency. Instead, use a control-plane/data-plane split:
+
+```text
+Clients and Product Services
+          |
+          v
+  Edge / API Gateway / mTLS
+          |
+          v
+Account Security API
+  |          |           |
+  v          v           v
+Auth       Session     Recovery
+Ceremony   Service     Workflows
+  |          |           |
+  +----------+-----------+
+             |
+             v
+      Account Security Store
+   (replicated relational data)
+             |
+             v
+     Event / Audit Pipeline
+             |
+             v
+    SIEM, Detection, Analytics
+```
+
+### 2.2 Primary Authentication Flow
+
+A typical passkey login would be handled as follows:
+
+1. Client submits a login request containing an opaque request identifier and minimum contextual metadata.
+2. Account Security Service verifies that the request:
+   - Was created by a trusted client or product service.
+   - Has not expired.
+   - Has not already been consumed.
+   - Is bound to the intended authentication flow.
+3. Service returns a WebAuthn challenge and allowable credential metadata.
+4. Client completes the WebAuthn ceremony.
+5. Server validates:
+   - Origin and RP ID hash.
+   - Client-data JSON.
+   - Authenticator data.
+   - Signature counter behavior where available.
+   - User-presence and user-verification flags required by the ceremony.
+   - Credential public-key ownership.
+   - Challenge freshness and replay status.
+6. The service performs risk evaluation using a low-latency policy path.
+7. Session material is minted through a dedicated session issuer.
+8. The authentication result is written atomically with session creation and an audit event.
+9. Clients receive only the minimum session information necessary.
+
+For high-risk flows, the service can require a step-up challenge or fallback challenge without exposing whether a particular account or credential exists.
+
+### 2.3 Session Security Model
+
+Sessions should use an explicit lifecycle rather than treating a bearer token as an indefinitely valid credential.
+
+Recommended properties:
+
+- Short-lived access credentials.
+- Opaque, revocable session identifiers where practical.
+- Rotating refresh credentials.
+- Reuse detection for rotated refresh credentials.
+- Device and client binding signals.
+- Server-side revocation checks for sensitive operations.
+- Risk-aware step-up authentication.
+- Explicit session states such as:
+  - `ACTIVE`
+  - `ROTATING`
+  - `REVOKED`
+  - `EXPIRED`
+  - `COMPROMISED`
+- Maximum lifetime and idle timeout.
+- Separate session classes for browser, desktop, mobile, and administrative workflows.
+
+A session record should include a server-side session family. When a refresh credential is used, rotation occurs within a transaction:
+
+```text
+lookup refresh token
+verify token hash
+verify family and session status
+mark old token as consumed
+create replacement token
+persist rotation event
+```
+
+If a consumed token is presented again, the entire token family should be revoked rather than returning a generic error that allows an attacker to continue probing.
+
+### 2.4 API Design
+
+The exact transport would align with Discord’s existing service conventions, but the security boundary should expose small, explicit operations.
+
+Representative endpoints:
+
+```http
+POST /v1/auth/challenges
+POST /v1/auth/webauthn/verify
+POST /v1/auth/mfa/verify
+POST /v1/sessions
+POST /v1/sessions/refresh
+DELETE /v1/sessions/{session_id}
+POST /v1/sessions/{session_id}/step-up
+POST /v1/recovery/challenges
+POST /v1/recovery/verify
+GET  /v1/account/security/status
+POST /v1/account/security/credentials/{credential_id}/revoke
+```
+
+Important API properties:
+
+- Idempotency keys for state-changing operations.
+- No sensitive secrets in URLs.
+- Structured error codes independent of sensitive account existence.
+- Strict request and response size limits.
+- Request correlation IDs propagated through downstream calls.
+- mTLS or workload identity for internal callers.
+- Per-service authorization and audience restrictions.
+- Explicit anti-replay protection for every ceremony.
+- Rate limits partitioned by account, device, IP risk, and operation.
+- Constant-time or normalized handling where comparisons are security-sensitive.
+
+Example error response:
+
+```json
+{
+  "error": {
+    "code": "AUTHENTICATION_FAILED",
+    "request_id": "req_01J...",
+    "retryable": false
+  }
+}
+```
+
+The service should not reveal whether an account exists, whether a particular passkey is registered, or whether recovery is possible until the caller has passed the appropriate policy checks.
+
+### 2.5 Data Modeling
+
+A relational store is preferable for authentication and recovery state because the domain requires strong transactional guarantees, auditability, and controlled mutation.
+
+Example tables:
+
+```text
+users
+  user_id
+  status
+  created_at
+  updated_at
+
+auth_credentials
+  credential_id
+  user_id
+  credential_type
+  public_key
+  sign_count
+  transports
+  backup_eligible
+  backup_state
+  created_at
+  last_used_at
+  revoked_at
+
+auth_challenges
+  challenge_id
+  purpose
+  user_binding
+  challenge_material
+  expires_at
+  consumed_at
+  attempt_count
+  created_at
+
+sessions
+  session_id
+  user_id
+  session_family_id
+  device_id
+  client_type
+  risk_state
+  status
+  created_at
+  last_seen_at
+  expires_at
+  revoked_at
+
+refresh_tokens
+  token_id
+  session_id
+  token_family_id
+  token_hash
+  generation
+  issued_at
+  consumed_at
+  expires_at
+  revoked_at
+
+recovery_challenges
+  recovery_id
+  user_id
+  status
+  assurance_level
+  expires_at
+  completed_at
+
+security_events
+  event_id
+  user_id
+  actor_type
+  event_type
+  result
+  device_id
+  session_id
+  risk_score
+  metadata
+  occurred_at
+```
+
+Sensitive values such as refresh tokens, recovery codes, and challenge secrets should be stored as one-way hashes where possible. Private encryption keys should remain in the authenticator and should never be transmitted to Discord.
+
+For high-volume event data:
+
+- Keep hot authentication state in a primary transactional database.
+- Replicate read-heavy account-security status to a cache or materialized read model.
+- Stream immutable events to analytics and detection systems.
+- Avoid caching authentication decisions longer than the risk decision’s validity window.
+
+### 2.6 Concurrency and Consistency
+
+Security operations should use explicit consistency boundaries.
+
+#### WebAuthn challenge consumption
+
+Challenge consumption must be atomic:
+
+```sql
+UPDATE auth_challenges
+SET consumed_at = NOW()
+WHERE challenge_id = $1
+  AND consumed_at IS NULL
+  AND expires_at > NOW()
+```
+
+The update should affect exactly one row. This prevents two concurrent requests from successfully consuming the same challenge.
+
+#### Refresh-token rotation
+
+Refresh rotation should be executed as a transaction:
+
+1. Lock or compare-and-swap the current token record.
+2. Verify the token hash and expiration.
+3. Confirm the session is active.
+4. Mark the current token as consumed.
+5. Insert the successor token in the same transaction.
+6. Commit the rotation event.
+
+A duplicate use of a consumed token should trigger family revocation and a security event.
+
+#### Credential revocation
+
+Credential revocation should be:
+
+- Idempotent.
+- Immediate for sensitive operations.
+- Propagated to session and authorization caches through invalidation events.
+- Represented in an immutable audit record.
+
+#### Recovery races
+
+Only one recovery attempt should be authoritative for a given user and flow generation. Competing approvals should result in a controlled denial or invalidation, never an ambiguous state.
+
+### 2.7 Caching and Performance
+
+Caching should improve scale without becoming a source of authorization truth.
+
+Suitable cache use:
+
+- Public key metadata for credential lookup.
+- Account-security status projections.
+- Risk-policy configuration.
+- Short-lived rate-limit counters.
+- Non-sensitive client capability data.
+
+Unsafe cache use:
+
+- Authorization decisions for revoked sessions.
+- Recovery approvals.
+- One-time challenges.
+- Refresh-token validity.
+- High-risk step-up decisions unless TTL and revocation semantics are explicit.
+
+Recommended invalidation strategy:
+
+- Versioned cache keys by credential or session generation.
+- Event-driven invalidation for revocation.
+- Short TTLs as a safety net.
+- Cache stampede protection using request coalescing.
+- Separate hit, miss, stale-read, and invalidation metrics.
+
+### 2.8 Risk-Aware Authentication
+
+Risk scoring should assist policy, not replace it.
+
+Possible signals include:
+
+- Impossible travel.
+- New device or client fingerprint.
+- ASN or network reputation.
+- Authentication velocity.
+- Repeated failed attempts.
+- Credential-stuffing patterns.
+- Changes to recovery channels.
+- Session reuse</pre>
+    </div>
+</body>
+</html>

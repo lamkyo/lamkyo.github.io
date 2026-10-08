@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Principal Infrastructure Architect: Data Platform at ZoomInfo Technologies LLC</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Principal Infrastructure Architect: Data Platform</h2>
+        <p><strong>Company:</strong> ZoomInfo Technologies LLC | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/zoominfo-technologies-llc-principal-infrastructure-architect-data-platform" target="_blank">https://weworkremotely.com/remote-jobs/zoominfo-technologies-llc-principal-infrastructure-architect-data-platform</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Principal Infrastructure Architect: Data Platform at ZoomInfo Technologies LLC
+
+> **Personalization note:** The candidate’s actual employment history, metrics, and project outcomes were not provided. Claims requiring verification are marked with `[CANDIDATE-SPECIFIC EVIDENCE]`. Replace those markers with quantified, defensible examples before submitting. Do not present proposed designs or sample implementations as production work unless they were actually built.
+
+## 1. Executive Summary & Value Proposition
+
+ZoomInfo’s role is not primarily a platform-operations position. It is a mandate to create a trusted, self-service infrastructure foundation that allows data teams to deliver reliable, observable, secure, and cost-controlled data products across GCP without rebuilding foundational capabilities for every workload.
+
+I would bring a principal-level infrastructure engineering practice spanning:
+
+- Cloud platform architecture on GCP and AWS.
+- Kubernetes, compute, networking, private connectivity, workload identity, and least-privilege IAM.
+- Terraform modules and GitOps-based delivery.
+- Streaming, operational databases, analytical platforms, search, and batch/stream processing.
+- Production observability, SLOs, incident response, disaster recovery, and cost governance.
+- Technical evaluation and architecture review grounded in reproducible prototypes and measured trade-offs.
+- Cross-team enablement through standards, ADRs, reference implementations, and design reviews.
+
+The central value proposition is to turn ZoomInfo’s heterogeneous data estate into a governed paved road without imposing unnecessary constraints. The platform should provide sensible defaults for provisioning, networking, security, delivery, observability, reliability, and cost, while allowing data teams enough escape hatches to solve specialized workloads.
+
+### Alignment with ZoomInfo’s stack
+
+| ZoomInfo requirement | Proposed contribution |
+|---|---|
+| GCP data platform architecture | A common operating model spanning GKE, Pub/Sub, Kafka/Confluent, BigQuery, Cloud SQL, object storage, and Dataflow/Composer |
+| Terraform and GitOps | Versioned modules, policy-as-code, environment promotion, controlled change workflows, and workload ownership |
+| Managed data services | Private connectivity, workload identity, CMEK guidance, egress controls, DNS/routing patterns, and cost modeling |
+| Data reliability | Backup/restore standards, RTO/RPO definitions, replay strategies, idempotency, and pipeline failure recovery |
+| Performance and cost | Workload isolation, partitioning/clustering guidance, query budgets, storage tiering, utilization reporting, and per-team chargeback |
+| Technology evaluation | Reproducible POCs with explicit workloads, cost models, failure tests, security review, migration paths, and exit criteria |
+| Architecture leadership | Review rubrics, ADRs, standards, workshops, reference implementations, and hands-on initial enablement |
+
+### Why this approach is relevant to ZoomInfo
+
+ZoomInfo operates in a domain where data freshness, lineage, access control, residency, and system availability directly affect customer-facing intelligence products. Infrastructure choices therefore need to be evaluated across three dimensions simultaneously:
+
+1. **Reliability:** Can the system meet its freshness, latency, durability, and recovery objectives under failure?
+2. **Security and governance:** Can every identity, network path, data movement, and privileged operation be constrained and audited?
+3. **Economic efficiency:** Does the platform provide the required performance without creating opaque or uncontrolled cloud spend?
+
+I would make these trade-offs explicit in architecture decisions rather than treating infrastructure as a collection of individually reasonable defaults.
+
+### Candidate evidence to personalize
+
+Before submission, replace the following with two or three specific examples:
+
+- `[CANDIDATE-SPECIFIC EVIDENCE: scale achieved, such as petabytes, events per second, clusters, regions, or concurrent workloads]`
+- `[CANDIDATE-SPECIFIC EVIDENCE: paved-road/module adoption and measured reduction in delivery time or operational toil]`
+- `[CANDIDATE-SPECIFIC EVIDENCE: reliability improvement, recovery-time reduction, or cost optimization]`
+- `[CANDIDATE-SPECIFIC EVIDENCE: data platform technologies operated in production]`
+- `[CANDIDATE-SPECIFIC EVIDENCE: cross-team adoption without direct management authority]`
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 First principles: design the platform around workload contracts
+
+I would begin by classifying workloads by their operational characteristics rather than organizing the platform solely by product or vendor.
+
+#### Workload classes
+
+1. **Latency-sensitive operational data**
+   - PostgreSQL/Cloud SQL
+   - MongoDB
+   - Read-heavy APIs and synchronization services
+   - Target strict availability and predictable tail latency
+
+2. **High-throughput streaming**
+   - Kafka/Confluent
+   - Pub/Sub
+   - Flink or Beam/Dataflow
+   - Target partition-level failure containment, replayability, and lag management
+
+3. **Analytical and lakehouse workloads**
+   - BigQuery
+   - Snowflake
+   - Iceberg on object storage
+   - Target query performance, storage efficiency, retention, and governance
+
+4. **Search workloads**
+   - Elasticsearch/Solr
+   - Target indexing throughput, query latency, reindex safety, and capacity headroom
+
+5. **Pipeline control and orchestration**
+   - Airflow/Cloud Composer
+   - Dataflow
+   - Target dependency correctness, retries, idempotency, and backfill behavior
+
+For each class, the platform would define a workload contract covering:
+
+- Availability target.
+- Latency or freshness target.
+- RTO and RPO.
+- Data durability and replay expectations.
+- Encryption and key-management requirements.
+- Network and residency boundaries.
+- Cost allocation and budget thresholds.
+- Required telemetry and SLOs.
+- Approved deployment and rollback mechanism.
+- Recovery and exit procedure.
+
+This avoids creating a single “standard” that is too rigid for streaming but inappropriate for analytical storage, or too permissive for regulated operational data.
+
+---
+
+### 2.2 Paved-road architecture
+
+```text
+                         ┌──────────────────────────────┐
+                         │    Developer / Data APIs     │
+                         │ Terraform modules, Git repos, │
+                         │ policy checks, self-service  │
+                         └──────────────┬───────────────┘
+                                        │
+                              GitHub / Change workflow
+                                        │
+                           ┌────────────▼─────────────┐
+                           │ Policy / Validation Gate  │
+                           │ formatting, security,     │
+                           │ plan review, cost impact  │
+                           └────────────┬─────────────┘
+                                        │
+                           ┌────────────▼─────────────┐
+                           │ GitOps Deployment Controller│
+                           │ drift detection, rollout, │
+                           │ rollback, promotion       │
+                           └────────────┬─────────────┘
+                                        │
+             ┌──────────────────────────┼──────────────────────────┐
+             │                          │                          │
+      ┌──────▼──────┐            ┌──────▼──────┐            ┌──────▼──────┐
+      │ Data compute│            │  Data stores │            │  Streaming   │
+      │ GKE/Dataflow│            │ BigQuery,   │            │ Kafka/PubSub │
+      │ Beam/Flink  │            │ GCS, DB,    │            │ Flink        │
+      │ Airflow     │            │ search      │            │              │
+      └─────────────┘            └─────────────┘            └─────────────┘
+```
+
+The platform would be organized into reusable Terraform modules and documented contracts rather than a monolithic repository.
+
+#### Initial module families
+
+- `module/data-gcp-project`
+  - Project structure.
+  - APIs.
+  - service accounts.
+  - organization policies.
+  - budget alerts.
+  - logging and security controls.
+
+- `module/private-service`
+  - VPC-native service endpoints.
+  - Private Service Connect or PrivateLink where supported.
+  - DNS and routing.
+  - egress policy.
+  - network telemetry.
+
+- `module/data-workload`
+  - GKE or managed processing runtime.
+  - namespace, quotas, autoscaling, disruption budgets.
+  - workload identity.
+  - network policy.
+  - service-level monitoring.
+
+- `module/streaming-platform`
+  - Kafka/Pub/Sub topology.
+  - topic or topic-template provisioning.
+  - partition, retention, replication, and access policies.
+  - schema compatibility checks.
+  - lag and broker metrics.
+
+- `module/analytical-store`
+  - BigQuery/Snowflake/Iceberg storage layout.
+  - partitioning and clustering defaults.
+  - retention and tiering.
+  - workload isolation.
+  - query budgets and cost labels.
+
+- `module/backup-recovery`
+  - Backup policies.
+  - Restore test automation.
+  - RTO/RPO metadata.
+  - evidence collection.
+  - escalation.
+
+#### Module design principles
+
+- Inputs and outputs are strongly typed and versioned.
+- Environment-specific values are passed through data files rather than embedded in modules.
+- Modules do not embed workload ownership.
+- Sensitive values are referenced through secret managers or workload identity where possible.
+- Plan output is machine-readable and reviewable.
+- Changes are tested independently from provider runtime.
+- Breaking changes require a migration plan and explicit versioning.
+- Every production module has a documented support and deprecation policy.
+
+---
+
+### 2.3 Networking and managed data planes
+
+Managed data services would not be treated as exceptions to the security model. The standard pattern would address:
+
+- Private Service Connect, PrivateLink, or supported VPC peering.
+- DNS and routing ownership.
+- Public IP minimization.
+- Egress restrictions.
+- Cross-region data movement.
+- NAT and firewall topology.
+- VPC Service Controls where the service and compliance scope support it.
+- Encryption in transit and at rest.
+- CMEK ownership and rotation.
+- Workload identity rather than long-lived service-account keys.
+- Log and flow-log coverage across every approved boundary.
+
+#### Managed-service connectivity decision matrix
+
+| Service | Preferred pattern | Key decisions |
+|---|---|---|
+| BigQuery | Approved private connectivity and project-level controls | Dataset location, authorized views, service-account access, query egress |
+| Confluent Cloud | Private connectivity where supported | Network boundaries, IAM, schema governance, cross-region costs, DNS |
+| Snowflake | Private connectivity or tightly controlled public endpoint where required | Account-level network policy, user/role model, query tags, data residency |
+| MongoDB Atlas | Private endpoint and IP allowlisting only if required by connectivity model | VPC/DNS, identity, encryption, backup/DR, cost |
+| GCS | Regional/dual-region buckets with policy controls | Residency, object retention, CMEK, lifecycle, access logging |
+| Kafka/Pub/Sub | Native Google Cloud integration or approved private endpoint | Topic policy, encryption, key ownership, replay and egress |
+
+The design would explicitly model cross-region and egress costs rather than treating connectivity as a binary secure/insecure decision.
+
+---
+
+### 2.4 CI/CD for data workloads
+
+Application delivery assumptions do not directly transfer to data systems. A data deployment pipeline must account for:
+
+- Infrastructure changes.
+- Pipeline code changes.
+- Schema changes.
+- Data quality and contract checks.
+- Backfills.
+- Partition rewrites.
+- Dependency ordering.
+- Long-running jobs.
+- Idempotency and replay.
+- Partial failure recovery.
+
+#### Delivery workflow
+
+1. **Validate repository policy**
+   - Formatting and linting.
+   - Terraform validation.
+   - Policy-as-code checks.
+   - Secret scanning.
+   - Dependency and license checks.
+   - Ownership and CODEOWNERS enforcement.
+
+2. **Validate the Terraform plan**
+   - Destructive-change detection.
+   - Cost estimate.
+   - Drift against the current state.
+   - Provider/module compatibility.
+   - Environment-specific policy checks.
+
+3. **Validate the data contract**
+   - Backward, forward, and full compatibility.
+   - Nullability and field constraints.
+   - Partition expectations.
+   - Freshness and quality thresholds.
+   - Required retention and deletion behavior.
+
+4. **Run an ephemeral integration test**
+   - Provision into an isolated test project or namespace.
+   - Exercise representative ingestion and transformation paths.
+   - Verify permissions and network restrictions.
+   - Test failure, retry, and replay behavior.
+
+5. **Promote through Git**
+   - Development.
+   - Staging.
+   - Production.
+   - Controlled production promotion.
+   - Automated rollback or pause based on health signals.
+
+6. **Record evidence**
+   - Commit SHA.
+   - Terraform plan hash.
+   - Policy result.
+   - Test results.
+   - Approver.
+   - Deployment timestamp.
+   - Post-deployment verification.
+
+For pipelines, I would favor immutable, versioned artifacts and explicit promotion over mutating a long-running environment in place.
+
+---
+
+### 2.5 Observability and service-level objectives
+
+OpenTelemetry should provide a common instrumentation model, while Prometheus and cloud-native metrics provide infrastructure and data-plane signals.
+
+#### Baseline telemetry
+
+**Compute and orchestration**
+
+- CPU throttling.
+- Memory pressure and OOM events.
+- Pod restarts.
+- Scheduling latency.
+- Queue depth.
+- Work</pre>
+    </div>
+</body>
+</html>

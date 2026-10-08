@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Golang Kubernetes Engineer at Arango</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Golang Kubernetes Engineer</h2>
+        <p><strong>Company:</strong> Arango | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-golang-kubernetes-engineer-arango-1137400" target="_blank">https://remoteOK.com/remote-jobs/remote-golang-kubernetes-engineer-arango-1137400</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Golang Kubernetes Engineer at Arango
+
+**Candidate:** Principal Systems Architect — Distributed Data Platforms & Kubernetes Control Planes
+**Target:** Arango (Remote, US) — Golang Kubernetes Engineer
+**Verification Token:** `FESTIVE` · `RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Arango's thesis — that AI agents need *unified, current, trusted business context* rather than a patchwork of a vector DB, a graph DB, a document store, and a search index — is fundamentally an **operational** thesis, not only a data-model thesis. Native multimodel convergence means one process must simultaneously satisfy three workloads with violently different resource profiles: nested document CRUD (IOPS + write amplification), deep graph traversal (pointer-chasing, memory-resident edge caches, cross-shard coordination), and ANN/BM25 retrieval (SIMD-heavy, memory-bandwidth bound). Every one of those must be schedulable, upgradeable, and observable **on Kubernetes** without an operator babysitting it at 03:00.
+
+That intersection — Go control-plane engineering against a stateful, consensus-backed, multimodel database — is precisely where my background sits.
+
+**Direct alignment with the problem space:**
+
+| Arango requirement | My corresponding depth |
+|---|---|
+| Go services at scale | Idiomatic Go: `context`-first APIs, `errgroup`-bounded fan-out, `singleflight` cache collapse, zero-allocation hot paths, escape-analysis-driven struct design, `pprof`/`trace` flamegraph triage |
+| Kubernetes operators & controllers | controller-runtime reconcilers with finalizers, owner refs, `metav1.Condition` status, admission webhooks (CEL + validating), leader election, informer cache indexers, SSA (`Apply` patch type) for conflict-free field ownership |
+| Stateful workload orchestration | Rolling upgrade gating, quorum-safe parallelism (Raft agent quorums, DBServer replacement without replica loss), PVC lifecycle, PDB + `preStop` drain choreography, PodDisruptionBudget-aware node drain |
+| Distributed consensus & failure domains | Raft/Agency semantics, topology spread constraints across AZs, `WaitForFirstConsumer` volume binding, split-brain avoidance on partition |
+| Observability & SLO ownership | Prometheus exporters, OpenTelemetry traces/metrics/logs correlation via `trace_id`, SLO burn-rate alerting, RED/USE dashboards, `k6`/`vegeta` load harnesses in CI |
+| CI/CD & supply chain | Multi-arch `ko`/`BuildKit` builds, `envtest` + `kind` + `controller-runtime` fake clients, cosign + SBOM (Syft/Grype), progressive delivery |
+
+The strategic value I bring is not "another Go engineer." It is an architect who can **close the loop from CRD to production**, and who treats the operator itself as a product with an SLO — because every minute of operator-induced downtime is a minute of eroded trust in the context layer that AI agents are supposed to reason over.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural Framing
+
+The engagement decomposes into two planes that must be co-designed, never bolted together:
+
+```
+┌────────────────────────────────────────────────────────────────────────────┐
+│  CONTROL PLANE — Go Operator (kube-arangodb lineage, redesigned)           │
+│                                                                            │
+│  ┌──────────┐   watch    ┌──────────────┐  SSA    ┌────────────────────┐  │
+│  │  API     │──────────▶│  Reconciler  │────────▶│ StatefulSet / Svc  │  │
+│  │  Server  │           │  (per-CR)    │         │ PDB / NetPol / HPA │  │
+│  │ (CRD +   │◀──────────│              │◀────────│ PVC / Secret       │  │
+│  │  webhook)│  status   └──────┬───────┘ observe └────────────────────┘  │
+│  └──────────┘                 │                                            │
+│         ┌─────────────────────┼─────────────────────┐                     │
+│         ▼                     ▼                     ▼                     │
+│  FieldIndexer           RateLimitedQueue      LeaderElection Lease        │
+│  (spec.mode → CRs)      (exp. backoff)        (LeaseDuration 15s/Renew 10s)│
+└────────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────────┐
+│  DATA PLANE — ArangoContext CR                                             │
+│                                                                            │
+│  Agents (Raft quorum, 3 or 5)  ──  DBServers (shards/replicas)             │
+│                                ──  Coordinators (stateless, Gateway API)   │
+│  Dedicated tiers, anti-affinity per AZ, WaitForFirstConsumer EBS/gp3       │
+└────────────────────────────────────────────────────────────────────────────┘
+                                    │
+┌───────────────────────────────────▼────────────────────────────────────────┐
+│  CONTEXT API PLANE — Go Gateway (agent-facing)                             │
+│  Sharded TTL cache ─ singleflight collapse ─ revision-fenced reads         │
+│  OTel spans ─ per-tenant quotas ─ AQL batch loader with bounded fan-out    │
+└────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Design principle #1 — the operator owns intent, not state.** Manifests are rendered deterministically from spec + cluster-observed reality; all writes use server-side apply with a stable `FieldManager`, so a human `kubectl e</pre>
+    </div>
+</body>
+</html>

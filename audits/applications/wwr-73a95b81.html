@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Software Engineer, remote at Edfinity</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Software Engineer, remote</h2>
+        <p><strong>Company:</strong> Edfinity | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/edfinity-senior-software-engineer-remote" target="_blank">https://weworkremotely.com/remote-jobs/edfinity-senior-software-engineer-remote</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Software Engineer, Remote at Edfinity
+
+> **Submission note:** Replace `[Name]`, `[email]`, `[location]`, and any bracketed evidence with verified details from your résumé before submitting. The proposal below is intentionally grounded in the technical requirements in Edfinity’s job description rather than inventing employment history, metrics, or projects.
+
+## 1. Executive Summary & Value Proposition
+
+Edfinity is solving a difficult combination of product and systems problems: high-stakes assessment workflows, educator productivity, LMS interoperability, AI-assisted grading, and the reliability expectations of higher-education institutions. The role is particularly compelling because it treats engineering as system ownership rather than simply feature delivery: engineers frame problems, direct AI-assisted implementation, evaluate what ships, and remain accountable for production outcomes.
+
+My strongest alignment with this role comes from operating across the full path from product requirement to reliable production service:
+
+- **Backend depth:** Designing and operating Rails applications backed by MongoDB, Redis/Sidekiq, Elasticsearch, and analytical data stores.
+- **Assessment-oriented product thinking:** Treating submissions, grading, revisions, grading rubrics, attempts, and final results as separate domain concepts with explicit lifecycle and audit requirements.
+- **Reliability engineering:** Reducing failure modes through idempotent APIs, optimistic concurrency control, transactional boundaries, retry policies, observability, backpressure, and staged rollouts.
+- **AI-assisted engineering:** Using language models to accelerate implementation while retaining deterministic tests, evaluation suites, security review, and human accountability for production behavior.
+- **Frontend collaboration:** Building React experiences that make complex authoring, grading, feedback, and LMS workflows understandable rather than merely functional.
+- **Technical stewardship:** Treating upgrades, data migrations, query performance, observability, and technical-debt reduction as ongoing product capabilities.
+
+The value proposition is straightforward: I can help Edfinity move quickly without making speed synonymous with fragility. I would work with the team to convert ambiguous, high-impact problems into well-defined system designs; implement production software; establish measurable reliability and evaluation criteria; and leave each subsystem easier to understand and operate than it was before.
+
+### Alignment with Edfinity’s stack
+
+| Edfinity need | Applicable engineering approach |
+|---|---|
+| Rails application development | Explicit service objects, resource-oriented APIs, strong Active Job/Sidekiq usage, disciplined controller boundaries, and migration-safe persistence changes |
+| MongoDB data modeling | Access patterns before schema design, compound indexes, optimistic locking, tenant-scoped queries, and careful treatment of embedded versus referenced documents |
+| Elasticsearch | Search-oriented projections, explicit indexing ownership, idempotent reindexing, relevance testing, and eventual-consistency monitoring |
+| ClickHouse analytics | Append-oriented event modeling, partitioning and ordering strategies, materialized views, and dashboards for grading, delivery, latency, and model-quality trends |
+| Redis/Sidekiq | Durable job semantics, idempotency keys, bounded retries, scheduled work, concurrency controls, queue-depth alerts, and dead-letter handling |
+| React interfaces | Typed API contracts, accessible interaction design, optimistic updates with rollback, and component-level performance discipline |
+| LLM-powered features | Structured outputs, prompt/version tracking, retrieval boundaries, evaluation datasets, cost and latency budgets, guardrails, and human-review paths |
+| Performance and reliability | Load profiles, SLOs, tracing, metrics, timeouts, backpressure, graceful degradation, and zero-downtime deployment practices |
+| Customer support rotation | Reproducible diagnostics, useful internal tooling, incident communication, and converting recurring support issues into product improvements |
+
+### Initial priorities for the first 90 days
+
+I would avoid beginning with a speculative rewrite. The first month would focus on understanding the system as it exists:
+
+1. Establish a service, dependency, data-flow, and ownership map.
+2. Review assessment-delivery and grading paths for correctness and tenant-isolation risks.
+3. Measure latency, queue age, failure rate, grading throughput, and model-quality indicators.
+4. Identify high-risk abstractions and deploy a small, reversible reliability improvement.
+5. Document the current system sufficiently that a senior engineer or AI agent can work safely within it.
+6. Establish an agreed operating agreement with the team: quality gates, incident ownership, review standards, and definition of done.
+
+The objective is not to produce a large number of changes quickly. It is to establish a high-confidence improvement loop and create momentum without destabilizing a mature platform.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 System context
+
+A suitable logical architecture for Edfinity would preserve Rails as the primary product and integration boundary while making high-volume and asynchronous behavior explicit:
+
+```text
+Educator / Student / LMS
+          |
+      React UI
+          |
+   Rails API / BFF
+      |       |       \
+MongoDB   Redis    Elasticsearch
+      |
+  Sidekiq jobs
+   |       |       \
+LLM      ClickHouse  External services
+providers
+```
+
+The important design principle is that the Rails application owns product invariants and authorization, while workers own interruptible, retryable, and potentially long-running work.
+
+### 2.2 Assessment and grading domain model
+
+I would model the assessment lifecycle explicitly rather than using a single mutable “assessment” document for every concern.
+
+#### Core entities
+
+- **Course or course offering:** The tenant and academic context.
+- **Assessment:** Stable identity, version, publication state, and authoring metadata.
+- **AssessmentVersion:** Immutable published content or a controlled versioned representation.
+- **Item or Question:** The gradeable unit, including type, rubric references, metadata, and validation rules.
+- **Attempt:** A student’s execution of an assessment.
+- **Submission:** A submitted response, artifact, or answer set.
+- **Grade:** A scored result, rubric outcome, and feedback bundle.
+- **GradingJob:** An asynchronous execution record with provider/model/prompt versions.
+- **IntegrationDelivery:** LMS delivery state and external identifiers.
+- **AuditEvent:** Append-only record of meaningful state transitions.
+
+#### State transitions
+
+```text
+assessment:
+  draft -> in_review -> published -> archived
+
+attempt:
+  created -> in_progress -> submitted -> grading
+                              -> graded
+                              -> needs_review
+
+submission:
+  accepted -> processing -> processed
+                          -> rejected
+```
+
+Transitions should be validated by domain services. Controllers should not contain arbitrary status updates.
+
+### 2.3 MongoDB design
+
+MongoDB should be optimized for the query patterns required by the product.
+
+For example, an attempt might look conceptually like:
+
+```json
+{
+  "_id": "attempt_123",
+  "tenant_id": "tenant_456",
+  "assessment_version_id": "assessment_version_789",
+  "student_id": "student_abc",
+  "status": "submitted",
+  "attempt_number": 2,
+  "version": 7,
+  "submitted_at": "2026-02-20T14:03:11Z",
+  "created_at": "2026-02-20T13:45:00Z"
+}
+```
+
+Recommended indexes would be driven by measured access patterns:
+
+```js
+db.attempts.create_index(
+  { tenant_id: 1, assessment_version_id: 1, student_id: 1, attempt_number: -1 },
+  { unique: true, name: "unique_attempt_per_student_version" }
+)
+
+db.attempts.create_index(
+  { tenant_id: 1, status: 1, updated_at: 1 },
+  { name: "tenant_status_updated_at" }
+)
+```
+
+Design rules:
+
+- Every tenant-owned query includes `tenant_id`.
+- Compound-index order reflects actual filters and sort order.
+- Embedded data is used only when it has the same ownership, lifecycle, and bounded growth.
+- Large submissions, generated artifacts, and model outputs should be stored outside frequently queried documents.
+- Published assessment content is immutable where practical.
+- Schema validation is applied at the application boundary and, where supported, in MongoDB.
+- Uniqueness is enforced by database indexes rather than only application checks.
+
+### 2.4 API design
+
+External APIs should use resource-oriented endpoints with explicit idempotency and version semantics.
+
+Examples:
+
+```http
+POST /v1/attempts
+Idempotency-Key: 8f3c...
+Content-Type: application/json
+```
+
+```http
+GET /v1/attempts/:attempt_id
+```
+
+```http
+POST /v1/attempts/:attempt_id/submissions
+Idempotency-Key: 4f21...
+```
+
+```http
+POST /v1/attempts/:attempt_id/grade
+```
+
+```http
+GET /v1/grading-jobs/:grading_job_id
+```
+
+API response conventions:
+
+- Stable error codes independent of human-readable messages.
+- Request IDs echoed into logs, traces, and audit events.
+- Explicit pagination for collections.
+- Idempotency keys on externally initiated or retried writes.
+- Maximum request sizes enforced before expensive parsing or storage.
+- No internal stack traces, prompts, or provider responses returned to clients.
+
+Example error format:
+
+```json
+{
+  "error": {
+    "code": "attempt_already_submitted",
+    "message": "This attempt has already been submitted.",
+    "request_id": "req_01J4Z0Q4T4"
+  }
+}
+```
+
+### 2.5 Concurrency control and idempotency
+
+High-value writes should use both optimistic concurrency and idempotency.
+
+#### Optimistic concurrency
+
+Include a monotonically increasing `version` field on mutable documents. Update with a compare-and-set predicate:
+
+```ruby
+result = Attempt.where(
+  id: attempt_id,
+  version: expected_version,
+  status: "in_progress"
+).update_all(
+  status: "submitted",
+  submitted_at: Time.current,
+  version: expected_version + 1
+)
+
+raise ConcurrentModification if result.zero?
+```
+
+This prevents two browser tabs, LMS callbacks, or workers from silently overwriting one another.
+
+#### Idempotency
+
+For submission and grading requests:
+
+1. Hash the tenant, endpoint, principal, and idempotency key.
+2. Store the request fingerprint and response snapshot.
+3. Return the original response for an identical retry.
+4. Reject reuse of the same key with a different payload.
+5. Expire records according to business and privacy requirements.
+
+For asynchronous jobs, the job ID and domain transition must both be durable. A retry should not create a second grade or send a second integration callback.
+
+### 2.6 Asynchronous grading workflow
+
+A safe AI-assisted grading flow should look like this:
+
+```text
+1. Validate attempt ownership and state.
+2. Persist a GradingJob in pending state.
+3. Enqueue a Sidekiq job with a deterministic job key.
+4. Worker claims the job and transitions it to running.
+5. Normalize and redact the submission.
+6. Retrieve only authorized rubric/context data.
+7. Call the model with a versioned prompt and structured schema.
+8. Validate the response.
+9. Apply deterministic scoring and rubric rules.
+10. Persist the grade and audit event transactionally.
+11. Enqueue notifications and analytics projections.
+12. Mark the job complete.
+```
+
+Important safeguards:
+
+- Model output is untrusted input, even when generated by an internal provider.
+- JSON or tool results are schema-validated before use.
+- Raw model output is retained only according to privacy policy.
+- Prompt and model versions are recorded for reproducibility.
+- A confidence threshold can route uncertain work to human review.
+- A timeout or provider outage must not corrupt an attempt.
+- Retryable failures use exponential backoff with jitter.
+- Non-retryable validation failures go to a reviewable terminal state.
+
+### 2.7 Elasticsearch strategy
+
+Search should be modeled as a projection, not as the system of record.
+
+A robust indexing flow is:
+
+```text
+MongoDB transaction
+    -> outbox event
+        -> indexing worker
+            -> Elasticsearch document
+```
+
+The outbox prevents the classic dual-write failure where MongoDB commits but the search document is lost.
+
+Search documents should include only the fields required for search and display:
+
+- Tenant and authorization scope.
+- Assessment title and metadata.
+- Normalized question/prompt text.
+- Tags and course identifiers.
+- Content version.
+- Visibility state.
+- Index timestamp.
+
+Deleting or unpublishing content should generate a corresponding projection event. Periodic reconciliation should compare MongoDB source state with indexed documents.
+
+### 2.8 ClickHouse analytics
+
+ClickHouse should be used for high-volume, append-oriented analysis rather than transactional product reads.
+
+Examples of useful event streams:
+
+- Assessment opened and submitted.
+- Grading job queued, started, completed, failed, or manually reviewed.
+- Model latency and token/cost metrics.
+- Rubric score distribution.
+- LMS delivery success and retry counts.
+- Educator authoring activity.
+- Student feedback and review events.
+
+Example table design:
+
+```sql
+CREATE TABLE grading_events
+(
+    event_time DateTime64(3, 'UTC'),
+    tenant_id UInt64,
+    assessment_version_id UUID,
+    attempt_id UUID,
+    job_id UUID,</pre>
+    </div>
+</body>
+</html>

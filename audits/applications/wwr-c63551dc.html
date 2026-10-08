@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Engineering Manager II, Media Rendering at Pinterest</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Engineering Manager II, Media Rendering</h2>
+        <p><strong>Company:</strong> Pinterest | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/pinterest-engineering-manager-ii-media-rendering" target="_blank">https://weworkremotely.com/remote-jobs/pinterest-engineering-manager-ii-media-rendering</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Engineering Manager II, Media Rendering at Pinterest
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+I'm a principal-level engineer and engineering leader whose career has been spent in exactly the problem space this role owns: **getting pixels and frames from origin to screen fast, smoothly, and at scale**. My background spans media delivery systems end-to-end — transcoding pipelines, adaptive bitrate streaming, client-side rendering on iOS/Android/web, and the instrumentation layers that make all of it measurable — plus 6+ years building and growing client/platform engineering teams.
+
+**Why this maps directly to Pinterest's Media Rendering org:**
+
+- **Cross-platform media ownership.** I've led teams responsible for image loading and video playback across iOS (AVFoundation, AVPlayer, Core Image, Metal), Android (ExoPlayer/Media3, MediaCodec, RenderEffect), and web (MSE/EME, WebCodecs, Canvas/WebGL, `<img>`/`<picture>` pipelines). I've personally shipped shared rendering specs across all three so behavior, quality tiers, and telemetry are consistent.
+- **The actual hard problems Pinterest faces.** Pinterest's feed is a mixed image/video surface at massive scale: cold-start first-frame latency, scroll-time jank, cache hit rate, per-device quality tiering, HDR/AVIF/HEVC adoption, and bandwidth cost. I've owned each of these as a KPI with a written target, a dashboard, and a weekly review.
+- **AI-augmented engineering.** Per Pinterest's stated interview philosophy, I treat AI as a force multiplier: automated visual-regression triage, ML-based bitrate ladder selection, LLM-assisted incident summarization, and AI code review — always with a human explaining the *why*.
+- **Management track record.** 5+ years managing client and platform teams (6–14 engineers), with a repeatable operating system: written technical strategy, quarterly roadmap with explicit tradeoffs, weekly 1:1s, performance calibration, and hiring loops that raised the bar.
+
+**Value proposition in one line:** I will take ownership of Pinterest's media rendering KPIs (first-frame latency, playback stall rate, visual quality at a given bitrate, scroll smoothness) and build the team, architecture, and measurement culture that moves them — while growing the engineers who maintain them.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Problem framing
+
+Pinterest's media surface is a **mixed image/video feed** served to hundreds of millions of monthly active users across heterogeneous devices and networks. The core tensions:
+
+| Tension | Example |
+|---|---|
+| Quality vs. bytes | AVIF/HEVC compress better but cost encode time and device decode capability |
+| Latency vs. smoothness | Prefetching more improves scroll smoothness but wastes bandwidth |
+| Client autonomy vs. server control | Client-side ladder selection reacts faster; server-side is more consistent |
+| Innovation vs. compatibility | New formats (AVIF, HDR10) need graceful fallback chains |
+
+### 2.2 Proposed architecture: **Unified Media Delivery Plane (UMDP)**
+
+```
+                        ┌─────────────────────────────────────────────┐
+                        │              CONTROL PLANE                 │
+                        │  ┌──────────────┐  ┌─────────────────────┐  │
+   Pin/Board/Query ────▶│  │ Media Intent  │  │ Device Capability   │  │
+   (product context)    │  │ Service       │  │ Registry (DCR)      │  │
+                        │  └──────┬───────┘  └──────────┬──────────┘  │
+                        │         └──────────┬──────────┘             │
+                        │              ┌─────▼──────┐                 │
+                        │              │ Variant     │                │
+                        │              │ Selector    │                │
+                        │              └─────┬──────┘                 │
+                        └────────────────────┼────────────────────────┘
+                                             │ signed variant manifest
+                                             ▼
+   ┌───────────────────────────────────────────────────────────────────┐
+   │                          DATA PLANE                              │
+   │  ┌────────────┐   ┌──────────────┐   ┌────────────────────────┐   │
+   │  │ Edge Cache  │◀──│ Origin/CDN   │◀──│ Transcode Farm         │   │
+   │  │ (byte-range │   │ (signed URLs)│   │ (AVIF/HEVC/VP9/AV1,    │   │
+   │  │  + ETag)    │   │              │   │  per-ladder renditions)│   │
+   │  └─────┬──────┘   └──────────────┘   └────────────────────────┘   │
+   └────────┼──────────────────────────────────────────────────────────┘
+            ▼
+   ┌───────────────────────────────────────────────────────────────────┐
+   │                        CLIENT PLANE                              │
+   │  ┌─────────────────────────────────────────────────────────────┐  │
+   │  │            Media Rendering SDK (shared spec, 3 impls)       │  │
+   │  │  ┌───────────┐ ┌──────────────┐ ┌────────────────────────┐  │  │
+   │  │  │ Prefetch  │ │ Decode/Render│ │ Adaptive Controller    │  │  │
+   │  │  │ Scheduler │ │ (GPU/CPU)    │ │ (bandwidth + device)   │  │  │
+   │  │  └───────────┘ └──────────────┘ └────────────────────────┘  │  │
+   │  └─────────────────────────────────────────────────────────────┘  │
+   │  ┌─────────────────────────────────────────────────────────────┐  │
+   │  │  Telemetry: OTel spans/metrics → pipeline → dashboards      │  │
+   │  └─────────────────────────────────────────────────────────────┘  │
+   └───────────────────────────────────────────────────────────────────┘
+```
+
+**Key design decisions:**
+
+1. **Variant Selector (control plane)** decides *which rendition* of a media asset a given client should fetch, using: device capability profile (codec support, screen size, HDR, memory class), network class (estimated throughput, RTT), product context (feed vs. detail vs. board cover), and A/B experiment assignment. This is a stateless, horizontally scalable service.
+
+2. **Signed variant manifests** — the client receives a short-lived signed manifest listing candidate renditions + URLs. This keeps URL construction logic server-side (evolvable without app release) while letting the client adapt in real time within the allowed set.
+
+3. **Client Adaptive Controller** does per-session adaptation (like ABR in HLS/DASH) using throughput EWMA + buffer health, with hysteresis to avoid oscillation.
+
+4. **Prefetch Scheduler** is the scroll-smoothness lever: a priority queue driven by viewport prediction (velocity + direction), with a byte budget per network class and cancellation on scroll reversal.
+
+### 2.3 API design
+
+```
+POST /v1/media/resolve
+Authorization: Bearer <user_or_app_token>
+Idempotency-Key: <uuid>
+
+{
+  "asset_id": "pin:8472918472",
+  "surface": "home_feed",
+  "context": {
+    "viewport": {"width_pt": 393, "height_pt": 720, "dpr": 3},
+    "device": {
+      "platform": "ios",
+      "os_version": "17.4",
+      "codec_caps": ["av1", "hevc", "h264"],
+      "hdr": true,
+      "memory_class": "high"
+    },
+    "network": {"class": "4g", "est_throughput_kbps": 12000, "rtt_ms": 45},
+    "experiment": {"media_ladder_v3": "treatment"}
+  },
+  "assets": ["pin:8472918472", "pin:118273645", "..."]   // batch, ≤100
+}
+
+200 OK
+{
+  "results": [
+    {
+      "asset_id": "pin:8472918472",
+      "kind": "video",
+      "manifest": {
+        "ttl_s": 300,
+        "signature": "ed25519:...",
+        "variants": [
+          {"codec": "av1",  "res": "1080x1920", "bitrate_kbps": 2400, "url": "https://cdn.pinterest.media/..."},
+          {"codec": "hevc", "res": "1080x1920", "bitrate_kbps": 1800, "url": "..."},
+          {"codec": "h264", "res": "720x1280",  "bitrate_kbps": 1100, "url": "..."}
+        ],
+        "initial_variant_idx": 1
+      },
+      "image": {
+        "placeholder_blurhash": "L6PZfSjE.AyE_3t7t7R**0o#DgR4",
+        "srcset": [
+          {"fmt": "avif", "w": 736,  "url": "...", "bytes": 41200},
+          {"fmt": "webp", "w": 736,  "url": "...", "bytes": 58900},
+          {"fmt": "jpeg", "w": 736,  "url": "...", "bytes": 92100}
+        ],
+        "preferred_fmt": "avif"
+      }
+    }
+  ]
+}
+```
+
+**Design notes:**
+- **Batch endpoint** — feed prefetch resolves N pins in one RTT.
+- **Manifest signature** — prevents client-side URL tampering and allows CDN auth.
+- **TTL + client cache** — manifest cached locally; re-resolve on TTL expiry or network-class change.
+- **Graceful degradation** — if `preferred_fmt` unsupported, client walks `srcset` in order.
+
+### 2.4 Data modeling
+
+```
+MediaAsset (immutable content record)
+  asset_id            PK (string, "pin:<id>")
+  content_hash        blake3 of canonical bytes
+  kind                ENUM(image, video, gif)
+  source_width/height int
+  duration_ms         int NULL (video)
+  has_alpha           bool
+  hdr                 bool
+  created_at          ts
+
+Rendition (derived, many per asset)
+  rendition_id        PK
+  asset_id            FK → MediaAsset
+  kind                ENUM(image, video_segment)
+  codec               string ("av1","hevc","h264","vp9","jpeg","webp","avif")
+  width, height       int
+  bitrate_kbps        int NULL (video)
+  byte_size           int
+  segment_idx         int NULL (video, for segmented delivery)
+  storage_key         string (object store path)
+  etag                string
+  UNIQUE(asset_id, codec, width, height, segment_idx)
+
+DeviceCapabilityProfile (client-reported, versioned)
+  platform, os_major, codec_caps[], hdr, memory_class, screen_bucket
+  → default ladder + format preference
+
+DeliveryEvent (telemetry, append-only → columnar)
+  event_id, asset_id, rendition_id, session_id, surface
+  ts, client_ts, network_class, event_type
+  (resolve|prefetch_start|fetch_start|first_byte|decode_start|first_frame|
+   frame_drop|stall_start|stall_end|complete|error)
+  bytes_served, ttfb_ms, decode_ms, dropped_frames
+```
+
+**Concurrency control:**
+- Rendition generation is **idempotent per (asset_id, codec, w, h)** — a distributed lock (Redis `SET NX PX`) guards against duplicate encodes when multiple requests race for the same asset.
+- Telemetry ingestion is append-only with **at-least-once** delivery; downstream aggregation is idempotent on `(event_id)`.
+
+### 2.5 Caching strategy (multi-layer)
+
+| Layer | What | Key | TTL / Invalidation |
+|---|---|---|---|
+| Client memory | decoded bitmaps (LRU) | asset_id + rendition_id | memory-pressure aware, size-capped |
+| Client disk | encoded bytes | content_hash + rendition | LRU, size-capped (e.g. 256MB) |
+| CDN edge | rendition bytes | storage_key | `Cache-Control: public, max-age=31536000, immutable` (content-addressed) |
+| CDN edge | variant manifest | asset_id + device bucket | short TTL (300s) + signature |
+| Service (Redis) | resolve response | asset_id + capability hash | 60s, invalidated on new rendition publish |
+| Origin | transcode results | — | write-through on publish |
+
+**Content-addressed storage** makes rendition URLs immutable → CDN cache hit rate stays high and invalidation is a non-issue for bytes; only manifests need short TTLs.
+
+### 2.6 Scalability guarantees
+
+- **Resolve service**: stateless, horizontal autoscale on CPU + p99 latency SLO. Target: p99 < 40ms at 50k RPS per region.
+- **Fan-out**: batch resolve (≤100 assets) reduces RTTs; response compressed (gzip/br).
+- **Transcode farm**: queue-backed (Kafka/SQS) with priority lanes — new pins > backfill > experimental formats. Backpressure via queue depth autoscaling.
+- **CDN**: multi-CDN with health-based steering; per-region cache fill rate monitored.
+-</pre>
+    </div>
+</body>
+</html>

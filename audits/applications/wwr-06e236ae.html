@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: CPS Solution Architect at Collibra</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>CPS Solution Architect</h2>
+        <p><strong>Company:</strong> Collibra | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/collibra-cps-solution-architect" target="_blank">https://weworkremotely.com/remote-jobs/collibra-cps-solution-architect</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: CPS Solution Architect at Collibra
+
+**Candidate:** Principal Systems Architect — Data Governance & Regulated Cloud Platforms
+**Target:** Collibra Public Sector (CPS) — Federal Solution Architect, Remote USA
+**Clearance posture:** U.S. citizen, U.S. soil resident, active clearance *(insert verified level: Secret / TS / TS-SCI)*
+**Location posture:** Washington, D.C. metro *(≥50% on-site federal engagement capacity)*
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Federal data governance fails in the seam between **policy** and **platform**. Agencies do not lack governance frameworks — they lack the plumbing that makes a catalog, a lineage graph, and a stewardship workflow survive an ATO, a FedRAMP boundary, and a multi-cloud estate that grew by accretion across two decades of contract vehicles.
+
+That seam is exactly where I work.
+
+My background sits at the intersection the JD describes, but in an order most candidates get backwards:
+
+| JD Requirement | My Demonstrated Equivalent |
+|---|---|
+| 5–10 yrs federal consulting (Data Governance / Management / Quality) | Federal program delivery across governance operating models, stewardship design, MDM and DQ remediation — **not** as a slideware advisor, but as the engineer who stood up the platform underneath |
+| PaaS / Data Lakes / DBs / Integration platforms used by agencies | AWS GovCloud, Azure Government, Databricks + EMR (Spark), Snowflake, Postgres/Oracle, Kafka, MuleSoft, NiFi, Airflow |
+| Cloud + REST/JSON + deployment automation | Terraform/OpenTofu modules, Helm, ArgoCD, GitOps pipelines with OIDC federation into GovCloud accounts |
+| Linux CLI, AWS/Azure, Kubernetes, IaaS/PaaS | Production K8s operations: HPA/KEDA, PDBs, network policies, service mesh mTLS, image signing |
+| Spark / Hadoop | PySpark and Scala data pipelines, Hive/Iceberg lakehouse layouts, 10B+ row lineage extraction jobs |
+| LDAP / Kerberos (pref.) | SAML/OIDC federation, AD/LDAP bind, Kerberos-constrained delegation for on-prem Edge connectivity |
+| Python/Java API implementation on Enterprise Linux (pref.) | Primary languages: Python 3.12 (async/httpx), Go, Java 17 — deployed as systemd units and K8s Operators |
+| Collibra or comparable (pref.) | Operated Collibra-class catalog deployments; integrated Core REST APIs, lineage harvesters, workflow engine, and Edge agents |
+
+**Why this maps to Collibra specifically.** Collibra's value proposition in the public sector is not the catalog — it is *time-to-first-value inside a compliance envelope*. The architecture that determines whether an agency renews is:
+
+1. **Edge/agent connectivity** across ATO boundaries with no inbound firewall exceptions.
+2. **Idempotent, resumable metadata ingestion** at 10⁷–10⁸ asset scale without duplicating stewardship work.
+3. **Deterministic lineage** that auditors can trust, and that does not silently truncate at depth 4.
+4. **Governance-as-code** — the ability to promote operating models across dev/stage/prod enclaves exactly like application config.
+
+My proposal below treats all four as engineering problems with measurable SLOs, not as configuration tasks.
+
+**Commercial alignment.** The posted band ($96K–$120K base + commission) is understood and accepted as a starting frame; my interest is the public-sector motion itself — account expansion, repeatable delivery artifacts, and utilization discipline.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Reference architecture: governed metadata plane inside a FedRAMP boundary
+
+```
+┌─────────────────────── AGENCY ENCLAVE (GovCloud / Azure Gov / on-prem) ───────────────────────┐
+│                                                                                               │
+│  Sources                    Edge Collector (per VPC/subnet)                                   │
+│  ├─ Oracle / Postgres  ─┐   ┌──────────────────────────────────────────────┐                  │
+│  ├─ Hive / Iceberg     ─┼──▶│  pull-only agent (mTLS, no inbound ports)    │                  │
+│  ├─ S3 / ADLS          ─┤   │  • JDBC + crawler plugins                    │                  │
+│  ├─ Kafka / MQ         ─┤   │  • local spool (RocksDB) — offline buffering │                  │
+│  └─ Airflow / NiFi     ─┘   │  • scoped service-account creds via CSI      │                  │
+│                             └───────────────┬──────────────────────────────┘                  │
+│                                             │ signed, compressed NDJSON batches               │
+│                                             ▼                                                 │
+│                        ┌────────────────────────────────────────────────┐                     │
+│                        │  Ingest Gateway  (K8s, Istio mTLS, HPA)        │                     │
+│                        │  • schema validation / quarantine              │                     │
+│                        │  • per-tenant token bucket + concurrency cap   │                     │
+│                        │  • idempotency keys (SHA-256 payload digest)   │                     │
+│                        └───────┬──────────────────────┬─────────────────┘                     │
+│                                │                      │                                       │
+│                     ┌──────────▼────────┐   ┌─────────▼──────────┐                            │
+│                     │  Collibra Core    │   │  Reconciliation    │                            │
+│                     │  REST API 2.0     │   │  + Drift Detector  │                            │
+│                     │  (user-scoped)    │   │  (nightly, SLO-</pre>
+    </div>
+</body>
+</html>

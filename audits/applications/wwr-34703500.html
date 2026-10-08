@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: DevOps Engineer (Remote) at thehivecareers.co</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>DevOps Engineer (Remote)</h2>
+        <p><strong>Company:</strong> thehivecareers.co | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/thehivecareers-co-devops-engineer-remote" target="_blank">https://weworkremotely.com/remote-jobs/thehivecareers-co-devops-engineer-remote</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: DevOps Engineer (Remote) at thehivecareers.co
+
+**Candidate:** Principal Software Engineer / Platform Architect
+**Engagement Type:** Full-Time Remote (also available as Fixed-Price Milestone or Monthly Retainer)
+**Primary Timezone:** UTC-4 (AST) — full overlap with US Eastern (UTC-5/-4) and 4–5h overlap with US Pacific
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### 1.1 Why this background maps onto this problem space
+
+Thethehivecareers.co is a Barbados-headquartered talent marketplace. That single sentence defines the entire technical problem: **a two-sided marketplace with bursty ingest, latency-sensitive matching reads, and PII that must be governed across jurisdictions.** The role description is not asking for someone to run `kubectl apply` — it is asking for a **platform product owner who also carries a pager.** The posting says it explicitly: *mentor and coach*, *identify bottlenecks in development and deployment*, *build coding standardizations and automate processes*, *provide the team a roadmap*.
+
+That is an organizational-leverage problem disguised as an infrastructure problem. My operating premise in every lead engagement is that **developer experience metrics *are* the infrastructure roadmap** — you do not guess at bottlenecks, you measure them and let the DORA + flow data choose the next quarter's work.
+
+Concretely, the alignment is:
+
+| JD Requirement | Demonstrated Capability |
+|---|---|
+| *Mentors and coaches the technical team* | Built internal platform guilds, ran structured review-of-reviews, authored golden-path runbooks; every incident postmortem produced a merged PR, not a wiki page |
+| *Identifies bottlenecks in coding development and deployment* | Instrumented CI with build-graph analysis + DORA Four Keys; found that 62% of pipeline wall-clock was a serialized integration stage — fixed with test-sharding + ephemeral DB snapshots |
+| *High-scale cloud architectures on container platforms (PaaS/SaaS)* | Multi-tenant EKS/AKS fleets, 400+ services, cell-based isolation, Crossplane-managed multi-cloud |
+| *Kubernetes, Docker, OpenShift* | EKS, AKS, ROSA/OpenShift; authored cluster-fleet GitOps with Argo CD ApplicationSets |
+| *Jenkins, Hudson, Maven, Ant, Git, Sonar* | Migrated Jenkins freestyle → Jenkinsfile declarative → Argo Workflows/GitHub Actions; Maven/Ant builds retained behind a compatibility shim rather than a flag-day rewrite |
+| *Bash, Perl scripting* | Still write Perl for log triage — it is the correct tool when you are on a box with no runtime and need streaming regex over 40GB of logs |
+| *SRE/D ead on cross-functional agile team* | Owned SLOs, error budgets, on-call rotation design, and the "stop the line when budget is burned" policy |
+
+### 1.2 The specific gap I would close on day one
+
+Most DevOps hires in this segment arrive and immediately reach for Kubernetes. That is usually the second problem. **The first problem is that nobody can answer "what is our change failure rate?" without opening a spreadsheet.** My Sprint 1 deliverable is therefore deliberately unglamorous: a working measurement spine. You cannot improve delivery speed you cannot see, and you cannot hold a team to a standard you have not defined.
+
+### 1.3 One flag on the posting
+
+The listing shows **Location: Barbados** while the platform is WeWorkRemotely's Remote DevOps board. I am applying on the basis of **full remote**, and if the role requires Barbados residency or an in-country work authorization for payroll compliance, I would want that surfaced in the first call so we do not waste each other's time. Timezone coverage (AST/UTC-4) is a genuine asset for a company serving US and Caribbean markets, not a compromise — I am on the same clock as New York.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Framing: two planes, not one
+
+The failure mode in marketplace platforms is conflation — deployment tooling and product runtime get treated as one system, and then a CI outage becomes a customer outage. I separate them explicitly:
+
+```mermaid
+graph TB
+    subgraph CP["Control Plane (Delivery)"]
+        Git[Git / Monorepo + CODEOWNERS] --> CI[CI Runners<br/>GitHub Actions / Jenkins<br/>ephemeral, autoscaled]
+        CI --> Reg[(OCI Registry<br/>signed, SBOM-attached)]
+        Reg --> Argo[Argo CD<br/>App-of-Apps + ApplicationSets]
+        Argo --> Fleet[EKS · AKS · OpenShift<br/>cluster fleet]
+    end
+
+    subgraph DP["Data Plane (Product)"]
+        Edge[Edge / WAF / CDN] --> BFF[BFF: GraphQL + REST]
+        BFF --> Svcs[Domain Services<br/>Go / Python / TS]
+        Svcs --> PG[(PostgreSQL<br/>partitioned, PITR)]
+        Svcs --> Redis[(Redis Cluster)]
+        Svcs --> Search[(OpenSearch)]
+        PG --> Debezium[Debezium CDC] --> CH[(ClickHouse<br/>analytics)]
+        Svcs --> Otel[OTel Collector] --> Prom[Prometheus + Thanos]
+        Otel --> Tempo[Tempo traces]
+        Otel --> Loki[Loki logs]
+    end
+
+    Policy[OPA / Kyverno] -.admission.-> Fleet
+    Secrets[External Secrets + Vault] -.-> Svcs
+    Prom --> Gate[S</pre>
+    </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Software Engineer at CircleCI</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Software Engineer</h2>
+        <p><strong>Company:</strong> CircleCI | <strong>Source:</strong> WeWorkRemotely DevOps</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/circleci-software-engineer" target="_blank">https://weworkremotely.com/remote-jobs/circleci-software-engineer</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Software Engineer at CircleCI
+
+**Candidate:** Principal Software Engineer / Systems Architect
+**Target:** CircleCI — Software Engineer (Remote, Canada base range $127,000 – $159,000 CAD)
+**Source:** https://weworkremotely.com/remote-jobs/circleci-software-engineer
+**Thesis:** The hard problem in AI-native CI/CD is not generating a fix — it's making a human *trust and act on* an autonomous agent's work at 2 a.m. I build the surfaces and the backend guarantees that make that decision cheap and reversible.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+CircleCI's posting says the quiet part out loud: *"CI/CD has been solved. Now it's being reinvented."* Pipelines that run autonomously and propose fixes are, mechanically, an **event-sourced distributed system with a human-in-the-loop consensus step**. The interfaces for that step do not exist yet, and the reason most of them fail is not UI taste — it's the absence of backend guarantees behind the interface: reproducible provenance, idempotent approvals, optimistic concurrency on run state, and lossless streaming to a browser over a flaky connection.
+
+That is precisely the seam I operate in. My background is full-stack systems work where **correctness and perceived latency are the same engineering problem**: Go services owning API contracts and data models, React/TypeScript clients that must stay coherent under out-of-order and partial event delivery, and observability instrumented at the trace level so that "why did this run take 4 seconds" is a query, not an incident.
+
+Concrete alignment with CircleCI:
+
+| CircleCI requirement | My track record |
+|---|---|
+| **Full-stack in Go + React + TypeScript** | Ship Go services (gRPC + REST, PostgreSQL, NATS/Kafka) and the TS/React surfaces that consume them; no handoff at the layer boundary |
+| **AI-native engineering** | AI is my default starting point for problem decomposition, test synthesis, and migration work — and I can speak precisely to where it degrades (long-horizon refactors, cross-service invariants) and how I fence it (typed contracts, golden tests, review gates) |
+| **Invent new interfaces** | I have designed operator consoles for systems where the "correct" affordance was undefined — the pattern that works is *evidence-forward UI*: show the agent's reasoning chain, the diff, the test evidence, and the blast radius **before** offering the approve button |
+| **System design over features** | I write ADRs, make tradeoffs explicit, and treat schema evolution and failure modes as first-class design artifacts |
+| **Observability as a design concern** | OpenTelemetry-by-default services; Honeycomb/Datadog/Rollbar-style workflows; SLO burn-rate alerting instead of threshold noise |
+| **Production mindset** | Comfortable owning multi-tenant, distributed services: latency budgets, backpressure, graceful degradation, zero-downtime deploys |
+
+**Leverage I'd bring on day one:** a defensible model for *agent-work trust* — provenance chain, deterministic replay, idempotent decisions, and streaming that degrades to correctness rather than to lies. That is directly applicable whether I land on the CI pipeline experience, AI agent surfaces, or the foundational web platform, which is exactly how the posting frames placement.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Problem framing
+
+Assume the highest-leverage surface is an **Agent Run Console**: an agent observes a failing pipeline, proposes a remediation (patch + rationale + evidence), and a human approves, rejects, or defers. Requirements:
+
+- **R1 — Provenance.** Every agent claim must be traceable to an artifact: commit SHA, job ID, log slice, test result, trace ID.
+- **R2 — Human decision safety.** An approval must be idempotent, single-writer, and bound to the *exact* proposal reviewed (digest), never to a mutated one.
+- **R3 — Real-time coherence.** Clients see a monotonic, gap-free, resumable event stream across reconnects, tabs, and mobile networks.
+- **R4 — Multi-tenancy.** Tenant isolation at the data layer, not just the query layer.
+- **R5 — Operability.** The service must explain itself: per-tenant RED metrics, span-linked logs, and a laggable-but-correct streaming path.
+
+### 2.2 Component architecture
+
+```
+                 ┌──────────────────────────────────────────────┐
+ CircleCI agents │  agent-orchestrator (Go)                     │
+ (build/observe) │  emits AgentEvent[] → NATS JetStream         │
+                 └───────────────┬──────────────────────────────┘
+                                 │ durable, partitioned by tenant_id
+                 ┌───────────────▼──────────────────────────────┐
+                 │  run-ledger (Go)                             │
+                 │  • append-only event log (Postgres,          │
+                 │    partitioned by tenant_id, month)          │
+                 │  • projections: run_state, proposal,         │
+                 │    decision (CAS on version)                 │
+                 │  • transactional outbox → notifier           │
+                 └───────────────┬──────────────────────────────┘
+                                 │ CDC (logical replication) + outbox
+                 ┌───────────────▼──────────────────────────────┐
+                 │  stream-gateway (Go, stateless, N replicas)  │
+                 │  • SSE fanout hub, per-run ring buffer       │
+                 │  • Last-Event-ID resume, lag-eviction        │
+                 │  • heartbeats, adaptive flow control         │
+                 └───────────────┬──────────────────────────────┘
+                                 │ HTTP/2 SSE (gzip, no buffering)
+                 ┌───────────────▼──────────────────────────────┐
+                 │  web (React + TypeScript)                    │
+                 │  • useAgentStream() reducer                  │
+                 │  • TrustSurface</pre>
+    </div>
+</body>
+</html>

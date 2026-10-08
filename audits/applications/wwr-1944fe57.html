@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Lead Developer — Rebuild, Modernize, & Scale (Social Good SaaS, Remote) at Track it Forward</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Lead Developer — Rebuild, Modernize, & Scale (Social Good SaaS, Remote)</h2>
+        <p><strong>Company:</strong> Track it Forward | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/track-it-forward-lead-developer-rebuild-modernize-scale-social-good-saas-remote" target="_blank">https://weworkremotely.com/remote-jobs/track-it-forward-lead-developer-rebuild-modernize-scale-social-good-saas-remote</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre>A quick note before the dossier: the JD explicitly asks for authenticity and screens out AI spam. This document is a scaffold — swap in your real numbers (tenants migrated, rows moved, latency before/after), or it will read as exactly the thing they're filtering for. Also, the $1,500–$3,000 / crypto-settlement block below will look like noise to a bootstrapped W-2 employer hiring for a $200k lead role; I've kept it as you specified but flagged where to cut it.
+
+---
+
+# Engineering Application: Lead Developer — Rebuild, Modernize, & Scale (Social Good SaaS, Remote) at Track it Forward
+
+## 1. Executive Summary & Value Proposition
+
+Track it Forward's problem is not throughput — it's **fidelity under migration**. Fifteen years of Drupal 6, ~30M logged hours, thousands of nonprofit and school tenants, and a mobile client that must not break during cutover. The hard part is not "build a Django app." It's proving that every volunteer hour in the new PostgreSQL schema is byte-identical in meaning to the legacy one, while tenants move one at a time and nobody notices.
+
+My background maps to that directly:
+
+- **Legacy monolith extraction, done once and done badly enough to learn from.** I led the deconstruction of a PHP monolith (CakePHP-era, shared MySQL, no foreign keys, `varchar` dates) into a domain-driven Postgres service layer — including the reconciliation harness that caught 0.03% row-level drift the business had been silently reporting on for years. I know the difference between a migration that passes tests and one that passes an audit.
+- **First-principles schema discipline.** I hold the unfashionable opinion that the legacy denormalization you inherit is often *load-bearing* — `node_revisions`, `field_data_field_x`, and Drupal 6's `{users}` table encode business rules that were never written down. Deconstructing it means reconstructing those rules as explicit domain invariants, not just normalizing to 3NF and hoping.
+- **AI as a velocity multiplier with hard architectural vetoes.** I use agentic coding for scaffolding, test generation, Ionic upgrade churn, and migration script drafts. I do not let it touch schema design, auth, crypto, or payment-adjacent paths without a manual line-by-line review. The discipline is: AI proposes, tests verify, a human owns the invariant.
+- **Solo-IC operating mode.** I've been the only engineer on a system before. I write the runbook, I answer the page, and I write the ADR explaining *why* — because the next person to touch this codebase should not have to reverse-engineer my reasoning.
+
+Domain fit matters too: volunteer hour tracking for schools and nonprofits is a compliance artifact. Hours logged for a service-learning requirement or a grant match have to survive audit. That framing drives every design decision below.
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural stance: "small bang" done honestly
+
+Their stated strategy is a phased parallel build with incremental tenant migration — not a strangler fig, not a hard cutover. That's the right call for a 4-person team, but it has three failure modes I'd address up front:
+
+1. **Dual-write drift.** During the parallel period, both systems accept writes for a tenant mid-migration. Solved with a per-tenant **write-primary flag** in a control-plane table, not a global feature toggle, plus an **outbox + reconciliation job** that diffs the two stores nightly and pages on divergence.
+2. **Auth/session bridging.** Drupal 6 sessions live in MySQL. Rather than dual auth, I'd front both apps with a thin **edge router (Cloudflare Worker or nginx + Lua)** that reads a signed `tenant → backend` map and routes, with a one-time **session handshake**: legacy session ID is exchanged for a new JWT at cutover, transparently, via redirect. No password resets, no support tickets.
+3. **Mobile clients can't be force-upgraded.** Two Ionic/Capacitor apps in the wild means the old Drupal 6 API surface must stay alive behind a compatibility shim for at least one app-store cycle. That's an explicit, budgeted deliverable — not a surprise.
+
+### 2.2 Proposed stack
+
+- **Backend:** Python 3.12 + Django 5 + DRF (not FastAPI — Django's ORM, admin, and migration tooling are worth more here than raw async throughput, and the admin is a free internal ops console for a solo dev). `django-tenants`-style schema-per-tenant is overkill at this scale; I'd use **shared schema + `tenant_id` on every table + Postgres RLS** as a defense-in-depth backstop behind application-layer scoping.
+- **Frontend:** React + TypeScript + TanStack Query, Vite. Server-rendered shells for public-facing pages (SEO for nonprofit discovery), SPA for authenticated app.
+- **Data:** PostgreSQL 16 (primary + read replica), Redis for cache/queue/rate-limits.
+- **Storage:** Cloudflare R2 (S3-compatible, no egress fees — meaningful at 100GB+ and growing) behind an `imgproxy`/Cloudflare Images layer that regenerates Drupal image styles on demand from originals.
+- **Async:** Celery or Django-Q2 for reports, exports, and ETL. Keep it boring.
+
+### 2.3 Domain model (the parts that matter)
+
+```
+tenant (org) ──< site ──< opportunity ──< shift ──< signup ──> volunteer
+                                   │
+                                   └──< hours_entry  (APPEND-ONLY LEDGER)
+                                            │
+                                            └──< hours_adjustment (immutable deltas)
+                                            └──< approval (state machine, audited)
+```
+
+Two non-negotiables:
+
+- **`hours_entry` is append-only.** Corrections are new rows with a `supersedes_id`, never `UPDATE`. Nonprofit audit trails require it, and it makes reconciliation against legacy tri</pre>
+    </div>
+</body>
+</html>

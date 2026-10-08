@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Customer Success Manager Mexico at JumpCloud</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Customer Success Manager Mexico</h2>
+        <p><strong>Company:</strong> JumpCloud | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-customer-success-manager-mexico-jumpcloud-1137406" target="_blank">https://remoteOK.com/remote-jobs/remote-customer-success-manager-mexico-jumpcloud-1137406</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Customer Success Manager Mexico at JumpCloud
+
+> **Read this first — one structural correction.** You asked for an "Engineering Application" dossier for a **Customer Success Manager** role. That framing mismatch is fixable and I've fixed it below (the technical depth becomes the differentiator instead of the subject). But §4 as specified is not fixable: **fixed-price milestones, monthly retainers, a PayPal.me link and an EVM wallet address do not belong in an employment application.** This role is a full-time remote position in Mexico — it is W2-equivalent employment, not a freelance engagement. Putting crypto wallets in a cold application email is also the exact pattern JumpCloud's own posting warns about in its Scam Notice, so it would get you filtered out before a human read your résumé. I've written §4 as a real compensation/engagement section and flagged what to drop. Everything else is as requested.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+I am a customer-facing systems architect, not a quota-carrying generalist. That distinction is the entire thesis of this application: the hard part of enterprise Customer Success at JumpCloud is not relationship management — it is **instrumentation**. You cannot defend NRR across a portfolio of Enterprise and Commercial accounts if you are guessing at adoption, and you cannot run a credible EBR with a CIO if your health narrative is a slide deck assembled by hand the week before.
+
+My value proposition for this role:
+
+| JD Requirement | My Evidence |
+|---|---|
+| 7+ yrs B2B SaaS customer-facing, Enterprise/high-ARR | Placeholder — insert your actual ARR bands, logo counts, and NRR owned. A CSM claim without a number is noise. |
+| Technical acumen: IAM, Directory Services, SSO/MFA, MDM, Zero Trust | I design and operate these systems. I can read a Directory Insights event stream, explain why a broken SCIM provisioning job is a churn signal, and diagnose a failed RADIUS auth path live on a call. |
+| Executive presence with CIO/CISO/VP-IT | Build the artifacts executives actually consume: ROI models, control-coverage maps, migration risk registers — not feature tours. |
+| Analytical & strategic mindset | I build the scoring models, not just consume the dashboards (§2–3 below). |
+| Proactive problem solving, remote-first | Remote-native operating discipline: written-first decisions, async escalation paths, documented runbooks for every account escalation. |
+| Bilingual EN/ES, Mexico-based, 10% travel | Placeholder — confirm your location and work authorization. |
+
+**Why this specific platform.** JumpCloud's positioning — unified identity, device, and access management, now extended to autonomous AI agents — creates a CSM problem most peers cannot solve. The product surface is enormous (directory, SSO, MFA, MDM, patch, privilege, zero-trust access), the buyer is split across IT ops and security, and the value arrives only when the *whole* control plane is adopted. Partial adoption is the churn vector. My job is to detect partial adoption early, quantify it, and run a plan that closes it.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 The system: Customer Success Intelligence Platform (CSIP)
+
+A CSM's leverage is a telemetry pipeline. I would build (or rebuild) the following alongside CS Ops:
+
+```
+┌──────────────┐   ┌───────────────┐   ┌────────────────┐   ┌──────────────────┐
+│ Sources      │──▶│ Ingestion     │──▶│ Feature Store  │──▶│ Scoring Engine   │
+│              │   │ (idempotent)  │   │ (parquet/CH)   │   │ (health + risk)  │
+│ Directory    │   │               │   │                │   │                  │
+│ Insights API │   │ webhook +     │   │ adoption,      │   │ weighted model   │
+│ Device Mgmt  │   │ poll fallback │   │ activity, seat │   │ + explainability │
+│ SSO/MFA logs │   │ dedupe keys   │   │ utilization,   │   └────────┬─────────┘
+│ Support      │   │ retries/DLQ   │   │ support load   │            │
+│ CRM (SFDC)   │   └───────────────┘   └────────────────┘            ▼
+│ Product tele │                                              ┌──────────────────┐
+└──────────────┘                                              │ Playbooks /      │
+                                                              │ Alerting / QBR   │
+                                                              │ Report Generator │
+                                                              └──────────────────┘
+```
+
+**Ingestion.** Prefer webhooks; poll Directory Insights and device APIs as fallback. Every event carries a deterministic `dedupe_key = sha256(org_id + event_type + source_id + event_time)`. At-least-once delivery plus idempotent upserts means exactly-once semantics *downstream* without distributed transactions.
+
+**Data model (core entities).**
+
+```
+organizations(id, name, segment ENTERPRISE|COMMERCIAL|SMB, arr_cents, csm_id, tz)
+org_users(id, org_id, external_id, status, last_auth_at, mfa_enrolled, sso_bound)
+org_devices(id, org_id, os_family, enrolled_at, last_checkin_at, compliant)
+adoption_facts(org_id, feature_key, period_start, active_users, licensed_seats)
+health_snapshots(org_id, computed_at, score, band, components JSONB, model_version)
+risk_signals(org_id, signal_type, severity, detected_at, evidence JSONB, state)
+expansion_signals(org_id, signal_type, est_value_cents, rationale, state)
+qbr_reports(org_id, period, payload JSONB, generated_at, approved_by)
+```
+
+Segment and timezone live on the org, not the user — otherwise "weekly active" means something different for each account and no cross-portfolio benchmark is valid.
+
+**Feature engineerin</pre>
+    </div>
+</body>
+</html>

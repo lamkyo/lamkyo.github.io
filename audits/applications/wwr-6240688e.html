@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Backend Developer (Node.js / Nest.js) at Proxify AB</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Backend Developer (Node.js / Nest.js)</h2>
+        <p><strong>Company:</strong> Proxify AB | <strong>Source:</strong> WeWorkRemotely Backend</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/proxify-ab-senior-backend-developer-node-js-nest-js-3" target="_blank">https://weworkremotely.com/remote-jobs/proxify-ab-senior-backend-developer-node-js-nest-js-3</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Backend Developer (Node.js / Nest.js) at Proxify AB
+
+> **Application note:** Replace all bracketed fields with verifiable experience, metrics, and contact details before submission. No candidate biography, employment history, location, or timezone was provided, so this dossier deliberately avoids inventing credentials.
+>
+> **Eligibility gate:** Proxify limits candidates to **CET ±3 hours**. Confirm the applicant’s actual location and working hours before applying. If eligible, state this explicitly in the opening paragraph of the email; otherwise, do not submit an application that cannot satisfy this hard requirement.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+I am applying for the Senior Backend Developer position because it combines three areas in which strong systems engineering is especially valuable:
+
+1. **TypeScript backend engineering:** production Node.js and NestJS services, REST and GraphQL APIs, asynchronous processing, and maintainable domain architecture.
+2. **Reliability at business-critical boundaries:** payment initiation, balance accounting, authorization, third-party integrations, auditability, and failure recovery.
+3. **Cloud-native delivery:** PostgreSQL, Redis, message-driven workflows, Docker, CI/CD, observability, automated testing, and zero-downtime deployments.
+
+Proxify AB appears to operate a **remote talent marketplace** where the platform must coordinate candidate discovery, engagement matching, client workflows, contractor availability, and predictable payment operations. That domain places unusually strong requirements on backend correctness. A minor defect in a recommendation feature is inconvenient; a double withdrawal, duplicated payout, inconsistent balance, or authorization bypass is a direct commercial and trust failure.
+
+My approach would be to combine:
+
+- A **well-structured NestJS modular monolith** for transactional business capabilities.
+- Explicit **domain boundaries** that can later be extracted into services only when scale or team ownership justifies it.
+- **PostgreSQL as the authoritative transactional store**.
+- An **outbox-based event workflow** for asynchronous matching, notifications, analytics, and payout processing.
+- **Idempotency, immutable financial ledger entries, optimistic or pessimistic concurrency controls**, and auditable state transitions.
+- Defense-in-depth through OIDC/OAuth 2.1, short-lived tokens, RBAC/ABAC, encryption, rate limiting, and sensitive-data minimization.
+- Production evidence through OpenTelemetry, Prometheus, structured logs, SLOs, load testing, and deployment automation.
+
+### Alignment with the stated stack
+
+| Proxify requirement | Engineering approach |
+|---|---|
+| Node.js and NestJS | Modular NestJS application with explicit application, domain, and infrastructure layers |
+| REST and/or GraphQL | Versioned REST for commands and integration APIs; GraphQL for read-heavy, shape-specific client experiences |
+| PostgreSQL, MySQL, or MongoDB | PostgreSQL preferred for transactions, constraints, JSONB, auditing, and reporting |
+| JWT and OAuth2 | OIDC/OAuth 2.1 Authorization Code + PKCE, short-lived access tokens, rotating refresh tokens, server-side revocation where required |
+| Jest/Mocha testing | Jest unit tests, Supertest API tests, Testcontainers integration tests, and contract tests |
+| AWS/Azure/GCP | Cloud-agnostic containers deployed to ECS/Fargate, AKS, GKE, or an equivalent managed platform |
+| CI/CD and DevOps | Reproducible builds, migration gates, automated security checks, progressive delivery, and rollback |
+| RabbitMQ or Kafka | Start with a managed queue such as SQS, RabbitMQ, or Kafka according to ordering and throughput needs |
+| Docker | Multi-stage builds, non-root runtime, read-only filesystem, pinned dependencies, and SBOM generation |
+| Microservices | Domain-oriented modularity first; extraction only where independently scalable or deployable boundaries justify the operational cost |
+
+### Evidence to customize
+
+The strongest application should cite two or three measurable examples corresponding to the following:
+
+- `[X]+ years` building production Node.js/TypeScript services.
+- `[X]+ years` using NestJS in production.
+- A backend or marketplace scale example: `[requests/day]`, `[peak RPS]`, `[database size]`, or `[number of users]`.
+- A reliability example: `[99.9x%] availability`, `[P95 latency]`, `[reduction in incidents]`, or `[throughput]`.
+- A financial or high-integrity workflow involving ledgers, billing, payouts, credits, or reconciliation.
+- A cloud, migration, event-driven, or observability example.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Proposed architecture
+
+I would begin with a **modular monolith backed by asynchronous workers**, not distribute the entire system prematurely. Proxify’s requirements span multiple business capabilities, but transactional consistency, rapid delivery, and maintainable ownership are more valuable initially than service-count sophistication.
+
+```mermaid
+flowchart TB
+    subgraph Clients
+        WEB[Web and Mobile Clients]
+        ADMIN[Operations Console]
+        CLIENT[Client API Consumers]
+    end
+
+    subgraph Edge
+        CDN[CDN / WAF]
+        GATEWAY[API Gateway / BFF]
+    end
+
+    subgraph NestJS Application
+        IAM[Identity and Access]
+        TALENT[Talent and Profile]
+        ENGAGEMENT[Engagement and Contract]
+        MATCHING[Matching and Availability]
+        PAYMENT[Payments and Withdrawals]
+        NOTIFICATION[Notifications]
+        ADMINAPI[Internal Operations API]
+    end
+
+    subgraph Data
+        PG[(PostgreSQL)]
+        REDIS[(Redis Cache)]
+        OBJECTS[(Object Storage)]
+        OUTBOX[(Transactional Outbox)]
+        QUEUE[Managed Message Broker]
+    end
+
+    subgraph Workers
+        MATCHWORKER[Matching Worker]
+        PAYWORKER[Payout Worker]
+        NOTIFYWORKER[Notification Worker]
+        RECON[Reconciliation Worker]
+    end
+
+    subgraph External
+        OIDC[OIDC / Identity Provider]
+        PSP[Payment Provider]
+        EMAIL[Email / SMS Provider]
+    end
+
+    WEB --> CDN --> GATEWAY
+    ADMIN --> CDN
+    CLIENT --> GATEWAY
+
+    GATEWAY --> IAM
+    GATEWAY --> TALENT
+    GATEWAY --> ENGAGEMENT
+    GATEWAY --> MATCHING
+    GATEWAY --> PAYMENT
+    GATEWAY --> NOTIFICATION
+
+    IAM --> OIDC
+    TALENT --> PG
+    ENGAGEMENT --> PG
+    MATCHING --> PG
+    PAYMENT --> PG
+    PAYMENT --> OUTBOX
+    OUTBOX --> QUEUE
+
+    MATCHING --> REDIS
+    ENGAGEMENT --> REDIS
+
+    QUEUE --> MATCHWORKER
+    QUEUE --> PAYWORKER
+    QUEUE --> NOTIFYWORKER
+    QUEUE --> RECON
+
+    PAYWORKER --> PSP
+    NOTIFYWORKER --> EMAIL
+    TALENT --> OBJECTS
+```
+
+### 2.2 Domain boundaries
+
+Each module would expose application-layer use cases rather than allowing arbitrary cross-module database access.
+
+#### Identity and Access
+
+- OIDC login and account linking.
+- Short-lived access tokens and rotating refresh tokens.
+- Roles such as `talent`, `client`, `operations`, `finance`, and `administrator`.
+- Resource-level authorization, for example</pre>
+    </div>
+</body>
+</html>

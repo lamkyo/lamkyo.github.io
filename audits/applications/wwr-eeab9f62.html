@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior Risk Associate at Lithic</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior Risk Associate</h2>
+        <p><strong>Company:</strong> Lithic | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/lithic-senior-risk-associate" target="_blank">https://weworkremotely.com/remote-jobs/lithic-senior-risk-associate</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior Risk Associate at Lithic
+
+> **Framing note before the dossier:** this is a *risk program ownership* role, not a software engineering req. The winning angle is not "hire me to build microservices" — it is "hire me because rubric-based scoring, register integrity, evidence lineage, and agentic tooling are systems problems, and I build the systems that make a risk program defensible in front of a partner bank and an examiner." The dossier below is written that way. Section 4 is a contracting artifact, not part of the employer application — see the note at the end.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### The thesis
+
+Lithic's assessment function has three properties that make it an engineering problem in disguise:
+
+1. **It is a decision system with a reproducibility requirement.** A client risk tier, a reserve number, or a vendor control-effectiveness rating must be derivable again, from the same inputs, two years later, in front of a regulator. That is a versioned, deterministic scoring engine with an immutable input log — not a spreadsheet.
+2. **It is an evidence pipeline under adversarial audit.** Partner banks and examiners do not ask "what is the tier?" They ask "show me the artifact, the date you received it, who reviewed it, what you concluded, and what changed since." That is content-addressed storage, provenance, and bitemporal history.
+3. **It is explicitly AI-forward, and the role owns the build.** "Test, deploy, and tune agentic tooling across the assessment workflows... document the context that makes the output repeatable and defensible." This is exactly model-gated automation: structured extraction, schema validation, confidence thresholds, abstention, mandatory human decision on every rating and limit, and an eval harness that proves the automation did not degrade the judgment.
+
+The value proposition: **you get a risk owner who also owns the platform.** Most risk associates hand requirements to engineering and wait a quarter. Most engineers cannot write a defensible residual-risk position. This role needs both, and the agentic tooling mandate is precisely where the two skill sets stop being separable.
+
+### Direct alignment to Lithic's domain
+
+| Lithic reality | What it demands of this role | What I bring |
+|---|---|---|
+| Card issuing for 100+ programs across fintech, credit, disbursements, spend management | Client risk typologies that vary by product mix (credit vs. debit vs. secured), BIN sponsorship exposure, and settlement behavior | Rubric design with **non-compensatory gates** — a program cannot average its way past a sanctions or sponsorship-control failure |
+| Partner-bank dependent model | Every assessment is also a bank deliverable; the bank's exam cycle sets your SLA | Evidence packs generated from the system of record with a hash manifest, so the register and the report cannot diverge |
+| Program underwriting: "recommend spend, transfer, and reserve limits" | Exposure math with floors, buffers, and downgrade triggers | Expected-loss reserve modeling with Decimal precision, tier caps, and monitoring triggers — code below |
+| Third-party risk: ISO 27001, SOC 2 Type II, PCI DSS AOC | Reading control reports and converting them to residual risk + a remediation ask | Control-to-requirement mapping, gap scoring with compensating-control credit, and dated remediation tracking |
+| Agentic tooling across diligence and documentation | Repeatable, testable, explainable automation | Golden-set evals, confidence gating, deterministic re-scoring, model/prompt version pinning in every assessment record |
+| Scale: 170+ people, 26 states, 7 countries, unlimited PTO, async by default | Programs must run without a human in the loop for routine collection | Docs-as-code SOPs versioned alongside the rubric, so the SOP and the engine never drift |
+
+**The gap I will not paper over:** I am not claiming ten years inside a bank's second line of defense. What I am claiming, and what the code in §3 demonstrates, is that the *methodology* — weighted typologies, consistent rating discipline, defensible residual risk, program underwriting — is a formal system, and I build formal systems. The domain vocabulary I learn in week one; the platform that makes 100+ assessments repeatable is a build, and that is the scarce part.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural stance
+
+Three principles drive every decision:
+
+- **The register is the system of record. Nothing else is.** No parallel spreadsheet. If a vendor tier, a control rating, or a reserve number exists in two places, the examiner will find the disagreement.
+- **Human judgment is a first-class, recorded object — not an exception path.** Every rating has an `origin` (`rubric_engine`, `analyst_override`, `imported_legacy`) and a reasoning trail. Automation produces *candidates*; humans produce *decisions*.
+- **Defensibility is a storage property, not a documentation habit.** Repro­ducibility, provenance, and tamper-evidence are enforced by the schema, not by discipline.
+
+### 2.2 System topology
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  Assessment Console (Next.js / TypeScript)                                │
+│   • Assessment workspace  • Vendor register  • ERC packet builder         │
+│   • Override + justification capture  • KRI dashboards                    │
+└───────────┬──────────────────────────────────────────────────────────────┘
+            │ REST + JSON Schema contracts, ETag/If-Match, Idempotency-Key
+┌───────────▼──────────────────────────────────────────────────────────────┐
+│  Assessment API (Python / FastAPI, Pydantic v2)                           │
+│   /clients /assessments /rubrics /vendors /register /limits /evidence     │
+└───┬──────────────┬───────────────┬──────────────┬────────────────────────┘
+    │              │               │              │
+┌───▼────┐  ┌──────▼──────┐  ┌─────▼──────┐  ┌────▼─────────────────────┐
+│Scoring │  │</pre>
+    </div>
+</body>
+</html>

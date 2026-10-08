@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Software Engineer at Mirantis</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,500 USD</div>
+    <div class="card">
+        <h2>Software Engineer</h2>
+        <p><strong>Company:</strong> Mirantis | <strong>Source:</strong> RemoteOK US</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://remoteOK.com/remote-jobs/remote-software-engineer-mirantis-1137387" target="_blank">https://remoteOK.com/remote-jobs/remote-software-engineer-mirantis-1137387</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Software Engineer at Mirantis
+
+**Candidate:** Principal Software Engineer / Systems Architect (US Remote)
+**Target:** Mirantis (an IREN company) — Software Engineer, Kubernetes-native AI infrastructure
+**Referral tag:** `RMjYwNzpmMmQ4OjYwNjU6MTNjZDo6YQ==`
+**Keyword read-and-confirmed:** **SEAMLESS**
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Mirantis sits at an unusual intersection that very few engineers can genuinely claim: it is simultaneously a **distributor of hardened Kubernetes primitives** (k0s, k0rdent, Lens), a **lifecycle manager for platform fleets** (Cluster API, Helm/Kustomize, GitOps), and — post-IREN — an operator of **sovereign AI infrastructure**, where the workloads are GPU-bound, the tenancy boundaries are contractual as well as technical, and downtime is measured in burnt accelerator-hours rather than error budgets alone.
+
+My engineering background is a direct match to that intersection:
+
+- **Kubernetes control-plane internals at the source level.** I design controllers with `controller-runtime`, understand the informer/reflector/workqueue machinery well enough to reason about cache staleness, resync storms, and hot-key contention under 10k+ object churn. This is the substrate k0rdent's "super control plane" model depends on: a central management plane whose health is the health of every managed cluster underneath it.
+- **Go-first systems engineering.** Idiomatic Go with context propagation, bounded concurrency, and explicit failure semantics — the language of k0s, CAPI, and virtually every component Mirantis ships.
+- **AI/ML infrastructure reality.** GPU node pools, device plugins, MIG partitioning, topology-aware scheduling, RDMA/InfiniBand fabric constraints, and the observability gap between "the pod is Running" and "the model is actually training." Mirantis's customers care about GPU utilization curves, not pod phases.
+- **Sovereignty and air-gapped delivery.** Mirantis sells to regulated and sovereign buyers. I build for offline-first: vendored images, signed OCI artifacts (Cosign/Sigstore), SBOM generation (Syft), and reproducible bundles that install with **zero outbound egress**. This is a first-class architectural constraint, not a checkbox.
+- **Sustained production ownership.** Multi-year ownership of control-plane-adjacent services with SLOs, on-call rotation, and post-incident authoring.
+
+**The value proposition in one sentence:** I can take a requirement that lands as "make GPU cluster provisioning reliable and observable across sovereign estates" and return a merged, tested, instrumented controller, a rollout plan that never breaks an existing management plane, and the runbooks that let a customer SRE operate it without calling us.
+
+**Why this specific role.** The listing blends open-source stewardship with managed-service delivery — engineers here contribute upstream *and* carry a pager for customer estates. That is precisely the operating model I want: the feedback loop from real fleet incidents back into upstream code is the only mechanism that keeps a distribution honest.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Framing the primary system requirement
+
+The recurring architectural problem in Mirantis's product surface — and the one I would expect this role to own — is:
+
+> **Declaratively reconcile a heterogeneous fleet of GPU-enabled Kubernetes clusters across sovereign/air-gapped environments, with deterministic, auditable, and reversible provisioning — while keeping a single management plane responsive under partial failure.**
+
+Three forces make this hard simultaneously:
+
+1. **Idempotency across an unreliable, eventually-consistent cloud/hardware API.** Bare-metal and GPU provisioning (MAAS, OpenStack Ironic, cloud GPU APIs) partially fails *constantly*. A controller that is not explicitly designed for partial failure will leak nodes, orphan volumes, and double-charge customers.
+2. **Scale of the management plane.** If one control plane manages *N* child clusters × *M* resources, the API server's watch fan-out and the controller's cache memory become the binding constraints long before CPU does.
+3. **Sovereignty/air-gap.** No image pulls from public registries, no telemetry exfiltration, no "phone home" licensing. Signatures must verify offline against a pinned trust root.
+
+### 2.2 Architectural proposal — a layered reconciliation stack
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  Management Plane (k0rdent-style super control plane)            │
+│                                                                  │
+│  [API]  CRDs: ClusterTemplate · ClusterDeployment · GPUPool      │
+│         Admission webhooks (validate + default + mutate)         │
+│                           │                                      │
+│         ┌─────────────────┼─────────────────┐                    │
+│         ▼                 ▼                 ▼                    │
+│  [Reconcilers]     [Reconcilers]     [Reconcilers]               │
+│  ClusterDeploy     GPUPool/Scale     Fabric/Network              │
+│         │                 │                 │                    │
+│         └────────┬────────┴────────┬────────┘                    │
+│                  ▼                 ▼                             │
+│        [Provider Abstraction]  [Inventory Cache]                 │
+│        CloudAPI | Ironic |     TTL + singleflight +              │
+│        MAAS | Static          generation-fenced                  │
+│                  │                                               │
+│         ┌────────┴────────┐                                      │
+│         ▼                 ▼                                      │
+│   [Child Cluster A]  [Child Cluster B]  … (CAPI-managed)         │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### 2.3 Core components
+
+**API design.** Keep the API *narrow and declarative*. Three CRDs, each with `spec` fully declarative and `status` carrying only observed state plus a typed `conditions` array (`Ready`, `Provisioning`, `Degraded`, `Stalled`) using the standard `metav1.Condition` shape so `kubectl wait --for=condition` and every existing tooling assumption works unchanged. Never encode intent in annotations; annotations are for consumers, not controllers.
+
+Key API-design rules I enforce:
+- **No field is both defaulted and required.** Defaulting happens in the webhook so clients can omit; validation rejects contradiction.
+- **Immutable fields are explicitly `+kubebuilder:validation:XValidation:rule="self == oldSelf"`** (CEL, available since 1.25) so the API server enforces immutability rather than the reconciler silently fighting the user.
+- **Every mutating field documents its blast radius.** Changing `spec.gpuPool.topology` on a live pool is a disruptive operation and the CRD should say so.
+
+**Data modeling.** The critical modeling decision is the **stateless-intent / stateful-observation split**:
+
+| Layer | Storage | Rationale |
+|---|---|---|
+| Desired state (spec) | etcd via CRD | Single source of truth, GitOps-diffable |
+| Observed infra state | `status` + provider tags/labels | Must survive controller restarts → authoritative tag on the *provider* resource, e.g. `mirantis.io/owner-uid=<cr-uid>` |
+| Intermediate provisioning state | **Recomputed on every reconcile, never persisted** | Persisting a "wing in progress" flag guarantees divergence after a crash |
+| Provider inventory (catalog) | In-memory TTL cache | Read-heavy, short-lived, expensive upstream |
+
+The single most important rule: **the provider resource's own tags are the system of record for ownership.** A controller that keeps ownership only in its own memory will, after a crash mid-provision, forget it created a node and will never clean it up. Tagging the remote object with the owning CR's UID makes orphan detection a *query* rather than a *memory* — which is what makes the "reversible and auditable" guarantee real.
+
+**Concurrency control.** Four distinct layers, each solving a different problem:
+
+1. **Workqueue-level:** `controller-runtime`'s per-key serialization guarantees no two goroutines reconcile the same CR simultaneously. I raise `MaxConcurrentReconciles` to a *measured* value (4–8 for I/O-bound provider controllers), never unbounded — provider APIs rate-limit and an unbounded reconciler turns a rate limit into a retry storm.
+2. **Optimistic concurrency on status:** every `Status().Update()` carries the `resourceVersion` read at reconcile start. Conflicts are handled by **requeueing, never by `RetryOnConflict` loops that re-read and blindly re-apply** — blind re-apply is how controllers resurrect state a user just deleted.
+3. **Cross-resource mutual exclusion:** provisioning a GPU pool touches a quota object shared with other pools. I use a Kubernetes-native lease (`coordination.k8s.io/Lease`) per quota domain with a bounded TTL rather than cluster-wide l</pre>
+    </div>
+</body>
+</html>

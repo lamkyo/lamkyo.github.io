@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Power Platform Solutions Architect at Toptal</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Power Platform Solutions Architect</h2>
+        <p><strong>Company:</strong> Toptal | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/toptal-power-platform-solutions-architect" target="_blank">https://weworkremotely.com/remote-jobs/toptal-power-platform-solutions-architect</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Power Platform Solutions Architect at Toptal
+
+> **Note to the applicant:** everything marked `[[ … ]]` is a slot for your verifiable specifics (client names, dates, scale figures, certification IDs). Fill those before sending — a dossier with placeholders reads as a template. Nothing else here needs editing.
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+### 1.1 The problem, stated precisely
+
+This engagement is not "build a Power App." It is a **decision-grade architecture assessment** of a legacy Power Platform estate whose integration boundary is unstable. Three properties make it hard:
+
+1. **The data-profiling spike (Regulatory) is on the critical path.** You cannot choose Dataverse entity granularity, indexing strategy, or capacity model until you know cardinality, multiplicities, and PII/retention classification of the regulatory dataset. Architecting before profiling means architecting twice.
+2. **Four integration touchpoints are under-specified.** Counterparty APIs that are "uncertain, changing, or being migrated" break the default assumption of every low-code integration pattern: that the remote contract is a constant. The architecture must treat the *counterparty contract as a variable*.
+3. **Licensing is an architectural constraint, not a procurement afterthought.** A model choice that adds an unlicensed audience segment (Power Pages) or an extra Dataverse per-user app changes the run-rate by five figures annually. Licensing must be a first-class input to the design, evaluated in the same document as the ERD.
+
+### 1.2 Why this background maps onto it
+
+| Client need | Demonstrated capability |
+|---|---|
+| Assess existing Power Apps / Flows / data layer / Power BI | `[[Reverse-engineering X solutions, produced Y-page assessment]]`; solution-layer and dependency-graph analysis via `pac solution` + Solution Checker + Dataverse metadata extraction |
+| Dataverse schema & security-role design | `[[Designed N-entity models for regulated workloads]]`; business units × teams × role matrix, column security profiles for PII, hierarchical security for regional segmentation |
+| Azure architecture (APIM, Functions, Key Vault, Entra ID, App Insights) | `[[Built Y APIM-fronted integration platforms]]`; managed-identity-only Key Vault access, OpenTelemetry-native observability |
+| ERP integration | `[[SAP integration via OData/BAPI/RFC through a canonical boundary]]`; IDoc/OData delta semantics, master-data reconciliation |
+| Identity for licensed + unlicensed audiences | Entra ID External ID / Power Pages local-auth vs. federated models, delegated vs. application permissions, service principal + managed identity patterns |
+| Costed patch vs. rebuild | `[[Delivered N build-vs-replatform business cases]]` with TCO modeled across licensing, ALM overhead, and remediation debt |
+| Staffed Phase 2 plan | `[[Led squads of N engineers]]`; role-level decomposition with named skill profiles and workstream sequencing |
+
+### 1.3 Alignment with Toptal's engagement model
+
+Toptal's client engagements succeed on **decision velocity with documentation quality**. The deliverable here is a set of architecture decisions that a client-side team will implement after we leave. So the dossier below is written the way I would write the actual engagement artifacts: decisions with explicit consequences, and code that a staff engineer can read without me in the room.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Phase 1 Assessment Methodology (Weeks 1–2)
+
+The assessment is a **dependency-graph extraction**, not a code read.
+
+**Artifact inventory and static analysis**
+- Unpack every solution (unmanaged export → `pac solution unpack --processCanvasApps`) to recover canvas app `Src/`, flow definitions, environment variables, and connection references. Canvas apps are not reviewable in the Maker portal at scale; the unpacked YAML/JSON is.
+- Build a **dependency graph**: environment variable → connection reference → connection → connector → external endpoint. This surfaces the hidden dependency that kills rewrites: a cloud flow bound to a *user's personal connection* to a system that has no service principal.
+- Run Solution Checker (Ruleset: Solution Checker) and triage findings into (a) security, (b) performance/delegation, (c) deprecated API usage, (d) unused components.
+
+**Runtime evidence, not opinion**
+- Application Insights / Dataverse telemetry (if present) → p50/p95 latency by operation, plugin execution time, top-20 slowest Flows.
+- If absent, we instrument: a short-lived audit that captures `OrganizationRequest` volume by user, to size service-protection headroom.
+- Dataverse row counts and table-size distribution via the `RetrieveTotalRecordCount` / `PrincipalObjectAccess` data → the real basis for capacity and indexing decisions.
+
+**Anti-pattern catalog with severity.** Every finding gets: *finding → evidence → blast radius → remediation cost → whether it blocks the rebuild option*. This is the document that makes the patch-vs-rebuild decision defensible.
+
+Target deliverable: a **Current-State Architecture & Findings Register**, with a dependency graph, a risk-weighted findings table, and a licensing baseline (current entitlement vs. actual consumption).
+
+### 2.2 Regulatory Data-Profiling Spike (Weeks 2–3, parallel workstream)
+
+Run as a bounded spike with a hard exit criterion, because the target schema depends on it.
+
+| Profiling question | Method | Downstream architectural consequence |
+|---|---|---|
+| Cardinality & multiplicity (1:1 vs 1:N vs M:N) | Profile the four upstream sources against the current table shape | Determines table decomposition vs. wide-table; N:N relationships drive intersect-table and alternate-key design |
+| Data classification (PII, finan</pre>
+    </div>
+</body>
+</html>

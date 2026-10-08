@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application: Senior React Native Developer at Lemon.io</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.6; padding: 2rem; max-width: 900px; margin: 0 auto; }
+        h1, h2, h3 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 0.3em; }
+        pre { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 16px; overflow-x: auto; color: #e6edf3; }
+        code { background: #161b22; padding: 0.2em 0.4em; border-radius: 6px; }
+        a { color: #58a6ff; text-decoration: none; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; background: #238636; color: #fff; font-weight: bold; font-size: 0.85em; margin-bottom: 1rem; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 20px; margin-bottom: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="badge">PROPOSED ENGAGEMENT: $5,000 USD</div>
+    <div class="card">
+        <h2>Senior React Native Developer</h2>
+        <p><strong>Company:</strong> Lemon.io | <strong>Source:</strong> WeWorkRemotely Fullstack</p>
+        <p><strong>Job Posting Link:</strong> <a href="https://weworkremotely.com/remote-jobs/lemon-io-senior-react-native-developer-1" target="_blank">https://weworkremotely.com/remote-jobs/lemon-io-senior-react-native-developer-1</a></p>
+    </div>
+    <div class="markdown-body">
+        <pre># Engineering Application: Senior React Native Developer at Lemon.io
+
+**Candidate:** [Your Name] — Principal Software Engineer / Systems Architect
+**Target Track:** React Native & React & Node (combined track — qualifies on both disjuncts)
+**Source:** WeWorkRemotely Fullstack → Lemon.io · New York, NY (remote, 75+ countries)
+
+---
+
+## 1. Executive Summary & Value Proposition
+
+Lemon.io's product is not an app — it is a **matching engine with a trust problem**. You sell seniority ("we respect your seniority, no screen trackers"), and the thing that erodes that trust fastest is a placement that stalls in week three: unknown codebase, no offline story, a release train that ships a broken build on Friday. The scarce resource you actually optimize for is **time-to-first-merged-PR on a codebase the engineer has never seen.**
+
+That is the exact failure mode I have spent my career eliminating. My background sits at the intersection of three things this posting asks for simultaneously:
+
+| Lemon.io requirement | How I map |
+|---|---|
+| 4+ yrs RN, 2+ yrs React (or inverse) | I qualify on **both** disjuncts — RN-first depth *and* React depth — so I'm pliable to whichever client project opens first |
+| "Create projects from scratch… deep understanding of application architecture" | I've shipped greenfield RN apps and also performed architecture rescue on existing ones; I can do both inside a 2-week onboarding window |
+| "Strong self-organizational skills… no supervision" | I've run solo-architect engagements across US/EU timezones with async-first comms and written RFC culture |
+| "Communicate directly with clients… justify decisions" | I write decision records (ADRs) as a deliverable, not an afterthought — the client can read *why*, not just *what* |
+
+**The domain read.** Lemon.io's clients are US/EU startups. That means the RN work is almost never CRUD-with-a-nice-font. It is:
+
+- **Offline-first mobile** where the network is a hostile dependency (field ops, logistics, healthcare, fintech KYC).
+- **Multi-tenant backends that outgrow their first schema** — the BFF layer the mobile client talks to is usually 18 months old and undocumented.
+- **Release velocity under app-store latency** — the client wants weekly value, but review queues are 1–7 days. OTA updates, feature flags, and forced-update gates are not optional.
+
+My proposal below is written against that reality, not against a toy todo app. I'll show you the **sync architecture I would put behind a Lemon.io client's RN app in Sprint 1**, because that single decision determines whether the app feels fast at 200ms latency on a subway, and whether the backend survives a fleet of clients replaying queued mutations after an outage.
+
+---
+
+## 2. Deep Technical Solution Blueprint
+
+### 2.1 Architectural stance: the client is a replica, not a view
+
+The single most expensive architectural mistake in production React Native is treating the app as a renderer over a live API. It works in the demo. It dies at scale, because:
+
+- Cellular networks are intermittently connected, high-latency, and *lie about connectivity* (captive portals return 200 on a redirect).
+- Every screen becomes a bespoke loading/error/retry state, which is 60% of the bug surface.
+- Any mutation issued at 0% battery / airplane mode is lost, and users do not re-enter data.
+
+**The stance:** the RN client owns a durable local replica. All reads hit a local store. All writes hit an **append-only outbox**. A background sync engine reconciles. The UI is a pure function of the replica state machine. This gives a single, testable convergence contract instead of per-screen improvisation.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      React Native Client                     │
+│                                                              │
+│  UI (React) ──► Replica Store (DB/MMKV) ──► Sync Engine      │
+│       ▲                │                        │            │
+│       │         optimistic read          outbox append       │
+│       └────────────────┘                        │            │
+│                                                 ▼            │
+│                                    ┌────────────────────┐    │
+│                                    │  Outbox (durable)  │    │
+│                                    │  per-entity FIFO   │    │
+│                                    │  idempotency keys  │    │
+│                                    └────────────────────┘    │
+│                                                 │            │
+│                              BGTaskScheduler / WorkManager   │
+└─────────────────────────────────────────────────┼────────────┘
+                                                  ▼
+                        POST /v1/sync  (batched, If-Match, Idempotency-Key)
+                        GET  /v1/sync?since=<cursor>  (delta pull)
+```
+
+### 2.2 Core components
+
+**A. Sync transport (API design)**
+
+Two endpoints. That's it. Not one per resource.
+
+- `POST /v1/sync` — accepts a batch of up to 100 mutations. Each carries `idempotencyKey` (client ULID, stable across retries) and `baseRevision`. Response is **per-item**, never all-or-nothing: `{ results: [{ id, status: 'applied' | 'conflict' | 'rejected', revision?, serverRecord?, error? }] }`. Partial failure is the norm; a batch that fails atomically forces the client to re-derive what succeeded.
+- `GET /v1/sync?since=<opaque_cursor>&limit=500` — delta pull with tombstones included. The cursor is server-opaque (a monotonic log offset), not a timestamp — timestamps are wrong under clock skew and backfill.
+
+**Hardening details that matter in production:** `Idempotency-Key` response cache keyed by `(tenant, key)` with a 24h TTL so a retried batch after a timeout is a no-op; `ETag`/`If-Match` on single-record writes for optimistic concurrency; gzip/br on responses (mobile payloads are JSON-heavy); cursor-based pagination so a slow client can't force a full-table scan.
+
+**B. Data modeling**
+
+- Every entity: `id` (UUIDv7</pre>
+    </div>
+</body>
+</html>
