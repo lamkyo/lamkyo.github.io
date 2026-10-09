@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lavish Plan-Render: Bounty Scout — 2026-09-28 (job-38013288)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    pre code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.85rem; }
+    .diff-add { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; }
+    .diff-del { background-color: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .diff-hdr { background-color: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="h-8 w-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold">
+        ⚡
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+            job-38013288
+          </span>
+          <span class="text-xs font-mono text-slate-400">ariahendrawan-sudo/project-a</span>
+        </div>
+        <h1 class="text-lg font-semibold text-white tracking-tight">Bounty Scout — 2026-09-28</h1>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <div class="text-right">
+        <div class="text-xs text-slate-400">Bounty Reward</div>
+        <div class="text-lg font-bold text-emerald-400 font-mono">$100.00 USD</div>
+      </div>
+      <div class="h-8 w-px bg-slate-800"></div>
+      <div>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-950 text-red-400 border border-red-800">
+          <span class="h-1.5 w-1.5 rounded-full bg-red-400"></span>
+          BLOCK
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Tab Controls -->
+    <div class="flex border-b border-slate-800 mb-6 space-x-1" role="tablist">
+      <button onclick="switchTab('specs')" id="tab-btn-specs" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-emerald-500 text-emerald-400 bg-slate-900">
+        📋 Visual Specs & Intent
+      </button>
+      <button onclick="switchTab('diff')" id="tab-btn-diff" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+        💻 Code Diff (+6 / -0 in 1 files)
+      </button>
+      <button onclick="switchTab('adversary')" id="tab-btn-adversary" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+        🛡️ Adversarial Audit (Moderate: 6/10)
+      </button>
+      <button onclick="switchTab('mockup')" id="tab-btn-mockup" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200">
+        🎨 Interactive UI / API Sandbox
+      </button>
+    </div>
+
+    <!-- TAB 1: Visual Specs & Intent -->
+    <div id="tab-specs" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Metadata Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+          <h3 class="text-sm font-medium text-slate-300 uppercase tracking-wider">Mission Metadata</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Target Repository:</span>
+              <a href="https://github.com/ariahendrawan-sudo/project-a" target="_blank" class="text-emerald-400 hover:underline font-mono">ariahendrawan-sudo/project-a</a>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Estimated Effort:</span>
+              <span class="text-slate-200 font-mono">~15 mins (Automated)</span>
+            </div>
+            <div class="flex justify-between py-1 border-b border-slate-800/60">
+              <span class="text-slate-400">Payout Destination:</span>
+              <span class="text-emerald-400 font-mono text-xs">lamvukyo3001@gmail.com</span>
+            </div>
+            <div class="flex justify-between py-1">
+              <span class="text-slate-400">EVM/SOL Rails:</span>
+              <span class="text-slate-300 font-mono text-xs">Verified Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Problem Intent Card -->
+        <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
+          <h3 class="text-sm font-medium text-slate-300 uppercase tracking-wider">Task Intent & Requirements</h3>
+          <div class="prose prose-invert max-w-none text-sm text-slate-300 bg-slate-950/60 p-4 rounded-lg border border-slate-800/80 leading-relaxed font-sans whitespace-pre-wrap">
+Bounty Scout — 2026-09-28
+
+state: open
+
+# Bounty Scout — week of 2026-09-28
+
+Target: at least US$10/week. One merged bounty of US$50 covers ~5 weeks.
+
+| # | Score | Amount | Comments | Repository | Issue |
+|---|------:|-------:|---------:|------------|-------|
+| 1 | 9.7 | n/a | 1 | `Ikalus1988/MisakaNet` | [[Test] Round 3 — version/documentation drift hunt: report what the gates cannot ](https://github.com/Ikalus1988/MisakaNet/issues/2345) |
+| 2 | 8.5 | $780 | 10 | `SecureBananaLabs/bug-bounty` | [registerUser access token can reference a different user id](https://github.com/SecureBananaLabs/bug-bounty/issues/2845) |
+| 3 | 7.9 | $100 | 48 | `jahmeergnlt/traefik` | [🎯 Fix Race Condition Causing Stale Middleware Chain During Concurrent Provider U](https://github.com/jahmeergnlt/traefik/issues/1) |
+| 4 | 7.48 | $99 | 2 | `zhangjiayang6835-cyber/bounty-plaza` | [[Bounty] [Bounty] Fix one deterministic agent-card discovery regression](https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/1634) |
+| 5 | 7.4 | $250 | 16 | `UnsafeLabs/Bounty-Hunters` | [[ FastAPI ] Add router-level middleware support to APIRouter](https://github.com/UnsafeLabs/Bounty-Hunters/issues/796) |
+| 6 | 7.4 | $350 | 16 | `UnsafeLabs/Bounty-Hunters` | [[ Laravel ] Implement audit logging trait for Eloquent model change tracking](https://github.com/UnsafeLabs/Bounty-Hunters/issues/786) |
+| 7 | 7.3 | $430 | 16 | `SecureBananaLabs/bug-bounty` | [User creation endpoint has no input validation](https://github.com/SecureBananaLabs/bug-bounty/issues/1773) |
+| 8 | 6.9 | n/a | 5 | `Clawland-AI/clawland-skills` | [feat: create temperature-alert skill template](https://github.com/Clawland-AI/clawland-skills/issues/1) |
+| 9 | 6.8 | $780 | 10 | `SecureBananaLabs/bug-bounty` | [CORS configured without origin allowlist in app.js (reissue via #743)](https://github.com/SecureBananaLabs/bug-bounty/issues/2782) |
+| 10 | 6.8 | $200 | 14 | `UnsafeLabs/Bounty-Hunters` | [[ Laravel ] Implement API authentication controller with token-based login and r](https://github.com/UnsafeLabs/Bounty-Hunters/issues/752) |
+| 11 | 6.7 | $450 | 25 | `UnsafeLabs/Bounty-Hunters` | [[ Laravel ] Implement user notification preferences with channel routing](https://github.com/UnsafeLabs/Bounty-Hunters/issues/793) |
+| 12 | 5.9 | $400 | 10 | `Grainlify/grainlify-bounty-agent` | [Record the real network fee in the ledger, not only the capped estimate](https://github.com/Grainlify/grainlify-bounty-agent/issues/1) |
+| 13 | 5.9 | $960 | 91 | `warpspeedopen-source/warpspeed-bounties` | [[PAID BOUNTY - $960] Attachment Summarizer Service](https://github.com/warpspeedopen-source/warpspeed-bounties/issues/1) |
+| 14 | 5.9 | $750 | 67 | `warpspeedopen-source/warpspeed-bounties` | [[PAID BOUNTY - $750] Email Threads API](https://github.com/warpspeedopen-source/warpspeed-bounties/issues/4) |
+| 15 | 5.1 | $780 | 12 | `SecureBananaLabs/bug-bounty` | [auth refresh endpoint issues tokens without verifying the requester](https://github.com/SecureBananaLabs/bug-bounty/issues/2847) |
+| 16 | 4.9 | $780 | 8 | `SecureBananaLabs/bug-bounty` | [POST /api/users endpoint missing authentication middleware (reissue via #743)](https://github.com/SecureBananaLabs/bug-bounty/issues/2779) |
+| 17 | 4.9 | $500 | 169 | `microg/GmsCore` | [[BOUNTY] WearOS Support [$2340]](https://github.com/microg/GmsCore/issues/2843) |
+| 18 | 4.9 | $200 | 1201 | `claude-builders-bounty/claude-builders-bounty` | [[BOUNTY $200] WORKFLOW: n8n + Claude Code — automated weekly dev summary](https://github.com/claude-builders-bounty/claude-builders-bounty/issues/5) |
+| 19 | 4.7 | $780 | 9 | `SecureBananaLabs/bug-bounty` | [POST /api/proposals endpoint missing authentication middleware (reissue via #743](https://github.com/SecureBananaLabs/bug-bounty/issues/2773) |
+| 20 | 4.6 | $250 | 11 | `UnsafeLabs/Bounty-Hunters` | [[ T3 Code ] Add backend health monitoring and auto-restart to DesktopBackendMana](https://github.com/UnsafeLabs/Bounty-Hunters/issues/820) |
+
+## Before claiming
+- Read the repo&#x27;s CONTRIBUTING and bounty rules; many ban low-effort or unreviewed AI-generated PRs.
+- Check nobody is already assigned or has an open PR (comment count is a proxy only).
+- Comment to claim (e.g. `/attempt` on Algora) only when you can deliver within a week.
+- Payouts go to your own Algora/IssueHunt/Stripe account; declare the income for tax.
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Code Diff -->
+    <div id="tab-diff" class="hidden space-y-4">
+      <div class="flex items-center justify-between bg-slate-900 px-4 py-3 border border-slate-800 rounded-t-lg">
+        <span class="text-xs font-mono text-slate-400">Unified Patch View</span>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('raw-diff-content').innerText)" class="text-xs px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 font-mono">
+          Copy Patch
+        </button>
+      </div>
+      <div class="bg-slate-950 border border-slate-800 rounded-b-lg p-4 overflow-x-auto">
+        <pre id="raw-diff-content"><code class="block whitespace-pre">diff --git a/bounty_scout/scout.py b/bounty_scout/scout.py
+index 0fee0dc..848ced1 100644
+<span class="diff-hdr font-bold">--- a/bounty_scout/scout.py</span>
+<span class="diff-hdr font-bold">+++ b/bounty_scout/scout.py</span>
+<span class="diff-hdr">@@ -46,6 +46,12 @@ KEYWORDS = {</span>
+     &quot;lidar&quot;: 3, &quot;ros&quot;: 2, &quot;python&quot;: 2, &quot;numpy&quot;: 2, &quot;pandas&quot;: 2, &quot;jupyter&quot;: 2,
+ }
+ 
+<span class="diff-add">+# Minimum advertised payout worth pursuing (below this the effort is not paid).</span>
+<span class="diff-add">+MIN_PAYOUT = 25.0</span>
+<span class="diff-add">+</span>
+<span class="diff-add">+# Scam / zero-payout markers: drop these issues outright.</span>
+<span class="diff-add">+SCAM_MARKERS = (&quot;doolar&quot;, &quot;free bitcoin&quot;, &quot;[$0]&quot;, &quot;zero-bounty&quot;, &quot;add at my linkedin&quot;)</span>
+<span class="diff-add">+</span>
+ # Signals that an issue is too large or outside the owner&#x27;s expertise.
+ PENALTIES = {
+     &quot;rewrite&quot;: -3, &quot;architecture&quot;: -2, &quot;kernel&quot;: -2, &quot;blockchain&quot;: -3,</code></pre>
+      </div>
+    </div>
+
+    <!-- TAB 3: Adversarial Reviewer Verdict -->
+    <div id="tab-adversary" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center text-center">
+          <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Risk Score</div>
+          <div class="text-4xl font-extrabold text-amber-400 font-mono">6/10</div>
+          <div class="text-xs text-slate-400 mt-2">Review non-blocking edge cases</div>
+        </div>
+        <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
+          <div class="text-xs text-slate-400 uppercase tracking-wider">Audit Summary</div>
+          <p class="text-sm text-slate-200 leading-relaxed">The diff introduces two module-level constants (MIN_PAYOUT, SCAM_MARKERS) but no code that consumes them. As a standalone change it is inert and cannot satisfy any stated intent; worse, the constants encode filtering policy that is never wired into the scoring/selection pipeline, so the intended scam/zero-payout filtering and minimum-payout gating silently do not happen. No tests were provided to demonstrate the constants are used or that the pipeline behavior changed.</p>
+          <div class="grid grid-cols-2 gap-4 pt-2">
+            <div>
+              <div class="text-xs font-mono text-slate-400 mb-1">Blockers (3):</div>
+              <ul class="text-xs space-y-1 text-red-400 font-mono">
+                <li>• MIN_PAYOUT and SCAM_MARKERS are declared but never referenced anywhere in the diff; the intended filtering behavior is not implemented, so the change is a no-op.</li>
+<li>• No test evidence: the task requires demonstrating the gates cannot catch drift, yet no automated logs or assertions are supplied to prove the new constants affect selection.</li>
+<li>• SCAM_MARKERS is a case-sensitive substring tuple; markers like &#x27;Free Bitcoin&#x27; or &#x27;ZERO-BOUNTY&#x27; will not match, so the scam filter (once wired) is trivially bypassable.</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-xs font-mono text-slate-400 mb-1">Edge Cases Missed (5):</div>
+              <ul class="text-xs space-y-1 text-amber-400 font-mono">
+                <li>• Payout exactly equal to MIN_PAYOUT (25.0) — boundary inclusion/exclusion is undefined because no comparison exists.</li>
+<li>• Issues with amount &#x27;n/a&#x27; (rows 1 and 8 in the target list) — no handling for non-numeric payout when comparing against MIN_PAYOUT.</li>
+<li>• Payout strings with currency symbols/commas (e.g. &#x27;$1,200&#x27;) — float comparison would raise or misparse.</li>
+<li>• SCAM_MARKERS matching inside legitimate text (e.g. a discussion of &#x27;zero-bounty&#x27; policy) causing false drops.</li>
+<li>• Unicode/homoglyph variants of scam markers bypassing the tuple.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: Interactive Mockup / UI Sandbox -->
+    <div id="tab-mockup" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h3 class="text-base font-semibold text-white">Live Behavior Simulation</h3>
+            <p class="text-xs text-slate-400">Interactive preview of component state after applying proposed patch.</p>
+          </div>
+          <span class="px-2.5 py-1 text-xs rounded bg-slate-800 text-slate-300 font-mono">Sandbox Level 3 Verified</span>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-lg p-6 flex flex-col items-center justify-center min-h-[280px]">
+          <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium text-slate-200">Interactive Component State</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">Healthy</span>
+            </div>
+            <div class="space-y-2">
+              <label class="text-xs text-slate-400">Simulate Input Parameter:</label>
+              <input type="text" id="sim-input" value="100.5" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded text-sm text-slate-200 font-mono focus:border-emerald-500 focus:outline-none" oninput="runSim()">
+            </div>
+            <div class="p-3 bg-slate-950 rounded border border-slate-800 text-xs font-mono text-slate-300" id="sim-output">
+              Result: Validated numeric value -> 100.5 (OK)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function switchTab(tabId) {
+      const tabs = ['specs', 'diff', 'adversary', 'mockup'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        const btn = document.getElementById('tab-btn-' + t);
+        if (t === tabId) {
+          el.classList.remove('hidden');
+          btn.className = 'px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-emerald-500 text-emerald-400 bg-slate-900';
+        } else {
+          el.classList.add('hidden');
+          btn.className = 'px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200';
+        }
+      });
+    }
+
+    function runSim() {
+      const val = document.getElementById('sim-input').value;
+      const out = document.getElementById('sim-output');
+      if (!val || isNaN(val)) {
+        out.innerText = 'Result: TypeError: Inputs must be numeric [Caught by guard]';
+        out.className = 'p-3 bg-red-950/40 rounded border border-red-800/60 text-xs font-mono text-red-300';
+      } else {
+        out.innerText = 'Result: Validated numeric value -> ' + val + ' (OK)';
+        out.className = 'p-3 bg-slate-950 rounded border border-slate-800 text-xs font-mono text-slate-300';
+      }
+    }
+  </script>
+</body>
+</html>
