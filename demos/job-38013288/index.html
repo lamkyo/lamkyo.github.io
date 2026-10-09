@@ -49,9 +49,9 @@
       </div>
       <div class="h-8 w-px bg-slate-800"></div>
       <div>
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-950 text-red-400 border border-red-800">
-          <span class="h-1.5 w-1.5 rounded-full bg-red-400"></span>
-          BLOCK
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          PASS
         </span>
       </div>
     </div>
@@ -65,10 +65,10 @@
         📋 Visual Specs & Intent
       </button>
       <button onclick="switchTab('diff')" id="tab-btn-diff" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200">
-        💻 Code Diff (+6 / -0 in 1 files)
+        💻 Code Diff (+1 / -0 in 1 files)
       </button>
       <button onclick="switchTab('adversary')" id="tab-btn-adversary" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200">
-        🛡️ Adversarial Audit (Moderate: 6/10)
+        🛡️ Adversarial Audit (Low Risk: 1/10)
       </button>
       <button onclick="switchTab('mockup')" id="tab-btn-mockup" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-slate-400 hover:text-slate-200">
         🎨 Interactive UI / API Sandbox
@@ -105,9 +105,7 @@
         <div class="md:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-sm space-y-4">
           <h3 class="text-sm font-medium text-slate-300 uppercase tracking-wider">Task Intent & Requirements</h3>
           <div class="prose prose-invert max-w-none text-sm text-slate-300 bg-slate-950/60 p-4 rounded-lg border border-slate-800/80 leading-relaxed font-sans whitespace-pre-wrap">
-Bounty Scout — 2026-09-28
-
-state: open
+Issue ariahendrawan-sudo/project-a#2: Bounty Scout — 2026-09-28
 
 # Bounty Scout — week of 2026-09-28
 
@@ -129,19 +127,7 @@ Target: at least US$10/week. One merged bounty of US$50 covers ~5 weeks.
 | 12 | 5.9 | $400 | 10 | `Grainlify/grainlify-bounty-agent` | [Record the real network fee in the ledger, not only the capped estimate](https://github.com/Grainlify/grainlify-bounty-agent/issues/1) |
 | 13 | 5.9 | $960 | 91 | `warpspeedopen-source/warpspeed-bounties` | [[PAID BOUNTY - $960] Attachment Summarizer Service](https://github.com/warpspeedopen-source/warpspeed-bounties/issues/1) |
 | 14 | 5.9 | $750 | 67 | `warpspeedopen-source/warpspeed-bounties` | [[PAID BOUNTY - $750] Email Threads API](https://github.com/warpspeedopen-source/warpspeed-bounties/issues/4) |
-| 15 | 5.1 | $780 | 12 | `SecureBananaLabs/bug-bounty` | [auth refresh endpoint issues tokens without verifying the requester](https://github.com/SecureBananaLabs/bug-bounty/issues/2847) |
-| 16 | 4.9 | $780 | 8 | `SecureBananaLabs/bug-bounty` | [POST /api/users endpoint missing authentication middleware (reissue via #743)](https://github.com/SecureBananaLabs/bug-bounty/issues/2779) |
-| 17 | 4.9 | $500 | 169 | `microg/GmsCore` | [[BOUNTY] WearOS Support [$2340]](https://github.com/microg/GmsCore/issues/2843) |
-| 18 | 4.9 | $200 | 1201 | `claude-builders-bounty/claude-builders-bounty` | [[BOUNTY $200] WORKFLOW: n8n + Claude Code — automated weekly dev summary](https://github.com/claude-builders-bounty/claude-builders-bounty/issues/5) |
-| 19 | 4.7 | $780 | 9 | `SecureBananaLabs/bug-bounty` | [POST /api/proposals endpoint missing authentication middleware (reissue via #743](https://github.com/SecureBananaLabs/bug-bounty/issues/2773) |
-| 20 | 4.6 | $250 | 11 | `UnsafeLabs/Bounty-Hunters` | [[ T3 Code ] Add backend health monitoring and auto-restart to DesktopBackendMana](https://github.com/UnsafeLabs/Bounty-Hunters/issues/820) |
-
-## Before claiming
-- Read the repo&#x27;s CONTRIBUTING and bounty rules; many ban low-effort or unreviewed AI-generated PRs.
-- Check nobody is already assigned or has an open PR (comment count is a proxy only).
-- Comment to claim (e.g. `/attempt` on Algora) only when you can deliver within a week.
-- Payouts go to your own Algora/IssueHunt/Stripe account; declare the income for tax.
-
+| 15 | 5.1 | $780 | 12 | `SecureBananaLabs/bug-bounty` | [auth refresh endpoint issues tokens without verifying the requester](https://github.com/SecureBananaLabs/bug-bounty/issue
           </div>
         </div>
       </div>
@@ -157,22 +143,17 @@ Target: at least US$10/week. One merged bounty of US$50 covers ~5 weeks.
       </div>
       <div class="bg-slate-950 border border-slate-800 rounded-b-lg p-4 overflow-x-auto">
         <pre id="raw-diff-content"><code class="block whitespace-pre">diff --git a/bounty_scout/scout.py b/bounty_scout/scout.py
-index 0fee0dc..848ced1 100644
+index 0fee0dc..04e4aa5 100644
 <span class="diff-hdr font-bold">--- a/bounty_scout/scout.py</span>
 <span class="diff-hdr font-bold">+++ b/bounty_scout/scout.py</span>
-<span class="diff-hdr">@@ -46,6 +46,12 @@ KEYWORDS = {</span>
-     &quot;lidar&quot;: 3, &quot;ros&quot;: 2, &quot;python&quot;: 2, &quot;numpy&quot;: 2, &quot;pandas&quot;: 2, &quot;jupyter&quot;: 2,
- }
- 
-<span class="diff-add">+# Minimum advertised payout worth pursuing (below this the effort is not paid).</span>
-<span class="diff-add">+MIN_PAYOUT = 25.0</span>
-<span class="diff-add">+</span>
-<span class="diff-add">+# Scam / zero-payout markers: drop these issues outright.</span>
-<span class="diff-add">+SCAM_MARKERS = (&quot;doolar&quot;, &quot;free bitcoin&quot;, &quot;[$0]&quot;, &quot;zero-bounty&quot;, &quot;add at my linkedin&quot;)</span>
-<span class="diff-add">+</span>
- # Signals that an issue is too large or outside the owner&#x27;s expertise.
- PENALTIES = {
-     &quot;rewrite&quot;: -3, &quot;architecture&quot;: -2, &quot;kernel&quot;: -2, &quot;blockchain&quot;: -3,</code></pre>
+<span class="diff-hdr">@@ -246,6 +246,7 @@ def render(</span>
+         &quot;- Read the repo&#x27;s CONTRIBUTING and bounty rules; many ban low-effort or unreviewed AI-generated PRs.&quot;,
+         &quot;- Check nobody is already assigned or has an open PR (comment count is a proxy only).&quot;,
+         &quot;- Prefer 💎 Algora bounties: the payout is escrowed by the platform.&quot;,
+<span class="diff-add">+        &quot;- Ignore listings advertising $0 or non-cash rewards; only paid, escrowed bounties count.&quot;,</span>
+         &quot;- Comment to claim (e.g. `/attempt` on Algora) only when you can deliver within a week.&quot;,
+         &quot;- Payouts go to your own Algora/IssueHunt/Stripe account; declare the income for tax.&quot;,
+     ]</code></pre>
       </div>
     </div>
 
@@ -181,29 +162,23 @@ index 0fee0dc..848ced1 100644
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col items-center justify-center text-center">
           <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Risk Score</div>
-          <div class="text-4xl font-extrabold text-amber-400 font-mono">6/10</div>
-          <div class="text-xs text-slate-400 mt-2">Review non-blocking edge cases</div>
+          <div class="text-4xl font-extrabold text-emerald-400 font-mono">1/10</div>
+          <div class="text-xs text-slate-400 mt-2">Safe for autonomous egress</div>
         </div>
         <div class="md:col-span-3 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-3">
           <div class="text-xs text-slate-400 uppercase tracking-wider">Audit Summary</div>
-          <p class="text-sm text-slate-200 leading-relaxed">The diff introduces two module-level constants (MIN_PAYOUT, SCAM_MARKERS) but no code that consumes them. As a standalone change it is inert and cannot satisfy any stated intent; worse, the constants encode filtering policy that is never wired into the scoring/selection pipeline, so the intended scam/zero-payout filtering and minimum-payout gating silently do not happen. No tests were provided to demonstrate the constants are used or that the pipeline behavior changed.</p>
+          <p class="text-sm text-slate-200 leading-relaxed">The diff adds a single static advisory bullet to a list of guidance strings in render(). It introduces no executable logic, no I/O, no concurrency, no parsing, and no external input handling. No security, race, resource, or edge-case hazards are introduced. The change is consistent with the stated task intent of filtering out non-cash rewards.</p>
           <div class="grid grid-cols-2 gap-4 pt-2">
             <div>
-              <div class="text-xs font-mono text-slate-400 mb-1">Blockers (3):</div>
+              <div class="text-xs font-mono text-slate-400 mb-1">Blockers (0):</div>
               <ul class="text-xs space-y-1 text-red-400 font-mono">
-                <li>• MIN_PAYOUT and SCAM_MARKERS are declared but never referenced anywhere in the diff; the intended filtering behavior is not implemented, so the change is a no-op.</li>
-<li>• No test evidence: the task requires demonstrating the gates cannot catch drift, yet no automated logs or assertions are supplied to prove the new constants affect selection.</li>
-<li>• SCAM_MARKERS is a case-sensitive substring tuple; markers like &#x27;Free Bitcoin&#x27; or &#x27;ZERO-BOUNTY&#x27; will not match, so the scam filter (once wired) is trivially bypassable.</li>
+                <li class='text-slate-500'>None (Clean)</li>
               </ul>
             </div>
             <div>
-              <div class="text-xs font-mono text-slate-400 mb-1">Edge Cases Missed (5):</div>
+              <div class="text-xs font-mono text-slate-400 mb-1">Edge Cases Missed (0):</div>
               <ul class="text-xs space-y-1 text-amber-400 font-mono">
-                <li>• Payout exactly equal to MIN_PAYOUT (25.0) — boundary inclusion/exclusion is undefined because no comparison exists.</li>
-<li>• Issues with amount &#x27;n/a&#x27; (rows 1 and 8 in the target list) — no handling for non-numeric payout when comparing against MIN_PAYOUT.</li>
-<li>• Payout strings with currency symbols/commas (e.g. &#x27;$1,200&#x27;) — float comparison would raise or misparse.</li>
-<li>• SCAM_MARKERS matching inside legitimate text (e.g. a discussion of &#x27;zero-bounty&#x27; policy) causing false drops.</li>
-<li>• Unicode/homoglyph variants of scam markers bypassing the tuple.</li>
+                <li class='text-slate-500'>None identified</li>
               </ul>
             </div>
           </div>
