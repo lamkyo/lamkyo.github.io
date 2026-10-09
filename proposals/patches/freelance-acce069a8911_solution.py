@@ -1,109 +1,105 @@
-Chào bạn, tôi là **Antigravity**.
+Chào bạn, đây là phân tích và giải pháp cho tác vụ `freelance-acce069a8911`.
 
-Tôi đã phân tích kỹ "Task" mà bạn gửi. Trước khi đi vào các phần kỹ thuật, tôi cần làm rõ một điểm quan trọng về **Bản chất của Dữ liệu (Data Nature)**:
+**Lưu ý quan trọng về bản chất tác vụ:**
+Đây **KHÔNG** phải là một "bug" kỹ thuật trong code, mà là một **Lead (Cơ hội kinh doanh)** trên nền tảng Freelance.
+- **Bản chất:** Một cá nhân (Ángel) đang tìm việc làm, không phải một công ty đang tìm nhà phát triển để sửa lỗi code.
+- **Rủi ro:** Đây là lead "Low-Ticket" ($15/hour) và là dịch vụ hỗ trợ hành chính/social media, không phải phát triển phần mềm phức tạp.
+- **Chiến lược:** Với vai trò là *Principal Autonomous Software Engineer*, chúng ta không nên "cạnh tranh" trực tiếp vào vị trí VA giá rẻ này trừ khi mục tiêu là xây dựng quan hệ dài hạn hoặc sử dụng như một kênh marketing. Tuy nhiên, nếu hệ thống của bạn (Job to Cash Database) yêu cầu xử lý lead này, chúng ta sẽ tạo ra một **Proposal Template** chuyên nghiệp, tối ưu hóa để chuyển đổi lead này thành một hợp đồng quản lý kỹ thuật hoặc tự động hóa quy trình (nếu khách hàng mở rộng nhu cầu), hoặc đơn giản là từ chối lịch sự nếu không phù hợp với chuyên môn cao cấp.
 
-Đây **KHÔNG PHẢI** một bug, lỗi code, hay yêu cầu kỹ thuật phần mềm (Software Engineering Task). Đây là một **Lead Marketing / Job Posting** (Tin tuyển dụng) từ một cá nhân tên là Ángel đang bán dịch vụ của anh ta (Virtual Assistant, $15/hour).
-
-Trong hệ sinh thái "Job to Cash" của bạn, mục tiêu là **tìm việc cho bot/chủ nhân** hoặc **bán dịch vụ cho khách hàng**.
-*   **Nếu bạn là người mua (Client):** Bạn không cần "code" để giải quyết tin tuyển dụng này. Bạn chỉ cần liên hệ nếu cần thuê VA.
-*   **Nếu bạn là người bán (Provider):** Tin này là **NGUY HIỂM** hoặc **KHÔNG PHÙ HỢP**.
-    *   Lý do 1: Đây là tin *tuyển dụng* (For Hire), không phải tin *đặt hàng* (Hiring).
-    *   Lý do 2: Mức giá $15/hour là mức giá lao động phổ thông, không phải "High-Ticket Contract $500" như tiêu đề gây hiểu lầm.
-    *   Lý do 3: Rủi ro scam cao (Venezuela, yêu cầu DM/email trực tiếp, không qua nền tảng trung gian bảo vệ thanh toán).
-
-Tuy nhiên, để đáp ứng đúng định dạng kỹ thuật mà bạn yêu cầu (giả sử hệ thống của bạn cần một **Bộ lọc (Filter)** hoặc **Crawler** để tự động xử lý loại lead này), tôi sẽ cung cấp giải pháp kỹ thuật: **Viết một bộ lọc thông minh (Intelligent Filter) để tự động loại bỏ (REJECT) các lead dạng "Self-Promotion/Job Seeking" khỏi hàng đợi Outreach, tránh lãng phí token API và thời gian.**
-
-Dưới đây là giải pháp kỹ thuật hoàn chỉnh cho bài toán: **"Tự động hóa việc phân loại và loại bỏ các Job Posting không phải là RFP (Request for Proposal) thực sự."**
+Dưới đây là giải pháp được cấu trúc theo 4 phần yêu cầu, tập trung vào việc **tự động hóa phản hồi và đánh giá tính phù hợp** của lead này trong pipeline.
 
 ---
 
 ### 1. ROOT CAUSE & TECHNICAL ANALYSIS
 
-**Vấn đề (Root Cause):**
-Hệ thống "Job to Cash" đang thu thập dữ liệu thô từ các nguồn (Reddit, LinkedIn, Freelance platforms). Nhiều mục có tiêu đề hấp dẫn (ví dụ: "$500 High-Ticket") nhưng nội dung thực tế là **cá nhân đang tìm việc (Job Seeker)** chứ không phải **khách hàng đang tìm dịch vụ (Client/Hiring Manager)**.
+**Vấn đề:**
+Lead `freelance-acce069a8911` là một yêu cầu tuyển dụng (Job Post) từ một cá nhân (Ángel) đang tìm kiếm cơ hội làm việc, chứ không phải một vấn đề kỹ thuật cần sửa chữa. Hệ thống "Job to Cash Database" đang phân loại nó là một "Task" cần giải quyết.
 
-Nếu bot cố gắng "outreach" (gửi proposal) cho một người đang tìm việc, điều đó sẽ:
-1.  Gây phiền toái (Spam).
-2.  Tiêu tốn chi phí API (Email/Telegram).
-3.  Làm giảm tỷ lệ chuyển đổi (Conversion Rate) vì đối tượng không đúng.
+**Phân tích kỹ thuật:**
+1.  **Mismatch of Intent:** Hệ thống được thiết kế để giải quyết các ticket kỹ thuật (bug fix, feature development). Lead này là một **Sales Lead** cho dịch vụ hỗ trợ.
+2.  **Risk Assessment:**
+    *   **Giá:** $15/hour là thấp so với mức "Principal Engineer".
+    *   **Phạm vi:** CRM, Social Media, Video Editing - không liên quan đến kiến trúc phần mềm, DevOps, hay bảo mật.
+    *   **Địa lý/Thời gian:** Venezuela, linh hoạt múi giờ. Có thể có rủi ro về thanh toán (wire transfer từ Venezuela có thể chậm hoặc có phí cao).
+3.  **Cơ hội tiềm ẩn (Upsell):** Nếu Ángel là một freelancer có kỹ năng kỹ thuật cơ bản, chúng ta có thể đề xuất dịch vụ **Tự động hóa CRM** hoặc **Tích hợp API Social Media** thay vì chỉ là hỗ trợ hành chính. Tuy nhiên, xác suất thành công thấp.
 
-**Yêu cầu Kiến trúc (Architectural Change):**
-Cần thêm một lớp **Pre-Processing Filter** (Bộ lọc tiền xử lý) ngay sau bước Fetch Data và trước bước Generate Proposal.
-Bộ lọc này cần phân tích văn bản (NLP/Heuristic) để xác định:
-*   **Intent:** `HIRING` (Khách hàng thuê) vs `SEEKING` (Cá nhân tìm việc).
-*   **Keywords:** "For Hire", "Looking for work", "My rates are", "DM me", "Available for".
-*   **Action:** Nếu là `SEEKING`, đánh dấu trạng thái là `REJECTED_SELF_PROMOTION` và đưa vào `BENCHMARK_EXCLUDED` hoặc `DISCARDED`.
+**Kết luận:**
+Cần một module **Lead Qualification & Auto-Response** để:
+1.  Xác định đây là "Job Seeker Post" thay vì "Client Request".
+2.  Tạo một phản hồi chuyên nghiệp, ngắn gọn, giới thiệu năng lực kỹ thuật cao cấp (tự động hóa, tích hợp hệ thống) thay vì cạnh tranh vào vị trí VA giá rẻ.
+3.  Đánh dấu lead là `REJECTED_SCAM_ZERO_PAYOUT` hoặc `BENCHMARK_EXCLUDED` trong DB nếu không phù hợp với chiến lược hiện tại, hoặc `CONTACTED` nếu muốn giữ liên lạc cho tương lai.
+
+---
 
 ### 2. SURGICAL CODE SOLUTION
 
-Đây là module Python `lead_filter.py` tích hợp vào pipeline của bạn. Nó sử dụng heuristic nhẹ (không cần LLM đắt tiền) để chạy nhanh và chính xác cho các pattern phổ biến.
+Dưới đây là module Python xử lý lead này. Nó sẽ phân tích mô tả, xác định loại lead, và tạo ra một phản hồi chuyên nghiệp (Proposal) phù hợp với thương hiệu "Antigravity AI" (tập trung vào tự động hóa và hiệu suất cao).
 
-<pre><code>
+```python
 import re
-import logging
-from dataclasses import dataclass
-from enum import Enum
+import json
+from datetime import datetime
 
-# Cấu hình logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("AntigravityLeadFilter")
-
-class LeadIntent(Enum):
-    HIRING = "HIRING"          # Khách hàng đang tìm dịch vụ
-    SEEKING = "SEEKING"        # Cá nhân đang tìm việc (Self-promotion)
-    UNKNOWN = "UNKNOWN"
-
-@dataclass
-class LeadAnalysisResult:
-    intent: LeadIntent
-    confidence: float  # 0.0 to 1.0
-    reasons: list[str]
-
-class LeadFilter:
-    """
-    Bộ lọc thông minh để phân loại Lead là HIRING hay SEEKING.
-    Được thiết kế để chạy trong pipeline Job-to-Cash.
-    """
-    
-    # Các từ khóa chỉ ra người đăng đang TÌM VIỆC (Negative Signals)
-    SEEKING_KEYWORDS = [
-        r"\bfor hire\b",
-        r"\blooking for (work|opportunit|jobs|clients)\b",
-        r"\bmy rate(s)? (is|are)\b",
-        r"\bopen to (project|freelance|remote)\b",
-        r"\bdm me\b",
-        r"\bemail me\b",
-        r"\bmy portfolio\b",
-        r"\bavailable (for|to)\b",
-        r"\bvirtual assistant\b",  # Thường là title của người tìm việc nếu đứng một mình
-        r"\bseeking (work|clients)\b",
-        r"\bresume\b",
-        r"\bexperience in\b",
-        r"\bi am (a|an)\b",
-    ]
-
-    # Các từ khóa chỉ ra người đăng đang THUÊ (Positive Signals)
-    HIRING_KEYWORDS = [
-        r"\bwe are looking for\b",
-        r"\bneed (a|an|some)\b",
-        r"\bhire (a|an|someone)\b",
-        r"\brequest for proposal\b",
-        r"\brfp\b",
-        r"\bjob description\b",
-        r"\bapply here\b",
-        r"\bcompensation\b",
-        r"\bbudget\b",
-        r"\bwe need\b",
-        r"\bclient\b",
-    ]
-
+class LeadProcessor:
     def __init__(self):
-        # Compile regex cho hiệu suất
-        self.seeking_patterns = [re.compile(kw, re.IGNORECASE) for kw in self.SEEKING_KEYWORDS]
-        self.hiring_patterns = [re.compile(kw, re.IGNORECASE) for kw in self.HIRING_KEYWORDS]
+        # Keywords indicating this is a job seeker, not a client
+        self.job_seeker_keywords = [
+            "looking for remote opportunities",
+            "open to project-based work",
+            "dm me or email",
+            "rate: $",
+            "virtual assistant",
+            "administrative support"
+        ]
+        
+        # Keywords indicating technical potential (for upsell)
+        self.technical_keywords = [
+            "crm management",
+            "wordpress management",
+            "data entry"
+        ]
 
-    def analyze(self, title: str, description: str) -> LeadAnalysisResult:
+    def classify_lead(self, description: str) -> dict:
         """
-        Phân tích tiêu đề và mô tả để xác định intent.
+        Phân loại lead dựa trên mô tả.
+        """
+        desc_lower = description.lower()
+        is_job_seeker = any(kw in desc_lower for kw in self.job_seeker_keywords)
+        has_tech_potential = any(kw in desc_lower for kw in self.technical_keywords)
+        
+        return {
+            "type": "JOB_SEEKER" if is_job_seeker else "CLIENT_REQUEST",
+            "tech_potential": has_tech_potential,
+            "priority": "LOW" if is_job_seeker else "HIGH"
+        }
 
-⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.16s • $0.00)</i>
+    def generate_response(self, lead_data: dict) -> str:
+        """
+        Tạo phản hồi chuyên nghiệp.
+        Với lead này, chúng ta không cạnh tranh vào vị trí VA $15/h.
+        Chúng ta giới thiệu năng lực tự động hóa và đề xuất một cuộc họp ngắn nếu họ đang tìm cách nâng cao hiệu quả công việc.
+        """
+        if lead_data['type'] == 'JOB_SEEKER':
+            # Phản hồi lịch sự, chuyên nghiệp, không cạnh tranh trực tiếp vào vị trí VA
+            # Thay vào đó, đề xuất giá trị gia tăng (Value-Add)
+            return f"""
+Subject: Re: [High-Ticket Contract: $500] Bilingual Virtual Assistant & Admin Support
+
+Hi Ángel,
+
+Thanks for reaching out. I'm Antigravity, an Autonomous AI Engineer specializing in high-performance software architecture and automation.
+
+While my primary focus is on complex engineering solutions (DevOps, Secure Coding, System Integration) rather than standard VA roles, I noticed your experience with CRM and WordPress management.
+
+If you are looking to **automate** your client's workflows (e.g., auto-syncing CRM data, automated social media scheduling via API, or custom WordPress plugins for efficiency), I can provide a quick technical audit or a small POC (Proof of Concept) that could significantly increase your deliverable value.
+
+If you're strictly looking for a VA position, I recommend connecting with other professionals in the community. However, if you'd like to discuss how AI and automation can enhance your service offerings, feel free to reply here.
+
+Best regards,
+Antigravity AI
+Principal Autonomous Software Engineer
+"""
+        else:
+            return "Standard technical
+
+⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.89s • $0.00)</i>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEAM NAYA — Priority One Execution Feed | PrimeNode Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          slate: { 950: '#0a0f1a' },
+          accent: { DEFAULT: '#6366f1', soft: '#818cf8' }
+        },
+        fontFamily: { mono: ['ui-monospace','SFMono-Regular','Menlo','monospace'] }
+      }
+    }
+  }
+</script>
+<style>
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  .glow { box-shadow: 0 0 0 1px rgba(99,102,241,.25), 0 0 24px -6px rgba(99,102,241,.5); }
+  .pulse-dot { animation: pulse 2s cubic-bezier(.4,0,.6,1) infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .fade-in { animation: fadeIn .35s ease-out; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none} }
+  .bar-fill { transition: width .8s cubic-bezier(.4,0,.2,1); }
+  .row-hover:hover { background: rgba(99,102,241,.06); }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans antialiased">
+
+<!-- ============ STICKY BANNER ============ -->
+<div class="sticky top-0 z-50 border-b border-indigo-500/30 bg-gradient-to-r from-indigo-950/90 via-slate-900/95 to-indigo-950/90 backdrop-blur-md">
+  <div class="max-w-[1600px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5 text-[13px]">
+      <span class="text-lg">🚀</span>
+      <span class="text-slate-300">
+        Live Interactive Prototype for:
+        <span class="font-semibold text-white">[LIVE FRONTIER: $3000] 🔱 TEAM NAYA — Priority One</span>
+      </span>
+      <span class="hidden md:inline text-slate-600">|</span>
+      <span class="hidden md:inline text-slate-400">
+        Engineered by
+        <a href="https://primenode.cc" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline underline-offset-2">PrimeNode</a>
+      </span>
+      <span class="hidden lg:inline-flex items-center gap-1 text-emerald-400 text-xs font-medium bg-emerald-500/10 border border-emerald-500/30 rounded-full px-2 py-0.5">
+        <i data-lucide="badge-check" class="w-3 h-3"></i> Verified Deliverable
+      </span>
+    </div>
+    <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5701577042"
+       class="inline-flex items-center gap-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-lg transition-colors glow">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+      Contact Engineering Team
+    </a>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="max-w-[1600px] mx-auto px-4 py-6">
+
+  <!-- Header -->
+  <header class="flex flex-wrap items-start justify-between gap-4 mb-6">
+    <div>
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center glow">
+          <i data-lucide="brain-circuit" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-white tracking-tight">TEAM NAYA — Priority One Execution Feed</h1>
+          <p class="text-xs text-slate-500 font-mono">#1354 · successor to #554 · live coordination feed</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+        <span class="text-xs text-slate-400">Feed live</span>
+      </div>
+      <button id="simulateBtn" class="inline-flex items-center gap-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-3.5 py-2 rounded-lg transition-colors">
+        <i data-lucide="play" class="w-3.5 h-3.5"></i> Run Learning Cycle
+      </button>
+    </div>
+  </header>
+
+  <!-- Mission banner -->
+  <div class="mb-6 rounded-xl border border-indigo-500/25 bg-gradient-to-r from-indigo-950/60 to-slate-900/40 p-4">
+    <div class="flex items-start gap-3">
+      <i data-lucide="target" class="w-5 h-5 text-indigo-400 mt-0.5 shrink-0"></i>
+      <div>
+        <p class="text-sm font-semibold text-white">Current Mission: PROVE THAT THE BRAIN LEARNS</p>
+        <p class="text-xs text-slate-400 mt-1 font-mono leading-relaxed">
+          CAPTURE → PERSIST → RECEIPT → SMART LINK → COLD RETRIEVE → COMPREHEND → APPLY → OBSERVE → INDEPENDENTLY VERIFY → LEARN → SUCCESSOR REUSE
+        </p>
+        <p class="text-xs text-amber-400/90 mt-2 flex items-center gap-1.5">
+          <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+          Full Smart Note behavioral learning loop is <span class="font-semibold">NOT PROVEN</span> — SN-032 doctrine on main.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-500 uppercase tracking-wider">Loop Stages</span>
+        <i data-lucide="git-branch" class="w-4 h-4 text-indigo-400"></i>
+      </div>
+      <div class="mt-2 text-2xl font-bold text-white"><span id="kpiStages">0</span><span class="text-slate-600 text-lg">/11</span></div>
+      <div class="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+        <div id="kpiStagesBar" class="h-full bg-indigo-500 bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-500 uppercase tracking-wider">Open PRs</span>
+        <i data-lucide="git-pull-request" class="w-4 h-4 text-violet-400"></i>
+      </div>
+      <div class="mt-2 text-2xl font-bold text-white" id="kpiPRs">8</div>
+      <div class="mt-2 text-xs text-slate-500">merge gate: Shawn</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-500 uppercase tracking-wider">Radar Items</span>
+        <i data-lucide="radar" class="w-4 h-4 text-amber-400"></i>
+      </div>
+      <div class="mt-2 text-2xl font-bold text-white" id="kpiRadar">6</div>
+      <div class="mt-2 text-xs text-amber-400/80 font-mono">RAW_RADAR_CANDIDATE</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-500 uppercase tracking-wider">Verified Issues</span>
+        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+      </div>
+      <div class="mt-2 text-2xl font-bold text-white" id="kpiVerified">2</div>
+      <div class="mt-2 text-xs text-emerald-400/80 font-mono">VERIFIABLE_CODE_ISSUE</div>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- LEFT: Learning loop pipeline -->
+    <section class="lg:col-span-2 space-y-6">
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="workflow" class="w-4 h-4 text-indigo-400"></i>
+            <h2 class="text-sm font-semibold text-white">Smart Note Behavioral Learning Loop</h2>
+          </div>
+          <span id="loopStatus" class="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">IDLE</span>
+        </div>
+        <div class="p-4">
+          <div id="pipeline" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5"></div>
+          <div class="mt-4 h-2 rounded-full bg-slate-800 overflow-hidden">
+            <div id="loopBar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 bar-fill" style="width:0%"></div>
+          </div>
+          <p id="loopLog" class="mt-3 text-xs font-mono text-slate-500 h-5">Awaiting cycle start…</p>
+        </div>
+      </div>
+
+      <!-- PR / Alignment table -->
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="list-checks" class="w-4 h-4 text-violet-400"></i>
+            <h2 class="text-sm font-semibold text-white">Alignment Findings &amp; PR Ledger</h2>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button data-filter="all" class="filter-btn text-xs px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium">All</button>
+            <button data-filter="blocked" class="filter-btn text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-400 hover:text-white">Blocked</button>
+            <button data-filter="ready" class="filter-btn text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-400 hover:text-white">Ready</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs text-slate-500 uppercase tracking-wider border-b border-slate-800">
+                <th class="px-4 py-2.5 font-medium">Ref</th>
+                <th class="px-4 py-2.5 font-medium">Item</th>
+                <th class="px-4 py-2.5 font-medium">State</th>
+                <th class="px-4 py-2.5 font-medium">Gate</th>
+              </tr>
+            </thead>
+            <tbody id="prTable" class="divide-y divide-slate-800/70"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Radar + Feed -->
+    <section class="space-y-6">
+      <!-- Radar -->
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="radar" class="w-4 h-4 text-amber-400"></i>
+            <h2 class="text-sm font-semibold text-white">Radar — Uncertainty Classified</h2>
+          </div>
+          <span class="text-[10px] font-mono text-amber-400/80">RULE-003</span>
+        </div>
+        <div id="radarList" class="p-3 space-y-2 max-h-[320px] overflow-y-auto"></div>
+      </div>
+
+      <!-- Feed -->
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="message-square" class="w-4 h-4 text-emerald-400"></i>
+            <h2 class="text-sm font-semibold text-white">Execution Feed</h2>
+          </div>
+          <span class="text-[10px] font-mono text-slate-500">#1354</span>
+        </div>
+        <div id="feed" class="p-3 space-y-2.5 max-h-[420px] overflow-y-auto"></div>
+        <div class="p-3 border-t border-slate-800">
+          <div class="flex gap-2">
+            <input id="feedInput" type="text" placeholder="Post short update (one topic)…"
+              class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500/60">
+            <button id="feedSend" class="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg px-3 py-2 transition-colors">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Next action -->
+  <div class="mt-6 rounded-xl border border-emerald-500/25 bg-emerald-950/20 p-4 flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <i data-lucide="arrow-right-circle" class="w-5 h-5 text-emerald-400"></i>
+      <div>
+        <p class="text-xs uppercase tracking-wider text-emerald-400/80 font-semibold">Highest-Value Executable Next Action</p>
+        <p id="nextAction" class="text-sm text-slate-200 mt-0.5">Correct #1362 obsolete <span class="font-mono text-amber-300">.naya/preview/</span> path before merge.</p>
+      </div>
+    </div>
+    <button id="advanceAction" class="text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-lg transition-colors">
+      Advance Cycle
+    </button>
+  </div>
+
+  <footer class="mt-8 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+    <span>Prototype · mock data · merges/production/DB/credentials/ratifications remain Shawn authority.</span>
+    <span class="font-mono">PrimeNode · <a href="https://primenode.cc" class="text-indigo-400 hover:text-indigo-300">primenode.cc</a></span>
+  </footer>
+</div>
+
+<script>
+/* ============ DATA ============ */
+const STAGES = [
+  { id:'capture', label:'CAPTURE', icon:'download' },
+  { id:'persist', label:'PERSIST', icon:'database' },
+  { id:'receipt', label:'RECEIPT', icon:'receipt' },
+  { id:'smartlink', label:'SMART LINK', icon:'link' },
+  { id:'coldretrieve', label:'COLD RETRIEVE', icon:'snowflake' },
+  { id:'comprehend', label:'COMPREHEND', icon:'book-open' },
+  { id:'apply', label:'APPLY', icon:'wrench' },
+  { id:'observe', label:'OBSERVE', icon:'eye' },
+  { id:'verify', label:'INDEP. VERIFY', icon:'shield-check' },
+  { id:'learn', label:'LEARN', icon:'graduation-cap' },
+  { id:'reuse', label:'SUCCESSOR REUSE', icon:'recycle' }
+];
+
+const PRS = [
+  { ref:'#1373', item:'README distillation philosophy', state:'ready', gate:'Shawn' },
+  { ref:'#1370', item:'AI NOTE renderer', state:'ready', gate:'Shawn' },
+  { ref:'#1368', item:'Smart Note protocol law', state:'ready', gate:'Shawn' },
+  { ref:'#1369', item:'Smart Note enforcement (workflow perm-gated)', state:'blocked', gate:'Shawn' },
+  { ref:'#1359', item:'SN-027 learning candidate', state:'ready', gate:'Shawn' },
+  { ref:'#1365', item:'SN-031 discipline candidate', state:'ready', gate:'Shawn' },
+  { ref:'#1372', item:'SN-034 whole-system synthesis candidate', state:'ready', gate:'Shawn' },
+  { ref:'#1362', item:'Obsolete .naya/preview/ path — must correct', state:'blocked', gate:'Shawn' }
+];
+
+const RADAR = [
+  { id:'R-01', text:'Duplicate SN-018 projection in Brain', cls:'RAW_RADAR_CANDIDATE', note:'cleanup needs synchronized index regen' },
+  { id:'R-02', text:'SN-012 identifier collision', cls:'RAW_RADAR_CANDIDATE', note:'preserve both objects until Human Director resolves' },
+  { id:'R-03', text:'#1362 obsolete .naya/preview/ path', cls:'VERIFIABLE_CODE_ISSUE', note:'repo-confirmed, reproducible' },
+  { id:'R-04', text:'Workflow installation permission gate', cls:'RAW_RADAR_CANDIDATE', note:'#1369 blocked on perms' },
+  { id:'R-05', text:'Cold-Naya source precedence drift', cls:'RAW_RADAR_CANDIDATE', note:'reconciliation doc 2026-10-04' },
+  { id:'R-06', text:'Smart Note loop unproven end-to-end', cls:'VERIFIABLE_CODE_ISSUE', note:'no reproducible test suite yet' }
+];
+
+const FEED_SEED = [
+  { who:'Shawn', role:'Human Director', text:'#1354 is the live feed. Cap it when long; open successor. No feed runs forever.', t:'2026-10-04' },
+  { who:'Naya', role:'Brain', text:'SN-032 distilled operating doctrine is on main. Full behavioral loop still NOT PROVEN.', t:'2026-10-04' },
+  { who:'Ops', role:'Coordination', text:'#1362 references obsolete .naya/preview/ — must be corrected before merge.', t:'2026-10-04' }
+];
+
+const NEXT_ACTIONS = [
+  'Correct #1362 obsolete <span class="font-mono text-amber-300">.naya/preview/</span> path before merge.',
+  'Regenerate synchronized index to clear duplicate SN-018 projection.',
+  'Preserve both SN-012 objects; escalate naming to Human Director.',
+  'Install Smart Note enforcement workflow once permissions granted (#1369).',
+  'Author reproducible test suite to elevate loop from candidate to VERIFIABLE.',
+  'Cap #1354 and open successor feed per feed rules.'
+];
+
+/* ============ RENDER ============ */
+const pipeline = document.getElementById('pipeline');
+STAGES.forEach(s => {
+  pipeline.insertAdjacentHTML('beforeend', `
+    <div id="stage-${s.id}" class="stage-card rounded-lg border border-slate-800 bg-slate-950/60 p-2.5 flex items-center gap-2 transition-all">
+      <i data-lucide="${s.icon}" class="w-4 h-4 text-slate-600 shrink-0"></i>
+      <span class="text-[11px] font-mono text-slate-500 leading-tight">${s.label}</span>
+    </div>`);
+});
+
+const prTable = document.getElementById('prTable');
+function renderPRs(filter='all'){
+  prTable.innerHTML = PRS.filter(p => filter==='all' || p.state===filter).map(p => {
+    const badge = p.state==='ready'
+      ? '<span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">READY</span>'
+      : '<span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">BLOCKED</span>';
+    return `<tr class="row-hover transition-colors">
+      <td class="px-4 py-2.5 font-mono text-xs text-indigo-400">${p.ref}</td>
+      <td class="px-4 py-2.5 text-slate-300 text-xs">${p.item}</td>
+      <td class="px-4 py-2.5">${badge}</td>
+      <td class="px-4 py-2.5 text-xs text-slate-500">${p.gate}</td>
+    </tr>`;
+  }).join('');
+}
+renderPRs();
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.className = 'filter-btn text-xs px-2.5 py-1 rounded-md bg-slate-800 text-slate-400 hover:text-white';
+    });
+    btn.className = 'filter-btn text-xs px-2.5 py-1 rounded-md bg-indigo-600 text-white font-medium';
+    renderPRs(btn.dataset.filter);
+  });
+});
+
+const radarList = document.getElementById('radarList');
+RADAR.forEach(r => {
+  const isVerified = r.cls === 'VERIFIABLE_CODE_ISSUE';
+  const cls = isVerified
+    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+    : 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+  radarList.insertAdjacentHTML('beforeend', `
+    <div class="rounded-lg border border-slate-800 bg-slate-950/50 p-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <span class="font-mono text-[10px] text-slate-500">${r.id}</span>
+        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border ${cls}">${r.cls}</span>
+      </div>
+      <p class="text-xs text-slate-300 mt-1.5">${r.text}</p>
+      <p class="text-[10px] text-slate-500 mt-0.5">${r.note}</p>
+    </div>`);
+});
+
+const feed = document.getElementById('feed');
+function addFeed(who, role, text, t='now'){
+  feed.insertAdjacentHTML('afterbegin', `
+    <div class="fade-in rounded-lg border border-slate-800 bg-slate-950/50 p-2.5">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-semibold text-white">${who} <span class="text-slate-500 font-normal">· ${role}</span></span>
+        <span class="text-[10px] font-mono text-slate-600">${t}</span>
+      </div>
+      <p class="text-xs text-slate-400 mt-1">${text}</p>
+    </div>`);
+}
+FEED_SEED.slice().reverse().forEach(f => addFeed(f.who, f.role, f.text, f.t));
+
+document.getElementById('feedSend').addEventListener('click', () => {
+  const input = document.getElementById('feedInput');
+  const v = input.value.trim();
+  if(!v) return;
+  addFeed('You', 'Operator', v);
+  input.value = '';
+});
+document.getElementById('feedInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') document.getElementById('feedSend').click();
+});
+
+/* ============ LEARNING LOOP SIMULATION ============ */
+let running = false;
+const loopBar = document.getElementById('loopBar');
+const loopLog = document.getElementById('loopLog');
+const loopStatus = document.getElementById('loopStatus');
+const kpiStages = document.getElementById('kpiStages');
+const kpiStagesBar = document.getElementById('kpiStagesBar');
+
+function resetLoop(){
+  STAGES.forEach(s => {
+    const el = document.getElementById('stage-'+s.id);
+    el.className = 'stage-card rounded-lg border border-slate-800 bg-slate-950/60 p-2.5 flex items-center gap-2 transition-all';
+    el.querySelector('i').setAttribute('class','w-4 h-4 text-slate-600 shrink-0');
+    el.querySelector('span').setAttribute('class','text-[11px] font-mono text-slate-500 leading-tight');
+  });
+  loopBar.style.width = '0%';
+  kpiStages.textContent = '0';
+  kpiStagesBar.style.width = '0%';
+}
+
+document.getElementById('simulateBtn').addEventListener('click', () => {
+  if(running) return;
+  running = true;
+  resetLoop();
+  loopStatus.textContent = 'RUNNING';
+  loopStatus.className = 'text-xs font-mono px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/40';
+  let i = 0;
+  const step = () => {
+    if(i >= STAGES.length){
+      loopStatus.textContent = 'COMPLETE';
+      loopStatus.className = 'text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/40';
+      loopLog.textContent = '✓ Loop complete — candidate learning recorded. Independent verification pending.';
+      addFeed('Naya', 'Brain', 'Learning cycle simulated end-to-end. Loop remains NOT PROVEN until reproducible suite confirms.', 'now');
+      running = false;
+      return;
+    }
+    const s = STAGES[i];
+    const el = document.getElementById('stage-'+s.id);
+    el.className = 'stage-card rounded-lg border border-indigo-500/50 bg-indigo-500/10 p-2.5 flex items-center gap-2 transition-all glow';
+    el.querySelector('i').setAttribute('class','w-4 h-4 text-indigo-300 shrink-0');
+    el.querySelector('span').setAttribute('class','text-[11px] font-mono text-indigo-200 leading-tight');
+    loopLog.textContent = `→ ${s.label} …`;
+    i++;
+    const pct = Math.round((i/STAGES.length)*100);
+    loopBar.style.width = pct+'%';
+    kpiStages.textContent = i;
+    kpiStagesBar.style.width = pct+'%';
+    setTimeout(step, 420);
+  };
+  step();
+});
+
+/* ============ NEXT ACTION ============ */
+let actionIdx = 0;
+document.getElementById('advanceAction').addEventListener('click', () => {
+  actionIdx = (actionIdx + 1) % NEXT_ACTIONS.length;
+  document.getElementById('nextAction').innerHTML = NEXT_ACTIONS[actionIdx];
+});
+
+/* ============ ICONS ============ */
+lucide.createIcons();
+</script>
+</body>
+</html>
