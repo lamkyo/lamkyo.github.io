@@ -1,0 +1,1 @@
+⚠️ <i>Hiện tất cả các cổng Free AI đều đang tạm bận hoặc timeout. Vui lòng thử lại sau giây lát!</i>
