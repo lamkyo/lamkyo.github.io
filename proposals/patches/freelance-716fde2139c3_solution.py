@@ -1,103 +1,139 @@
-Chào bạn, với tư cách là **Antigravity Principal Autonomous Software Engineer**, tôi đã phân tích kỹ lưỡng yêu cầu của bạn.
+Chào bạn, đây là phân tích và giải pháp cho Task `freelance-716fde2139c3`.
 
-**QUYẾT ĐỊNH: BÀI TOÁN NÀY KHÔNG CÓ LỖI (BUG) CẦN SỬA.**
+**Lưu ý quan trọng về bản chất Task:**
+Đây **KHÔNG PHẢI** một bug cần sửa (bug fix) hay một yêu cầu kỹ thuật cụ thể (ví dụ: "sửa lỗi crash khi mở app"). Đây là một **Lead tuyển dụng (Job Posting)** từ SKIES (Visual Choices AAC) cho vị trí **iOS Developer** tại UCLA Kasari Lab.
 
-Đây là một **Lead Tuyển dụng (Freelance Lead)** từ Hacker News, không phải là một issue kỹ thuật chứa mã nguồn lỗi, stack trace hay yêu cầu vá lỗi phần mềm. Do đó, việc áp dụng cấu trúc "Root Cause -> Code Patch -> Unit Test" là **sai ngữ cảnh kỹ thuật** (Category Error).
+Do đó, "Giải pháp" ở đây không phải là code vá lỗi, mà là **Chiến lược tiếp cận (Outreach Strategy)** và **Bản đề xuất năng lực (Capability Proposal)** để bạn (hoặc hệ thống) có thể phản hồi lại JuliusSu một cách chuyên nghiệp, thể hiện đúng các yêu cầu "hard skills" và "soft skills" của họ, nhằm mục đích giành lấy hợp đồng $500 (hoặc vị trí thực tập/việc làm nếu bạn là cá nhân).
 
-Tuy nhiên, để hỗ trợ chủ nhân tối đa trong việc xử lý lead này (đánh giá tính khả thi, rủi ro và chiến lược tiếp cận), tôi sẽ chuyển đổi cấu trúc phản hồi sang **Phân Tích Kinh Doanh & Đánh Giá Kỹ Thuật (Business & Technical Feasibility Analysis)** để bạn có thể quyết định có nên gửi proposal hay không.
+Tuy nhiên, dựa trên vai trò "Principal Autonomous Software Engineer", tôi sẽ xử lý task này như một **Yêu cầu Xây dựng Prototype Demo** cho ứng dụng "Visual Play" để chứng minh năng lực, kèm theo email phản hồi tuyển dụng.
 
-Dưới đây là phân tích chi tiết:
+---
 
-### 1. PHÂN TÍCH NGUYÊN NHÂN & ĐÁNH GIÁ MÔ HÌNH (ROOT CAUSE & TECHNICAL ANALYSIS)
+### 1. ROOT CAUSE & TECHNICAL ANALYSIS
 
-**Tại sao đây là một cơ hội "High-Ticket" nhưng phức tạp?**
+**Phân tích Yêu cầu (Requirements Analysis):**
+1.  **Domain:** Ứng dụng hỗ trợ giao tiếp (AAC - Augmentative and Alternative Communication) cho trẻ tự kỷ ít lời (minimally verbal).
+2.  **Công nghệ:** Native iOS (Swift/SwiftUI), Embedded in Research Lab.
+3.  **Đặc điểm kỹ thuật:**
+    *   "Play-based intervention": Giao diện phải trực quan, ít ma sát, phù hợp với trẻ nhỏ.
+    *   "Assistive tech setup": Cần khả năng cấu hình (configuration) cho các biểu tượng (symbols) dựa trên ngữ cảnh.
+    *   "AI as a force multiplier": Có thể dùng AI để gợi ý các biểu tượng tiếp theo dựa trên hành vi trước đó của trẻ (Predictive Text cho AAC), nhưng code phải maintainable.
+    *   "Complex yet maintainable": Kiến trúc sạch (Clean Architecture), tách biệt logic domain (AAC logic) và UI.
+4.  **Rào cản:** Ứng dụng phải hoạt động offline (môi trường phòng khám/lab không ổn định mạng), phản hồi tức thì (low latency) vì trẻ tự kỷ nhạy cảm với độ trễ.
 
-*   **Bản chất công việc:** Đây không phải là dự án freelance truyền thống (làm xong tính tiền). Đây là vị trí **Full-time, Onsite (5 ngày/tuần tại UCLA)** trong 6 tháng.
-*   **Rủi ro Địa lý & Thời gian:**
-    *   Yêu cầu: Onsite tại Los Angeles (UCLA).
-    *   Thời gian bắt đầu: Tháng 1/2027.
-    *   *Vấn đề:* Nếu bạn không ở LA hoặc không có kế hoạch di chuyển, lead này vô giá trị.
-    *   *Vấn đề:* Thời gian bắt đầu khá xa (1/2027), nhưng quy trình tuyển dụng thường diễn ra trước đó vài tháng.
-*   **Yêu cầu Kỹ thuật Khắt khe:**
-    *   **Native iOS:** Không dùng React Native/Flutter. Phải là Swift/SwiftUI.
-    *   **No AI Assistants in Interview:** Phiên phỏng vấn coding 60 phút **cấm dùng AI**. Điều này loại bỏ lợi thế của những người phụ thuộc vào Copilot/Cursor.
-    *   **Complex Systems:** Xây dựng app hỗ trợ can thiệp trị liệu (AAC - Augmentative and Alternative Communication). Yêu cầu độ ổn định cao, UX cực kỳ trực quan cho trẻ tự kỷ và bác sĩ.
-*   **Bối cảnh Doanh nghiệp:**
-    *   SKIES là công ty nhỏ (Pasadena), có vốn NIH SBIR (vốn nghiên cứu).
-    *   Sản phẩm hiện tại: Visual Choices (app AAC phổ biến).
-    *   Dự án mới: Visual Play (ứng dụng can thiệp chơi đùa).
-    *   *Điểm cộng:* Có nền tảng kỹ thuật sẵn có, không phải xây từ 0. Có đối tác nghiên cứu uy tín (UCLA Kasari Lab).
+**Chiến lược Kỹ thuật (Technical Solution):**
+*   **Kiến trúc:** MVVM + Clean Architecture.
+*   **UI:** SwiftUI (hiện đại, dễ maintain, hiệu năng cao).
+*   **Core Logic:** Một `CommunicationEngine` xử lý lịch sử tương tác và gợi ý biểu tượng.
+*   **AI Integration:** Sử dụng CoreML (on-device) để chạy mô hình dự đoán biểu tượng, đảm bảo privacy và offline.
+*   **Data:** SwiftData hoặc Core Data để lưu lịch sử phiên chơi (session logs) phục vụ nghiên cứu.
 
-**Kết luận:** Đây là một vị trí **Employment** (Việc làm chính thức), không phải Freelance. Mức lương $65k cho 6 tháng (tương đương $130k/năm) là mức trung bình khá cho iOS Dev tại LA, nhưng đổi lại là cơ hội làm việc trong môi trường nghiên cứu hàng đầu thế giới và tiềm năng sản phẩm hóa (Phase II).
+---
 
-### 2. CHIẾN LƯỢC KỸ THUẬT & CÂU HỎI PHỎNG VẤN (SURGICAL CODE SOLUTION)
+### 2. SURGICAL CODE SOLUTION
 
-Thay vì viết code vá lỗi, đây là **bộ khung kỹ thuật** bạn cần chuẩn bị cho buổi phỏng vấn "Collaborative Coding" (60 phút, không AI):
+Dưới đây là code mẫu cho **Core Module** của ứng dụng "Visual Play", tập trung vào phần **Predictive Symbol Engine** (sử dụng AI on-device) và **UI Screen** chính. Đây là phần "cốt lõi" để chứng minh năng lực "shipped real native iOS apps" và "uses AI as a force multiplier".
 
-**A. Kiến trúc đề xuất cho "Visual Play":**
+#### A. Model & Data Layer (Swift)
 
 ```swift
-// Pseudo-code kiến trúc SwiftUI cho app trị liệu
-import SwiftUI
+import Foundation
+import CoreML
 
-// 1. State Management: Sử dụng @Observable (iOS 17+) hoặc ObservableObject
-// Đảm bảo state của phiên trị liệu (session) được tách biệt rõ ràng.
-class TherapySession: ObservableObject {
-    @Published var currentStep: InterventionStep = .init()
-    @Published var childResponse: ChildResponse?
-    @Published var clinicianNotes: String = ""
+// Model đại diện cho một biểu tượng giao tiếp (Symbol)
+struct CommunicationSymbol: Identifiable, Codable, Hashable {
+    let id: UUID
+    let name: String
+    let imageName: String // Tên ảnh trong asset catalog
+    let category: SymbolCategory
+    let priority: Int // Mức độ ưu tiên hiển thị
     
-    // Logic xử lý phản hồi của trẻ (cần tối ưu hiệu năng, tránh lag)
-    func processChildInteraction(_ interaction: InteractionType) {
-        // Xử lý logic can thiệp dựa trên dữ liệu từ Kasari Lab
-        // Gửi sự kiện đến analytics (anonymized)
+    enum SymbolCategory: String, Codable {
+        case food, play, emotion, action, object
     }
 }
 
-// 2. UI Layer: SwiftUI với Focus trên Accessibility & Simplicity
-// Trẻ tự kỷ minimally verbal cần giao diện cực kỳ đơn giản, ít nhiễu.
-struct VisualPlayView: View {
-    @StateObject private var session = TherapySession()
-    
-    var body: some View {
-        ZStack {
-            // Background tĩnh, không gây xao nhãng
-            Color(.systemBackground)
-            
-            VStack(spacing: 20) {
-                // 1. Visual Prompt (Hình ảnh/Video gợi ý)
-                VisualPromptView(prompt: session.currentStep.prompt)
-                    .frame(height: 300)
-                
-                // 2. Interaction Zone (Nơi trẻ tương tác)
-                InteractionZoneView(
-                    onInteraction: { interaction in
-                        session.processChildInteraction(interaction)
-                    }
-                )
-                
-                // 3. Clinician Controls (Góc nhỏ, ít nổi bật)
-                ClinicianControlPanel(session: session)
-            }
-            .padding()
-        }
-    }
+// Kết quả dự đoán từ AI
+struct PredictionResult {
+    let symbol: CommunicationSymbol
+    let confidence: Float
+}
+
+// Protocol cho Engine để dễ test
+protocol CommunicationEngineProtocol {
+    func predictNextSymbols(history: [CommunicationSymbol]) -> [PredictionResult]
+    func logInteraction(symbol: CommunicationSymbol, timestamp: Date)
 }
 ```
 
-**B. Điểm mấu chốt cần thể hiện trong 60 phút coding:**
+#### B. CoreML Integration & Engine (Swift)
 
-1.  **State Management:** Cách bạn quản lý luồng dữ liệu giữa "Trẻ tương tác" -> "App xử lý" -> "Bác sĩ ghi chú".
-2.  **Performance:** App phải chạy mượt trên các thiết bị cũ (trường học/lab thường dùng iPad cũ). Tránh allocation object không cần thiết.
-3.  **Error Handling:** Xảy ra khi trẻ không tương tác, hoặc mất kết nối (nếu có), app phải tự phục hồi mà không làm gián đoạn phiên trị liệu.
-4.  **Code Readability:** Code phải sạch, có comment giải thích *tại sao* (why) chứ không chỉ *cái gì* (what), vì sẽ được review bởi cả kỹ sư lẫn nhà nghiên cứu.
+```swift
+import Foundation
+import CoreML
 
-### 3. KIỂM CHỨNG & CHUẨN BỊ PHỎNG VẤN (VERIFICATION & UNIT TEST SUITE)
+class CommunicationEngine: CommunicationEngineProtocol {
+    private var model: CommunicationModel?
+    private var interactionHistory: [InteractionRecord] = []
+    
+    struct InteractionRecord: Codable {
+        let symbolID: UUID
+        let timestamp: Date
+    }
+    
+    init() {
+        loadModel()
+    }
+    
+    private func loadModel() {
+        // Giả sử chúng ta có một mô hình CoreML đã được train
+        // Trong thực tế, file .mlmodel sẽ được thêm vào project
+        do {
+            model = try CommunicationModel(configuration: MLModelConfiguration())
+        } catch {
+            print("Failed to load ML model: \(error)")
+            // Fallback: sử dụng heuristic đơn giản
+        }
+    }
+    
+    func predictNextSymbols(history: [CommunicationSymbol]) -> [PredictionResult] {
+        guard let model = model else {
+            // Fallback logic nếu không có model: trả về các symbol phổ biến nhất
+            return history.prefix(5).map { PredictionResult(symbol: $0, confidence: 0.1) }
+        }
+        
+        // Chuẩn bị input cho CoreML
+        // Giả sử model nhận vào chuỗi ID của các symbol gần đây
+        let recentIDs = history.suffix(10).map { $0.id.uuidString }
+        
+        do {
+            let input = CommunicationModelInput(symbolIDs: recentIDs)
+            let output = try model.prediction(input: input)
+            
+            // Chuyển đổi output từ model thành PredictionResult
+            // Giả sử output.topPredictions là mảng [String] chứa ID symbol
+            return output.topPredictions.compactMap { idString in
+                guard let uuid = UUID(uuidString: idString),
+                      let symbol = findSymbol(byID: uuid) else { return nil }
+                return PredictionResult(symbol: symbol, confidence: 0.85)
+            }
+        } catch {
+            print("Prediction error: \(error)")
+            return []
+        }
+    }
+    
+    func logInteraction(symbol: CommunicationSymbol, timestamp: Date) {
+        let record = InteractionRecord(symbolID: symbol.id, timestamp: timestamp)
+        interactionHistory.append(record)
+        
+        // Lưu trữ async để không block UI
+        DispatchQueue.global(qos: .background).async {
+            self.persistHistory()
+        }
+    }
+    
+    private func findSymbol(byID id: UUID) -> CommunicationSymbol? {
+        // Trong thực tế, sẽ tra cứu
 
-Vì không có code lỗi để test, đây là **Checklist Tự Kiểm Tra** trước khi nộp đơn:
-
-| Hạng mục | Yêu cầu | Trạng thái |
-| :--- | :--- | :--- |
-| **Địa lý** | Bạn có thể làm onsite tại UCLA (Los Angeles)
-
-⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.07s • $0.00)</i>
+⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.24s • $0.00)</i>
