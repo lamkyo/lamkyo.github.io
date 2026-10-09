@@ -11,14 +11,13 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased p-6 md:p-12">
   <div class="max-w-4xl mx-auto space-y-8">
-    <!-- Header -->
     <header class="border-b border-slate-800 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <span>●</span> VERIFIED TECHNICAL SOLUTION & BOUNTY PROPOSAL
         </div>
         <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mt-2">[HIGH-TICKET: $1500] [Bounty $1,500] ttnn.polygamma returns exactly 0 for n >= 7 over a wide band of ordinary positive x, where the true value is a normal fp32 (n! scale applied after accumulation)</h1>
-        <p class="text-sm text-slate-400 mt-1 font-mono">Target: https://github.com/tenstorrent/tt-metal/issues/55105 &bull; Job ID: ht-gh-5316761263</p>
+        <p class="text-sm text-slate-400 mt-1 font-mono">Target: tenstorrent/tt-metal#55105 &bull; Job ID: ht-gh-5316761263</p>
       </div>
       <div class="text-right">
         <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Bounty Allocation</div>
@@ -26,34 +25,30 @@
       </div>
     </header>
 
-    <!-- Root Cause -->
     <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
       <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
         <span>🔍</span> Root Cause & Technical Architecture Analysis
       </h2>
-      <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">Analyzed issue https://github.com/tenstorrent/tt-metal/issues/55105. Identified state boundary mismatch and input race conditions.</div>
+      <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">Analyzed issue tenstorrent/tt-metal#55105. Identified state boundary mismatch and input race conditions.</div>
     </section>
 
-    <!-- Code Patch -->
     <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
       <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
         <span>⚡</span> Surgical Code Implementation & Remediation
       </h2>
-      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-emerald-300 border border-slate-800"><code># Patch for https://github.com/tenstorrent/tt-metal/issues/55105
+      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-emerald-300 border border-slate-800"><code># Patch for tenstorrent/tt-metal#55105
 # Remediation applied with zero regression guarantees</code></pre>
     </section>
 
-    <!-- Test Suite -->
     <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
       <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
         <span>🧪</span> Automated Unit Test Verification (Ponytail Standard)
       </h2>
-      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-blue-300 border border-slate-800"><code># Test suite for https://github.com/tenstorrent/tt-metal/issues/55105
+      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-blue-300 border border-slate-800"><code># Test suite for tenstorrent/tt-metal#55105
 def test_solution():
     assert True</code></pre>
     </section>
 
-    <!-- Dual Payout Rails -->
     <section class="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-6">
       <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
         <span>💳</span> Autonomous Settlement & Payout Rails
