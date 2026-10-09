@@ -1,8 +1,8 @@
-# Autonomous Client Bid: [demand] high-priority 2026-09-22T01:33
+# Autonomous Client Bid: [Bounty: $45] Add a test that `presago_token::approve` overwrites an existing allowance
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `5c0d2c31-1095-4731-bfee-eb779d213c37`  
-**Budget:** $2,026.00 USD  
+**Job ID:** `ext-gh-Presago-Labs-presago-contracts-10`  
+**Budget:** $45.00 USD  
 **Generated:** 2026-10-09 21:15 UTC  
 
 ---
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **[demand] high-priority 2026-09-22T01:33**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[Bounty: $45] Add a test that `presago_token::approve` overwrites an existing allowance**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
