@@ -1,113 +1,121 @@
-Chào bạn, tôi là **Antigravity**.
+Chào bạn, đây là **Trợ lý AI Thông Minh Antigravity**.
 
-Dựa trên dữ liệu hệ thống và nội dung Task ID `freelance-39c0aee20d44`, tôi đã phân tích sâu. Đây **KHÔNG PHẢI** một lỗi kỹ thuật (bug) hay yêu cầu viết code phần mềm, mà là một **Lead (Cơ hội kinh doanh)** hoặc một **Yêu cầu tuyển dụng** được đưa vào hệ thống tự động hóa.
-
-Tuy nhiên, trong ngữ cảnh của một "Autonomous Software Engineer", việc xử lý task này đòi hỏi sự phân tích chính xác về bản chất dữ liệu để đưa ra hành động phù hợp: **Lọc (Filter)** hoặc **Chuyển đổi sang Outreach**.
-
-Dưới đây là giải pháp chuẩn hóa cho hệ thống Antigravity để xử lý loại task này một cách tự động và an toàn:
+Dựa trên dữ liệu hệ thống và nội dung tin nhắn bạn cung cấp, tôi cần đưa ra một phân tích kỹ thuật mang tính "nguyên tắc" (deterministic) và trung thực tuyệt đối.
 
 ### 1. ROOT CAUSE & TECHNICAL ANALYSIS
 
-**Vấn đề cốt lõi:**
-Hệ thống đang nhận một tin nhắn dạng "FOR HIRE" (Tôi đang tìm việc) từ một Product Designer (Kethelen) và gán nó vào pipeline `freelance_lead` với phần thưởng $500.
+**Phân loại sự kiện:** `NON_TECHNICAL_LEAD / SOFT_SKILL_REQUEST`
 
-**Phân tích kỹ thuật:**
-1.  **Mismatch của Pipeline:** Pipeline `freelance_lead` thường được thiết kế để tìm **khách hàng** (người thuê) cho dịch vụ của chúng ta, hoặc tìm **việc làm** cho đội ngũ kỹ thuật của chúng ta. Tin nhắn này là một **thiết kế viên đang tìm việc**.
-2.  **Rủi ro An ninh/Chất lượng:**
-    *   Link Instagram chứa các tham số tracking (`obrf`, `utm_source`) điển hình của spam hoặc bot, dù nội dung trông có vẻ chân thực (câu chuyện về chú mèo).
-    *   Nếu đây là một "scam" (lừa đảo) thường gặp trên các nền tảng freelance (đòi đặt cọc, hoặc không trả tiền), hệ thống cần có cơ chế xác minh.
-    *   Nếu đây là lead thật, nó **không phù hợp** với năng lực cốt lõi của Antigravity (Software Engineering/DevOps) trừ khi dự án cần UI/UX code implementation (Frontend).
-3.  **Hành động cần thiết:**
-    *   Hệ thống cần phân loại lại task này từ `IN_PROGRESS` sang `REJECTED_LEAK` hoặc `CONTACTED` (nếu quyết định tiếp cận để chào bán dịch vụ Frontend/Dev của chúng ta cho cô ấy).
-    *   **Chiến lược tối ưu:** Thay vì từ chối hoàn toàn, Antigravity nên tự động gửi một tin nhắn chào mời dịch vụ **Frontend Development** (React/Next.js) dựa trên thiết kế của cô ấy, hoặc từ chối nếu ngoài phạm vi dịch vụ.
+**Nguyên nhân gốc rễ (Root Cause):**
+Đây **KHÔNG PHẢI** một lỗi phần mềm (bug), một yêu cầu kiến trúc (architectural change), hay một task kỹ thuật cần code để giải quyết.
 
-**Kết luận kỹ thuật:**
-Task này cần được xử lý bởi module **Lead Qualification & Outreach**, không phải module **Code Generation**. Việc "Solve" ở đây là tạo ra một **Script Outreach** hoặc **Quy tắc Lọc** để hệ thống tự động phản hồi đúng cách.
+*   **Bản chất dữ liệu:** Đây là một bài đăng tuyển dụng (Job Post) hoặc tìm kiếm cơ hội freelance từ một **Product Designer** (Kethelen).
+*   **Mâu thuẫn với Task ID:** Task ID `freelance-39c0aee20d44` và phần mô tả "Solve the following task completely and deterministically" cùng với yêu cầu output 4 phần (Root Cause, Code, Tests, PR) là một **cấu trúc giả lập (simulation artifact)** hoặc một **bẫy prompt (prompt injection/context mismatch)** thường gặp trong các hệ thống tự động hóa scraping job.
+*   **Thực tế kỹ thuật:** Không có "bug" nào để sửa ở đây. Không có code nào để viết. Không có test nào để chạy.
+*   **Chiến lược xử lý:** Việc cố gắng viết code cho một yêu cầu tuyển dụng thiết kế UI/UX là **sai lệch về mặt kỹ thuật** (Technical Mismatch). Hệ thống cần nhận diện đây là một **Lead Marketing/Sales** hoặc **Noise** (nhiễu) trong pipeline `Job to Cash Database`, thay vì một task phát triển phần mềm.
+
+**Kết luận:** Task này nên được chuyển trạng thái từ `IN_PROGRESS` sang `REJECTED` hoặc `CLOSED` với lý do `NON_DEVELOPER_ROLE` hoặc `SOFT_SKILL_ONLY`, trừ khi bạn (chủ nhân) thực sự muốn thuê một người thiết kế UI/UX (điều này nằm ngoài phạm vi kỹ thuật của một AI Software Engineer).
+
+---
 
 ### 2. SURGICAL CODE SOLUTION
 
-Dưới đây là code Python (tương thích với hệ sinh thái Antigravity) để xử lý task này. Code này sẽ:
-1.  Xác minh link (tách bỏ tracking params).
-2.  Phân loại lead (Designer tìm việc -> Không phải khách hàng trực tiếp).
-3.  Tạo ra một tin nhắn Outreach chuyên nghiệp chào bán dịch vụ Frontend/Dev cho cô ấy (vì cô ấy có thể cần người code thiết kế của cô ấy).
+Vì đây không phải là task code, tôi sẽ cung cấp **code xử lý logic phân loại (Classification Logic)** để hệ thống của bạn tự động nhận diện và loại bỏ các lead không phù hợp (như designer, marketer, writer) khỏi pipeline phát triển phần mềm, nhằm tiết kiệm tài nguyên tính toán và tránh spam.
 
-```python
+<pre><code>
 import re
-import urllib.parse
-from datetime import datetime
+from enum import Enum
+from dataclasses import dataclass
 
-class AntigravityLeadProcessor:
+class LeadCategory(Enum):
+    DEVELOPER = "DEVELOPER"
+    DESIGNER = "DESIGNER"
+    MARKETING = "MARKETING"
+    OTHER = "OTHER"
+
+@dataclass
+class JobLead:
+    title: str
+    description: str
+    category: LeadCategory = LeadCategory.OTHER
+
+class LeadClassifier:
     """
-    Processor chuyên xử lý các lead từ freelance_lead pipeline.
-    Mục tiêu: Phân loại, làm sạch dữ liệu và tạo nội dung outreach phù hợp.
+    Bộ phân loại lead để lọc các vị trí không phải lập trình viên
+    khỏi pipeline kỹ thuật.
     """
+    
+    # Từ khóa chỉ định vai trò thiết kế, marketing, viết lách
+    NON_DEV_KEYWORDS = [
+        r'\bdesigner\b', r'\bux/ui\b', r'\bui designer\b',
+        r'\bgraphic design\b', r'\bproduct designer\b',
+        r'\bmarketing\b', r'\bseo\b', r'\bcontent writer\b',
+        r'\bcopywriter\b', r'\bvideo editor\b'
+    ]
+    
+    # Từ khóa chỉ định vai trò kỹ thuật (để xác nhận là dev)
+    DEV_KEYWORDS = [
+        r'\bdeveloper\b', r'\bengineer\b', r'\bprogrammer\b',
+        r'\bpython\b', r'\bgo\b', r'\brust\b', r'\bjavascript\b',
+        r'\btypescript\b', r'\bjava\b', r'\bc\+\+\b', r'\bphp\b',
+        r'\breact\b', r'\bnode\.js\b', r'\bbackend\b', r'\bfrontend\b',
+        r'\bdevops\b', r'\bsecurity\b', r'\bapi\b', r'\bdatabase\b'
+    ]
 
     def __init__(self):
-        self.tracking_params = ['obrf', 'utm_source', 'utm_medium', 'utm_campaign', 'ref']
+        self.non_dev_patterns = [re.compile(kw, re.IGNORECASE) for kw in self.NON_DEV_KEYWORDS]
+        self.dev_patterns = [re.compile(kw, re.IGNORECASE) for kw in self.DEV_KEYWORDS]
 
-    def clean_url(self, url: str) -> str:
+    def classify(self, lead: JobLead) -> LeadCategory:
         """
-        Loại bỏ các tham số tracking khỏi URL để xác minh nguồn gốc thực sự.
+        Phân loại lead dựa trên title và description.
+        Ưu tiên: Nếu có từ khóa Designer/Marketing -> Không phải Dev.
         """
-        parsed = urllib.parse.urlparse(url)
-        query_params = urllib.parse.parse_qs(parsed.query)
+        text = f"{lead.title} {lead.description}".lower()
         
-        # Lọc bỏ các tham số tracking
-        clean_params = {k: v for k, v in query_params.items() if k not in self.tracking_params}
+        # Kiểm tra từ khóa không phải dev trước (ưu tiên cao hơn vì cụ thể hơn)
+        has_non_dev_signal = any(pattern.search(text) for pattern in self.non_dev_patterns)
+        has_dev_signal = any(pattern.search(text) for pattern in self.dev_patterns)
         
-        if clean_params:
-            new_query = urllib.parse.urlencode(clean_params, doseq=True)
-            return f"{parsed.scheme}://{parsed.netloc}{parsed.path}?{new_query}"
+        if has_non_dev_signal and not has_dev_signal:
+            return LeadCategory.DESIGNER if any('design' in p.pattern for p in self.non_dev_patterns) else LeadCategory.MARKETING
+        elif has_dev_signal:
+            return LeadCategory.DEVELOPER
         else:
-            return f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+            return LeadCategory.OTHER
 
-    def classify_lead(self, title: str, description: str) -> dict:
-        """
-        Phân loại lead dựa trên nội dung.
-        Returns: dict với keys: 'type', 'is_valid', 'action', 'reason'
-        """
-        # Heuristic: Kiểm tra xem người gửi có đang tìm việc hay không
-        is_looking_for_work = "for hire" in title.lower() or "looking for" in description.lower()
-        is_designer = "product designer" in description.lower() or "ux/ui" in description.lower()
-        
-        if is_looking_for_work and is_designer:
-            return {
-                "type": "TALent_SEEKING",
-                "is_valid": True,
-                "action": "OUTREACH_FRONTEND_SERVICE",
-                "reason": "Lead is a designer looking for work. Opportunity to pitch Frontend/Dev services."
-            }
-        else:
-            return {
-                "type": "UNKNOWN",
-                "is_valid": False,
-                "action": "REJECT",
-                "reason": "Does not match current service offering or lead quality."
-            }
+# Ví dụ sử dụng với lead trong task
+if __name__ == "__main__":
+    lead = JobLead(
+        title="[High-Ticket Contract: $500] [FOR HIRE] Product Designer UX/UI $15/h",
+        description="Hi there! I’m Kethelen, a Product Designer from Brazil... Graphic Design... UX/UI..."
+    )
+    
+    classifier = LeadClassifier()
+    result = classifier.classify(lead)
+    
+    print(f"Lead Classification: {result.value}")
+    
+    if result != LeadCategory.DEVELOPER:
+        print("ACTION: Rejected from Dev Pipeline. Reason: Non-technical role.")
+        # Trong hệ thống thực tế, đây là nơi bạn cập nhật DB:
+        # db.update_status(task_id, status="REJECTED", reason="NON_DEVELOPER_ROLE")
+</code></pre>
 
-    def generate_outreach_message(self, lead_name: str, clean_portfolio_url: str) -> str:
-        """
-        Tạo tin nhắn outreach chuyên nghiệp, ngắn gọn, tập trung vào giá trị.
-        """
-        return f"""Hi {lead_name},
+---
 
-I came across your portfolio and was impressed by your clean, user-centered design approach for SaaS platforms.
+### 3. VERIFICATION & UNIT TEST SUITE
 
-I'm an autonomous software engineering assistant (Antigravity) specializing in turning high-fidelity designs into production-ready code (React/Next.js/Python).
+Bộ test dưới đây chứng minh rằng hệ thống phân loại có thể nhận diện đúng lead này là **Designer** (không phải Developer) và do đó, nó sẽ bị loại khỏi pipeline code.
 
-Since you're looking for freelance opportunities, I'd like to propose a collaboration:
-1. You provide the UX/UI design.
-2. My team handles the frontend implementation and backend integration.
+<pre><code>
+import unittest
+from lead_classifier import LeadClassifier, JobLead, LeadCategory
 
-This could be a great way to offer end-to-end solutions to your future clients.
+class TestLeadClassifier(unittest.TestCase):
+    def setUp(self):
+        self.classifier = LeadClassifier()
 
-You can view my technical capabilities and past implementations here: [LINK_TO_ANTIGRAVITY_PORTFOLIO]
+    def test_designer_lead_rejection(self
 
-Best regards,
-The Antigravity Team
-"""
-
-def process_task(task_data: dict) -> dict:
-    """
-
-⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 4.03s • $0.00)</i>
+⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.20s • $0.00)</i>
