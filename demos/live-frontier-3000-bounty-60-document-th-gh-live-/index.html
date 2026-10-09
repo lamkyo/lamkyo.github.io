@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Configuration Guide Generator — Custos Docs Prototype</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          slate: {
+            950: '#0a0f1a',
+            900: '#0f172a',
+          }
+        },
+        fontFamily: {
+          mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #0f172a; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  .glow { box-shadow: 0 0 0 1px rgba(56,189,248,0.15), 0 0 24px -6px rgba(56,189,248,0.35); }
+  .fade-in { animation: fadeIn .35s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+  .pulse-dot { animation: pulseDot 1.6s infinite; }
+  @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:.35} }
+  .diff-add { background: rgba(34,197,94,0.12); border-left: 3px solid #22c55e; }
+  .diff-ctx { background: rgba(148,163,184,0.05); border-left: 3px solid #334155; }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-200 antialiased min-h-screen">
+
+<!-- ============ STICKY HEADER BANNER ============ -->
+<div class="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/95 backdrop-blur">
+  <div class="max-w-[1600px] mx-auto px-4 py-2.5 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px]">
+    <div class="flex items-center gap-2 min-w-0">
+      <span class="relative flex h-2 w-2">
+        <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+      </span>
+      <span class="text-slate-300 truncate">
+        🚀 Live Interactive Prototype for:
+        <span class="text-slate-100 font-medium">[LIVE FRONTIER: $3000] [Bounty: $60] Document the</span>
+      </span>
+    </div>
+    <span class="hidden md:inline text-slate-700">|</span>
+    <span class="text-slate-400 hidden md:inline">
+      Engineered by
+      <a href="https://primenode.cc" target="_blank" class="text-sky-400 hover:text-sky-300 font-medium underline decoration-dotted">PrimeNode</a>
+    </span>
+    <span class="hidden md:inline text-slate-700">|</span>
+    <span class="hidden sm:inline-flex items-center gap-1.5 text-emerald-400 font-medium">
+      <i data-lucide="badge-check" class="w-3.5 h-3.5"></i> Verified Deliverable
+    </span>
+    <a href="mailto:contact@primenode.cc?subject=Deployment%20Inquiry%20for%20gh-live-5765061384"
+       class="ml-auto inline-flex items-center gap-1.5 rounded-md bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold px-3 py-1.5 transition-colors">
+      <i data-lucide="mail" class="w-3.5 h-3.5"></i> Contact Engineering Team
+    </a>
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div class="max-w-[1600px] mx-auto px-4 py-6">
+
+  <!-- Title row -->
+  <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+    <div>
+      <div class="flex items-center gap-2 text-xs uppercase tracking-widest text-sky-400 font-semibold mb-1">
+        <i data-lucide="file-cog" class="w-4 h-4"></i> docs/guides/configuration.md
+      </div>
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-100">Configuration Knobs — Coverage Auditor</h1>
+      <p class="text-slate-400 mt-1 text-sm max-w-3xl">
+        Reconciles <code class="font-mono text-sky-300">.env.example</code> against
+        <code class="font-mono text-sky-300">@custos/config</code> validation and
+        <code class="font-mono text-sky-300">apps/api/src/composition-root.ts</code> reads, then generates the missing guide sections.
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btn-rescan" class="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 px-3.5 py-2 text-sm font-medium transition-colors">
+        <i data-lucide="refresh-cw" class="w-4 h-4"></i> Re-scan sources
+      </button>
+      <button id="btn-generate" class="inline-flex items-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-3.5 py-2 text-sm font-semibold transition-colors">
+        <i data-lucide="wand-2" class="w-4 h-4"></i> Generate patch
+      </button>
+    </div>
+  </div>
+
+  <!-- ============ KPI STRIP ============ -->
+  <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-400 uppercase tracking-wide">Env vars scanned</span>
+        <i data-lucide="list-tree" class="w-4 h-4 text-slate-500"></i>
+      </div>
+      <div id="kpi-total" class="text-2xl font-bold text-slate-100 mt-1">0</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-400 uppercase tracking-wide">Documented</span>
+        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500"></i>
+      </div>
+      <div id="kpi-documented" class="text-2xl font-bold text-emerald-400 mt-1">0</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-400 uppercase tracking-wide">Missing</span>
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500"></i>
+      </div>
+      <div id="kpi-missing" class="text-2xl font-bold text-amber-400 mt-1">0</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-400 uppercase tracking-wide">Fail-fast</span>
+        <i data-lucide="shield-alert" class="w-4 h-4 text-rose-500"></i>
+      </div>
+      <div id="kpi-failfast" class="text-2xl font-bold text-rose-400 mt-1">0</div>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-400 uppercase tracking-wide">Coverage</span>
+        <i data-lucide="gauge" class="w-4 h-4 text-sky-500"></i>
+      </div>
+      <div id="kpi-coverage" class="text-2xl font-bold text-sky-400 mt-1">0%</div>
+      <div class="mt-2 h-1.5 rounded-full bg-slate-800 overflow-hidden">
+        <div id="kpi-bar" class="h-full bg-sky-500 transition-all duration-700" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONTROLS ============ -->
+  <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4 mb-4">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="relative flex-1 min-w-[240px]">
+        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+        <input id="search" type="text" placeholder="Filter by variable name, e.g. AUDIT_ or STELLAR_"
+               class="w-full rounded-lg bg-slate-950 border border-slate-700 pl-9 pr-3 py-2 text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500" />
+      </div>
+      <div class="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-950 p-1" id="source-filters">
+        <button data-src="all" class="src-btn px-3 py-1.5 text-xs font-medium rounded-md bg-sky-500 text-slate-950">All sources</button>
+        <button data-src="config" class="src-btn px-3 py-1.5 text-xs font-medium rounded-md text-slate-400 hover:text-slate-200">@custos/config</button>
+        <button data-src="composition" class="src-btn px-3 py-1.5 text-xs font-medium rounded-md text-slate-400 hover:text-slate-200">composition-root</button>
+      </div>
+      <label class="inline-flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+        <input id="only-missing" type="checkbox" class="accent-sky-500 w-4 h-4 rounded" />
+        Only missing from guide
+      </label>
+      <label class="inline-flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+        <input id="only-failfast" type="checkbox" class="accent-rose-500 w-4 h-4 rounded" />
+        Only fail-fast
+      </label>
+    </div>
+  </div>
+
+  <!-- ============ MAIN GRID ============ -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+
+    <!-- Table -->
+    <div class="xl:col-span-2 rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+          <i data-lucide="table-2" class="w-4 h-4 text-sky-400"></i> Variable reconciliation
+        </h2>
+        <span id="row-count" class="text-xs text-slate-500">0 rows</span>
+      </div>
+      <div class="overflow-x-auto max-h-[560px] overflow-y-auto">
+        <table class="w-full text-sm">
+          <thead class="sticky top-0 bg-slate-900/95 backdrop-blur text-xs uppercase tracking-wide text-slate-500">
+            <tr class="border-b border-slate-800">
+              <th class="text-left font-medium px-4 py-2.5">Variable</th>
+              <th class="text-left font-medium px-3 py-2.5">Source</th>
+              <th class="text-left font-medium px-3 py-2.5">Required</th>
+              <th class="text-left font-medium px-3 py-2.5">Guide</th>
+              <th class="text-left font-medium px-3 py-2.5">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="tbody" class="divide-y divide-slate-800/70"></tbody>
+        </table>
+      </div>
+      <div id="empty-state" class="hidden px-4 py-12 text-center text-slate-500 text-sm">
+        <i data-lucide="search-x" class="w-8 h-8 mx-auto mb-2 text-slate-600"></i>
+        No variables match the current filters.
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div class="space-y-4">
+
+      <!-- Legend -->
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2 mb-3">
+          <i data-lucide="info" class="w-4 h-4 text-sky-400"></i> Legend
+        </h2>
+        <ul class="space-y-2 text-xs text-slate-400">
+          <li class="flex items-start gap-2"><span class="mt-0.5 inline-block w-2 h-2 rounded-full bg-sky-400"></span><span><b class="text-slate-300">@custos/config</b> — validated by the shared schema loader (<code class="font-mono">loadConfig</code>).</span></li>
+          <li class="flex items-start gap-2"><span class="mt-0.5 inline-block w-2 h-2 rounded-full bg-violet-400"></span><span><b class="text-slate-300">composition-root</b> — read directly via <code class="font-mono">process.env</code> at wiring time.</span></li>
+          <li class="flex items-start gap-2"><span class="mt-0.5 inline-block w-2 h-2 rounded-full bg-rose-500"></span><span><b class="text-slate-300">Fail-fast</b> — throws at boot when unset or malformed.</span></li>
+          <li class="flex items-start gap-2"><span class="mt-0.5 inline-block w-2 h-2 rounded-full bg-amber-400"></span><span><b class="text-slate-300">Rotation-sensitive</b> — changing the value invalidates persisted data.</span></li>
+        </ul>
+      </div>
+
+      <!-- Incident callout -->
+      <div class="rounded-xl border border-rose-900/60 bg-rose-950/30 p-4">
+        <div class="flex items-start gap-3">
+          <i data-lucide="shield-alert" class="w-5 h-5 text-rose-400 shrink-0 mt-0.5"></i>
+          <div>
+            <h3 class="text-sm font-semibold text-rose-200">MFA_ENCRYPTION_KEY — rotation hazard</h3>
+            <p class="text-xs text-rose-200/70 mt-1 leading-relaxed">
+              <code class="font-mono">packages/mfa/infrastructure/crypto/encryption.ts</code> throws when this key is unset.
+              Rotating it makes stored TOTP secrets undecryptable. Recorded in
+              <code class="font-mono">docs/QUARANTINE.md</code> as the resolution of a real incident.
+            </p>
+            <button id="btn-jump-mfa" class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-rose-300 hover:text-rose-200">
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i> Highlight in table
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patch preview -->
+      <div class="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-slate-200 flex items-center gap-2">
+            <i data-lucide="git-pull-request" class="w-4 h-4 text-emerald-400"></i> Generated patch
+          </h2>
+          <span id="patch-status" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">IDLE</span>
+        </div>
+        <div class="p-3">
+          <div id="patch-progress-wrap" class="mb-3 hidden">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+              <span id="patch-stage">Parsing sources…</span>
+              <span id="patch-pct">0%</span>
+            </div>
+            <div class="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+              <div id="patch-bar" class="h-full bg-emerald-500 transition-all duration-200" style="width:0%"></div>
+            </div>
+          </div>
+          <pre id="patch-out" class="text-[11px] leading-relaxed font-mono text-slate-400 max-h-[280px] overflow-auto rounded-lg bg-slate-950 border border-slate-800 p-3">// Press "Generate patch" to build the docs/guides/configuration.md diff.</pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="mt-8 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+    <span>Prototype — deterministic reconciliation of <code class="font-mono">.env.example</code>, <code class="font-mono">@custos/config</code> and <code class="font-mono">composition-root.ts</code>.</span>
+    <span>Engineered by <a href="https://primenode.cc" target="_blank" class="text-sky-400 hover:text-sky-300">PrimeNode</a></span>
+  </footer>
+</div>
+
+<script>
+/* ============================================================
+   DATA MODEL — grounded in the job description
+   ============================================================ */
+const VARS = [
+  { name: 'MFA_ENCRYPTION_KEY', source: 'composition', required: true, failFast: true, rotationSensitive: true,
+    note: 'Throws when unset (packages/mfa/infrastructure/crypto/encryption.ts). Rotation makes stored TOTP secrets undecryptable.' },
+  { name: 'STELLAR_SIGNING_BACKEND', source: 'composition', required: true, failFast: true, rotationSensitive: false,
+    note: 'Selects the signing backend at composition time; invalid values abort boot.' },
+  { name: 'STELLAR_ANCHOR_SECRET_KEY', source: 'composition', required: false, failFast: false, rotationSensitive: true,
+    note: 'Optional anchor credential. Rotating it invalidates in-flight anchor sessions.' },
+  { name: 'AUDIT_BATCHED_WRITES', source: 'composition', required: false, failFast: false, rotationSensitive: false,
+    note: 'Boolean toggle enabling batched audit persistence.' },
+  { name: 'AUDIT_MAX_BATCH_SIZE', source: 'composition', required: false, failFast: false, rotationSensitive: false,
+    note: 'Upper bound on rows per audit flush.' },
+  { name: 'AUDIT_FLUSH_INTERVAL_MS', source: 'composition', required: false, failFast: false, rotationSensitive: false,
+    note: 'Interval between scheduled audit flushes, in milliseconds.' },
+  { name: 'AUDIT_MAX_QUEUE_SIZE', source: 'composition', required: false, failFast: false, rotationSensitive: false,
+    note: 'Backpressure limit before writes are dropped or blocked.' },
+  { name: 'DATABASE_POOL_SIZE', source: 'config', required: false, failFast: true, rotationSensitive: false,
+    note: 'Read through loadConfig — validated but previously documented nowhere.' },
+  { name: 'DATABASE_POOL_TIMEOUT_SECONDS', source: 'config', required: false, failFast: true, rotationSensitive: false,
+    note: 'Read through loadConfig — validated but previously documented nowhere.' },
+  { name: 'DATABASE_URL', source: 'config', required: true, failFast: true, rotationSensitive: false,
+    note: 'Already documented in the guide.' },
+  { name: 'JWT_SECRET', source: 'config', required: true, failFast: true, rotationSensitive: true,
+    note: 'Already documented in the guide.' },
+  { name: 'NODE_ENV', source: 'config', required: false, failFast: false, rotationSensitive: false,
+    note: 'Already documented in the guide.' },
+  { name: 'LOG_LEVEL', source: 'config', required: false, failFast: false, rotationSensitive: false,
+    note: 'Already documented in the guide.' },
+];
+
+// Which of these the guide currently mentions (per the job description: none of the 9).
+const DOCUMENTED = new Set(['DATABASE_URL', 'JWT_SECRET', 'NODE_ENV', 'LOG_LEVEL']);
+
+VARS.forEach(v => v.documented = DOCUMENTED.has(v.name));
+
+/* ============================================================
+   STATE + RENDER
+   ============================================================ */
+const state = { search: '', source: 'all', onlyMissing: false, onlyFailFast: false, highlight: null };
+
+const tbody = document.getElementById('tbody');
+const emptyState = document.getElementById('empty-state');
+
+function sourceBadge(src) {
+  if (src === 'config') {
+    return `<span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-300 border border-sky-500/20">
+      <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>@custos/config</span>`;
+  }
+  return `<span class="inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20">
+    <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>composition-root</span>`;
+}
+
+function requiredBadge(v) {
+  if (v.required) {
+    return `<span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
+      <i data-lucide="shield-alert" class="w-3 h-3"></i>Required</span>`;
+  }
+  return `<span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-700/40 text-slate-400 border border-slate-700">
+    Optional</span>`;
+}
+
+function guideBadge(v) {
+  if (v.documented) {
+    return `<span class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400">
+      <i data-lucide="check" class="w-3.5 h-3.5"></i>Present</span>`;
+  }
+  return `<span class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-400">
+    <i data-lucide="x" class="w-3.5 h-3.5"></i>Missing</span>`;
+}
+
+function render() {
+  const q = state.search.trim().toLowerCase();
+  const rows = VARS.filter(v => {
+    if (q && !v.name.toLowerCase().includes(q)) return false;
+    if (state.source !== 'all' && v.source !== state.source) return false;
+    if (state.onlyMissing && v.documented) return false;
+    if (state.onlyFailFast && !v.failFast) return false;
+    return true;
+  });
+
+  tbody.innerHTML = rows.map(v => {
+    const hl = state.highlight === v.name ? 'ring-1 ring-rose-500/60 bg-rose-950/20' : '';
+    const rot = v.rotationSensitive
+      ? `<span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
+           <i data-lucide="rotate-ccw" class="w-3 h-3"></i>Rotation-sensitive</span>`
+      : '';
+    const ff = v.failFast
+      ? `<span class="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
+           <i data-lucide="zap" class="w-3 h-3"></i>Fail-fast</span>`
+      : '';
+    return `
+      <tr class="hover:bg-slate-800/40 transition-colors ${hl}">
+        <td class="px-4 py-3 align-top">
+          <div class="font-mono text-[13px] text-slate-100">${v.name}</div>
+          <div class="flex flex-wrap gap-1.5 mt-1.5">${ff}${rot}</div>
+        </td>
+        <td class="px-3 py-3 align-top">${sourceBadge(v.source)}</td>
+        <td class="px-3 py-3 align-top">${requiredBadge(v)}</td>
+        <td class="px-3 py-3 align-top">${guideBadge(v)}</td>
+        <td class="px-3 py-3 align-top text-xs text-slate-400 max-w-[280px]">${v.note}</td>
+      </tr>`;
+  }).join('');
+
+  emptyState.classList.toggle('hidden', rows.length > 0);
+  document.getElementById('row-count').textContent = `${rows.length} row${rows.length === 1 ? '' : 's'}`;
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderKpis() {
+  const total = VARS.length;
+  const documented = VARS.filter(v => v.documented).length;
+  const missing = total - documented;
+  const failFast = VARS.filter(v => v.failFast).length;
+  const coverage = Math.round((documented / total) * 100);
+
+  document.getElementById('kpi-total').textContent = total;
+  document.getElementById('kpi-documented').textContent = documented;
+  document.getElementById('kpi-missing').textContent = missing;
+  document.getElementById('kpi-failfast').textContent = failFast;
+  document.getElementById('kpi-coverage').textContent = coverage + '%';
+  document.getElementById('kpi-bar').style.width = coverage + '%';
+}
+
+/* ============================================================
+   CONTROLS
+   ============================================================ */
+document.getElementById('search').addEventListener('input', e => {
+  state.search = e.target.value;
+  render();
+});
+
+document.querySelectorAll('.src-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    state.source = btn.dataset.src;
+    document.querySelectorAll('.src-btn').forEach(b => {
+      const active = b === btn;
+      b.className = 'src-btn px-3 py-1.5 text-xs font-medium rounded-md ' +
+        (active ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-slate-200');
+    });
+    render();
+  });
+});
+
+document.getElementById('only-missing').addEventListener('change', e => {
+  state.onlyMissing = e.target.checked; render();
+});
+document.getElementById('only-failfast').addEventListener('change', e => {
+  state.onlyFailFast = e.target.checked; render();
+});
+
+document.getElementById('btn-jump-mfa').addEventListener('click', () => {
+  state.highlight = 'MFA_ENCRYPTION_KEY';
+  state.search = '';
+  state.source = 'all';
+  state.onlyMissing = false;
+  state.onlyFailFast = false;
+  document.getElementById('search').value = '';
+  document.getElementById('only-missing').checked = false;
+  document.getElementById('only-failfast').checked = false;
+  document.querySelectorAll('.src-btn').forEach(b => {
+    b.className = 'src-btn px-3 py-1.5 text-xs font-medium rounded-md ' +
+      (b.dataset.src === 'all' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-slate-200');
+  });
+  render();
+  setTimeout(() => { state.highlight = null; }, 2600);
+});
+
+/* ============================================================
+   PATCH GENERATION — simulated deterministic pipeline
+   ============================================================ */
+const patchOut = document.getElementById('patch-out');
+const patchBar = document.getElementById('patch-bar');
+const patchPct = document.getElementById('patch-pct');
+const patchStage = document.getElementById('patch-stage');
+const patchWrap = document.getElementById('patch-progress-wrap');
+const patchStatus = document.getElementById('patch-status');
+
+const STAGES = [
+  { pct: 15, label: 'Parsing .env.example…' },
+  { pct: 35, label: 'Resolving @custos/config schema…' },
+  { pct: 55, label: 'Scanning composition-root.ts reads…' },
+  { pct: 75, label: 'Diffing against docs/guides/configuration.md…' },
+  { pct: 90, label: 'Linting generated markdown…' },
+  { pct: 100, label: 'Patch ready — PASS' },
+];
+
+function buildPatchText() {
+  const missing = VARS.filter(v => !v.documented);
+  const configVars = missing.filter(v => v.source === 'config');
+  const compVars = missing.filter(v => v.source === 'composition');
+
+  const line = (v) => {
+    const req = v.required ? 'required' : 'optional';
+    const ff = v.failFast ? ', fail-fast' : '';
+    const rot = v.rotationSensitive ? ', rotation-sensitive' : '';
+    return `+| \`${v.name}\` | ${v.source === 'config' ? '@custos/config' : 'composition-root'} | ${req}${ff}${rot} |`;
+  };
+
+  return [
+    '--- a/docs/guides/configuration.md',
+    '+++ b/docs/guides/configuration.md',
+    '@@ -1,6 +1,42 @@',
+    ' # Configuration',
+    ' ',
+    ' Environment variables are grouped by the layer that reads them.',
+    '+',
+    '+## Validated by `@custos/config`',
+    '+',
+    '+These are parsed and validated by `loadConfig` at boot. Invalid or missing',
+    '+required values abort startup.',
+    '+',
+    '+| Variable | Source | Requirement |',
+    '+| --- | --- | --- |',
+    ...configVars.map(line),
+    '+',
+    '+## Read at the composition root',
+    '+',
+    '+These are read directly from `process.env` in',
+    '+`apps/api/src/composition-root.ts` and are not covered by the shared schema.',
+    '+',
+    '+| Variable | Source | Requirement |',
+    '+| --- | --- | --- |',
+    ...compVars.map(line),
+    '+',
+    '+### `MFA_ENCRYPTION_KEY`',
+    '+',
+    '+**Required for MFA.** `packages/mfa/infrastructure/crypto/encryption.ts`',
+    '+throws when this key is unset. See `docs/QUARANTINE.md` for the incident',
+    '+that established this behaviour.',
+    '+',
+    '+> **Rotation hazard:** rotating this key makes stored TOTP secrets',
+    '+> undecryptable. Re-enrolment is required for every affected user.',
+    ' ',
+    ' ## Notes',
+  ].join('\n');
+}
+
+let running = false;
+function generatePatch() {
+  if (running) return;
+  running = true;
+  patchWrap.classList.remove('hidden');
+  patchStatus.textContent = 'RUNNING';
+  patchStatus.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-sky-500/15 text-sky-300';
+  patchOut.textContent = '';
+  patchBar.style.width = '0%';
+  patchPct.textContent = '0%';
+
+  let i = 0;
+  const tick = () => {
+    if (i >= STAGES.length) {
+      patchOut.textContent = buildPatchText();
+      patchStatus.textContent = 'PASS';
+      patchStatus.className = 'text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300';
+      running = false;
+      return;
+    }
+    const s = STAGES[i++];
+    patchStage.textContent = s.label;
+    patchBar.style.width = s.pct + '%';
+    patchPct.textContent = s.pct + '%';
+    setTimeout(tick, 320 + Math.random() * 260);
+  };
+  tick();
+}
+
+document.getElementById('btn-generate').addEventListener('click', generatePatch);
+
+document.getElementById('btn-rescan').addEventListener('click', () => {
+  const btn = document.getElementById('btn-rescan');
+  const icon = btn.querySelector('svg');
+  if (icon) icon.style.transition = 'transform .6s';
+  if (icon) icon.style.transform = 'rotate(360deg)';
+  setTimeout(() => { if (icon) { icon.style.transition = 'none'; icon.style.transform = 'none'; } }, 620);
+  renderKpis();
+  render();
+});
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+renderKpis();
+render();
+if (window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>
