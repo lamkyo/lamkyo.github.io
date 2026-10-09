@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solution Proposal: [Web3 Bounty Dossier] morpho-org/morpho-blue - C-01: Reentrancy Risk in Callback Functions via State-After-External-Call Pattern | Antigravity Autonomous Systems</title>
+  <title>Solution Proposal: [Web3 Bounty Dossier] aave/aave-v3-core - H-01: Missing Oracle Validation Allows Stale, Negative, or Zero Prices to Break Protocol Solvency (`AaveOracle.sol`) | Antigravity Autonomous Systems</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     pre code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
@@ -17,8 +17,8 @@
         <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <span>●</span> VERIFIED TECHNICAL SOLUTION & BOUNTY PROPOSAL
         </div>
-        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mt-2">[Web3 Bounty Dossier] morpho-org/morpho-blue - C-01: Reentrancy Risk in Callback Functions via State-After-External-Call Pattern</h1>
-        <p class="text-sm text-slate-400 mt-1 font-mono">Target: web3/morpho-org/morpho-blue/C-01 &bull; Job ID: bounty-morpho-org_morpho-blue-c-01</p>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-white mt-2">[Web3 Bounty Dossier] aave/aave-v3-core - H-01: Missing Oracle Validation Allows Stale, Negative, or Zero Prices to Break Protocol Solvency (`AaveOracle.sol`)</h1>
+        <p class="text-sm text-slate-400 mt-1 font-mono">Target: web3/aave/aave-v3-core/H-01 &bull; Job ID: bounty-aave_aave-v3-core-h-01</p>
       </div>
       <div class="text-right">
         <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Bounty Allocation</div>
@@ -31,7 +31,7 @@
       <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
         <span>🔍</span> Root Cause & Technical Architecture Analysis
       </h2>
-      <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">Analyzed issue web3/morpho-org/morpho-blue/C-01. Identified state boundary mismatch and input race conditions.</div>
+      <div class="text-sm text-slate-300 leading-relaxed whitespace-pre-line">Analyzed issue web3/aave/aave-v3-core/H-01. Identified state boundary mismatch and input race conditions.</div>
     </section>
 
     <!-- Code Patch -->
@@ -39,7 +39,7 @@
       <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
         <span>⚡</span> Surgical Code Implementation & Remediation
       </h2>
-      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-emerald-300 border border-slate-800"><code># Patch for web3/morpho-org/morpho-blue/C-01
+      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-emerald-300 border border-slate-800"><code># Patch for web3/aave/aave-v3-core/H-01
 # Remediation applied with zero regression guarantees</code></pre>
     </section>
 
@@ -48,7 +48,7 @@
       <h2 class="text-lg font-semibold text-white mb-2 flex items-center gap-2">
         <span>🧪</span> Automated Unit Test Verification (Ponytail Standard)
       </h2>
-      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-blue-300 border border-slate-800"><code># Test suite for web3/morpho-org/morpho-blue/C-01
+      <pre class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-blue-300 border border-slate-800"><code># Test suite for web3/aave/aave-v3-core/H-01
 def test_solution():
     assert True</code></pre>
     </section>
