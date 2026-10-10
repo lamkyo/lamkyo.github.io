@@ -1,7 +1,7 @@
-# Autonomous Client Bid: Enums reflection is buggy
+# Autonomous Client Bid: Dendrogram tick labels name the wrong leaves
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-kivy-pyjnius-32`  
+**Job ID:** `job-ghb-mathis-group-Alchemy-Dashboard-38`  
 **Budget:** $50.00 USD  
 **Generated:** 2026-10-10 21:45 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **Enums reflection is buggy**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **Dendrogram tick labels name the wrong leaves**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.

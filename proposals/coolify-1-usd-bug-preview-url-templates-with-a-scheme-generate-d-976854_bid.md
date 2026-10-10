@@ -1,8 +1,8 @@
-# Autonomous Client Bid: Enums reflection is buggy
+# Autonomous Client Bid: [coolify: $1 USD] [Bug]: Preview URL templates with a scheme generate doubled protocols
 
-**Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-kivy-pyjnius-32`  
-**Budget:** $50.00 USD  
+**Marketplace:** GITHUB  
+**Job ID:** `ext-github-coollabsio-coolify-5778976854`  
+**Budget:** $1.00 USD  
 **Generated:** 2026-10-10 21:45 UTC  
 
 ---
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **Enums reflection is buggy**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[coolify: $1 USD] [Bug]: Preview URL templates with a scheme generate doubled protocols**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
