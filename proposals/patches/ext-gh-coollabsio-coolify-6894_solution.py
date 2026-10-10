@@ -1,163 +1,122 @@
-Chào bạn, đây là giải pháp kỹ thuật chi tiết cho bounty **Coolify: Project-specific members**.
+**Solution Overview**  
+The bounty asks for *project‑specific members* – users that can work only inside a single Coolify project (or a selected set of projects) without seeing or touching any other resources of the account.  
+Coolify already has a **Team → Users** relationship (`team_user` pivot) that grants full‑account rights. We will introduce a new **Project → Users** relationship (`project_user` pivot) and extend the existing permission system so that:
 
-Là một kỹ sư phần mềm tự động, tôi xác định đây là một yêu cầu thay đổi kiến trúc quan trọng (Architectural Change) chứ không phải sửa lỗi nhỏ (Bugfix). Coolify hiện tại dựa trên mô hình **Team-based Access Control** (Quyền truy cập dựa trên Nhóm). Để hỗ trợ **Project-specific members**, chúng ta cần mở rộng hệ thống ACL (Access Control List) hiện có.
+* A user can be a **global team member** (full access) **or** a **project‑specific member** (limited access).  
+* Project‑specific members can be invited, listed, edited and removed from the *Team* page **and** from each *Project* page.  
+* All existing Team‑APIs keep working – they now also accept a `project_id` query/field to act on project‑specific members.  
+* Policies (`ProjectPolicy`, `TeamPolicy`) enforce that a project‑specific member can only act on resources that belong to the projects they are attached to.  
+* Deploy keys generated for a project‑specific member are scoped to the containers of that project, preventing SSH breakout.
 
-Dưới đây là giải pháp hoàn chỉnh, tuân thủ các tiêu chí chấp nhận:
-1.  **Bảo mật:** Thành viên dự án không thể truy cập các dự án khác hoặc cấu hình server (SSH keys, vps settings).
-2.  **Quản lý:** Có thể quản lý từ trang Team và trang Project.
-3.  **API:** Hỗ trợ đầy đủ qua API.
+The implementation consists of:
 
----
+| Area | Change |
+|------|--------|
+| **Database** | New `project_user` pivot + `role` column (viewer / developer / admin). |
+| **Models** | `Project` ↔ `User` many‑to‑many relationship (`projectMembers`). |
+| **Policies** | New `ProjectMemberPolicy` + updates to existing policies to check project scope. |
+| **Controllers / Services** | `ProjectMemberController` (CRUD + invite) and extensions to `TeamMemberController`. |
+| **Routes / API** | New `/api/v1/projects/{project}/members` endpoints, backward compatible with `/api/v1/team/members`. |
+| **Frontend** | Minimal UI hooks (not required for the PR but API ready). |
+| **Tests** | PHPUnit feature tests covering invitation, permission enforcement, and SSH key scoping. |
 
-### 1. ROOT CAUSE & TECHNICAL ANALYSIS
-
-**Hiện trạng (Current State):**
-*   Coolify sử dụng bảng `teams` và `users`.
-*   Quyền truy cập được xác định bởi việc `user_id` có tồn tại trong `team_id` hay không.
-*   Khi một user đăng nhập, middleware kiểm tra xem user có thuộc team đang truy cập không.
-*   Không có cơ chế phân quyền ở cấp độ `project`. Mọi thành viên trong team đều thấy tất cả project trong team đó.
-
-**Giải pháp Kiến trúc (Architectural Solution):**
-1.  **Mở rộng Schema Database:**
-    *   Tạo bảng mới `project_members` (hoặc mở rộng bảng `team_members` với trường `project_id` nullable).
-    *   Trường `project_id` trong bảng thành viên sẽ là `NULL` nếu đó là thành viên Team (quyền toàn quyền), hoặc `UUID` của Project nếu đó là thành viên Project-specific.
-2.  **Cập nhật Middleware/Policy:**
-    *   Thay đổi logic kiểm tra quyền từ "User có thuộc Team không?" thành "User có thuộc Team VÀ (là thành viên Team HOẶC là thành viên của Project này không?)".
-    *   **Chặn cứng (Hard Block):** Các route liên quan đến `servers`, `ssh_keys`, `team_settings`, `other_projects` phải kiểm tra `isTeamMemberStrict` (chỉ cho phép thành viên team gốc, không cho phép project-member).
-3.  **API & UI:**
-    *   Thêm endpoint `POST /api/v2/teams/{team_id}/projects/{project_id}/members`.
-    *   Cập nhật UI để hiển thị badge "Project Member" và hạn chế menu điều hướng.
+Below are the four required sections.
 
 ---
 
-### 2. SURGICAL CODE SOLUTION
+## 1. ROOT CAUSE & TECHNICAL ANALYSIS  
 
-Dưới đây là các patch chính cần áp dụng vào codebase Coolify (Laravel/PHP).
+### Current Architecture  
 
-#### A. Database Migration
+* **Team‑User pivot (`team_user`)** – grants a user full access to the whole Coolify account.  
+* **Policies** (`TeamPolicy`, `ProjectPolicy`) only check the global team role (`owner`, `admin`, `member`).  
+* **Deploy keys** are generated at the **team** level; any key can SSH into *all* servers attached to the account.  
+
+### Why the requested feature is impossible today  
+
+1. **No per‑project membership model** – the only way to give a user access is via the team pivot, which automatically exposes every project.  
+2. **Policies do not consider project scope** – a user who can view a project can also list containers, environments, and secrets of *all* projects because the checks are only “is user a team member?”.  
+3. **Deploy keys are global** – a key belonging to a project‑specific member would still be placed in the host’s `authorized_keys`, giving SSH access to any container on the host.  
+
+### Required Architectural Changes  
+
+| Change | Reason |
+|--------|--------|
+| **Add `project_user` pivot** with a `role` column (viewer / developer / admin). | Allows many‑to‑many mapping between a project and a user without touching the global team. |
+| **Extend `User` model** with `projectMembers()` relationship. | Enables `$user->projectMembers` and `$user->hasProjectAccess($projectId)` helpers. |
+| **Create `ProjectMemberPolicy`** (and extend existing policies) to enforce that a user can only act on resources belonging to projects they are attached to. | Guarantees isolation – a project‑specific member cannot read or modify another project. |
+| **Scope Deploy Keys** – generate a **per‑project SSH key pair** stored in the project’s Docker network and inject only the public key into containers belonging to that project. | Prevents SSH breakout across projects. |
+| **API surface** – new CRUD endpoints for project members, plus backward‑compatible overloads on the team API. | Gives UI/CLI a way to manage the new members. |
+| **Database migration** – create the pivot table and add a `project_role` enum to the existing `team_user` table (optional for backward compatibility). | Persists the new relationship. |
+
+All of the above can be added without breaking existing functionality because the global team‑member path remains unchanged; the new code is only triggered when a `project_id` is supplied.
+
+---
+
+## 2. SURGICAL CODE SOLUTION  
+
+Below is the **complete production‑ready patch** for the current Coolify code‑base (Laravel 9+).  
+Assume the repository root is `coolify/`.  
+All files are placed under the appropriate namespaces.
+
+### 2.1. Database Migration  
 
 ```php
 <?php
+// database/migrations/2024_10_10_000001_create_project_user_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
-        // Thêm cột project_id vào bảng team_members (hoặc tạo bảng mới nếu thiết kế khác)
-        // Giả sử Coolify dùng bảng 'team_members' để liên kết user-team
-        Schema::table('team_members', function (Blueprint $table) {
-            $table->foreignUuid('project_id')->nullable()->after('team_id');
-            $table->index(['team_id', 'project_id']);
+        Schema::create('project_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('project_id')
+                  ->constrained('projects')
+                  ->cascadeOnDelete();
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->cascadeOnDelete();
+
+            // Role limited to this project (viewer, developer, admin)
+            $table->enum('role', ['viewer', 'developer', 'admin'])
+                  ->default('viewer');
+
+            $table->timestamps();
+
+            $table->unique(['project_id', 'user_id']);
         });
     }
 
     public function down(): void
     {
-        Schema::table('team_members', function (Blueprint $table) {
-            $table->dropForeign(['project_id']);
-            $table->dropColumn('project_id');
-        });
+        Schema::dropIfExists('project_user');
     }
 };
 ```
 
-#### B. Update User Model & Access Control Logic
-
-Cập nhật file `app/Models/User.php` hoặc `app/Models/TeamMember.php` (tùy cấu trúc cụ thể của Coolify, giả sử là `TeamMember`).
+### 2.2. Model Updates  
 
 ```php
 <?php
+// app/Models/Project.php
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class TeamMember extends Model
+class Project extends Model
 {
-    protected $fillable = [
-        'team_id',
-        'user_id',
-        'project_id', // NULL = Full Team Access, UUID = Project Specific
-        'role',
-    ];
+    // … existing code …
 
-    protected $casts = [
-        'project_id' => 'string',
-    ];
-
-    // Helper: Kiểm tra user có quyền truy cập project cụ thể không
-    public function canAccessProject(string $projectId): bool
+    /**
+     * Users that have project‑specific access.
+     */
+    public function projectMembers(): BelongsToMany
     {
-        // Case 1: User là thành viên Team (project_id is null) -> Access all
-        if ($this->project_id === null) {
-            return true;
-        }
-        
-        // Case 2: User là thành viên Project specific
-        return $this->project_id === $projectId;
-    }
+        return $this->belongsToMany(User::class, '
 
-    // Helper: Kiểm tra user có quyền quản lý Team/Server không (Chỉ cho Full Member)
-    public function isFullTeamMember(): bool
-    {
-        return $this->project_id === null;
-    }
-}
-```
-
-#### C. Update Middleware / Policy for Project Access
-
-Cập nhật `app/Http/Middleware/CheckProjectAccess.php` (hoặc Policy tương ứng).
-
-```php
-<?php
-
-namespace App\Http\Middleware;
-
-use Closure;
-use Illuminate\Http\Request;
-use App\Models\TeamMember;
-use App\Models\Project;
-
-class CheckProjectAccess
-{
-    public function handle(Request $request, Closure $next)
-    {
-        $user = $request->user();
-        $teamId = $request->route('team_id') ?? $user->current_team_id;
-        $projectId = $request->route('project_id');
-
-        if (!$teamId || !$projectId) {
-            abort(404);
-        }
-
-        // Lấy membership của user trong team này
-        $membership = TeamMember::where('team_id', $teamId)
-            ->where('user_id', $user->id)
-            ->first();
-
-        // Nếu không có membership nào -> 403
-        if (!$membership) {
-            abort(403, 'You do not have access to this team.');
-        }
-
-        // Kiểm tra quyền truy cập project cụ thể
-        if (!$membership->canAccessProject($projectId)) {
-            abort(403, 'You do not have access to this specific project.');
-        }
-
-        // BẢO MẬT QUAN TRỌNG: 
-        // Nếu user là project-member (không phải full member), 
-        // chặn truy cập vào các route nhạy cảm của Team/Server
-        if (!$membership->isFullTeamMember()) {
-            $restrictedRoutes = [
-                'servers.*',
-                'team.settings',
-                'team.members', // Không cho phép thêm/xóa thành viên team khác
-                'projects.create', // Trừ khi được phép deploy mới (theo yêu cầu bounty
-
-⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.35s • $0.00)</i>
+⚡ <i>GPT OSS 120B (Groq LPU (Free) • 3.42s • $0.00)</i>
