@@ -1,110 +1,117 @@
-Chào bạn, tôi là **Antigravity**.
+Chào bạn, tôi là Antigravity. Dựa trên dữ liệu hệ thống và mô tả công việc (Job Description) bạn cung cấp, đây là một **lệnh sai lệch (Command Mismatch)**.
 
-Tôi đã phân tích kỹ task `freelance-65520d470925`. Đây là một **Lead Thuê Nhân Sự (For Hire)**, không phải một Bug cần sửa hay một tính năng cần phát triển. Bạn (hoặc hệ thống) đang cố gắng áp dụng quy trình "Sửa lỗi/Coding" lên một bài đăng tuyển dụng.
+**Phân tích nhanh:**
+1.  **Bản chất công việc:** Đây là một tin tuyển dụng (Job Posting) từ Reddit (u/pe1uca) tìm kiếm một **Freelancer** (Backend PHP/Symfony + Godot).
+2.  **Yêu cầu của bạn:** Bạn yêu cầu tôi giải quyết một "bug" hoặc viết code patch theo cấu trúc 4 phần kỹ thuật (Root Cause, Code Fix, Test, PR).
+3.  **Thực tế:** **Không có bug nào ở đây.** Không có mã nguồn (source code) nào được cung cấp để tôi sửa. Không có hệ thống nào đang bị lỗi. Đây là một cơ hội kinh doanh (Business Opportunity) hoặc một yêu cầu tìm kiếm nhân sự, không phải một lỗi kỹ thuật cần vá (patch).
 
-**Phân tích thực tế:**
-1.  **Bản chất:** Người đăng (u/pe1uca) đang tìm kiếm một lập trình viên Backend/Web/Game Dev (PHP, Svelte, Godot) làm việc từ xa, tối đa 20h/tuần, mức lương ~$30 USD/h.
-2.  **Mâu thuẫn:** Không có "Code" hay "Bug" trong mô tả. Yêu cầu "Surgical Code Solution" là sai ngữ cảnh.
-3.  **Chiến lược:** Thay vì viết code giả lập, giải pháp đúng đắn nhất là **Chuẩn bị một Proposal (Đề xuất) chuyên nghiệp** để bạn có thể gửi cho người này, hoặc nếu hệ thống của bạn đang tự động hóa việc "chốt đơn", thì cần chuyển trạng thái từ `APPROVAL_REQUIRED` sang `CONTACTED` với nội dung phù hợp.
+Việc áp dụng cấu trúc "Sửa lỗi" cho một tin tuyển dụng là sai logic kỹ thuật. Tuy nhiên, để hỗ trợ bạn tốt nhất trong vai trò **Principal Autonomous Software Engineer**, tôi sẽ chuyển đổi bài toán này sang đúng bản chất: **Phân tích tính khả thi kỹ thuật và Đề xuất Chiến lược Tiếp cận (Outreach Strategy)** nếu bạn (hoặc hệ thống của bạn) muốn ứng tuyển hoặc tự động hóa quy trình xử lý lead này.
 
-Dưới đây là giải pháp cấu trúc lại theo đúng yêu cầu 4 phần, nhưng nội dung được điều chỉnh cho phù hợp với bản chất **Business/Outreach** của task này.
+Dưới đây là phản hồi dựa trên sự trung thực và chuẩn xác:
+
+---
 
 ### 1. ROOT CAUSE & TECHNICAL ANALYSIS
-**Vấn đề cốt lõi:** Mismatch giữa loại Task (Freelance Lead) và Pipeline xử lý (Software Bug Fix).
-*   **Hiện trạng:** Hệ thống đang giữ task này ở trạng thái `APPROVAL_REQUIRED` trong Job to Cash Database.
-*   **Nguyên nhân:** Pipeline tự động hóa có thể đang chờ một "Patch Code" để xác nhận task là "Solvable". Tuy nhiên, đây là một cơ hội kinh doanh (Business Opportunity), không phải một vấn đề kỹ thuật.
-*   **Yêu cầu kiến trúc:** Cần chuyển đổi logic xử lý từ "Code Generation" sang "Proposal Generation". Hệ thống cần tạo ra một thông điệp chào hàng (Sales Pitch) dựa trên hồ sơ năng lực của "Bạn" (hoặc Agent) để gửi cho `u/pe1uca`.
-*   **Điểm mấu chốt:** Người tuyển dụng yêu cầu:
-    *   Backend: PHP (Symfony) hoặc JS.
-    *   Frontend: Svelte.
-    *   Game: Godot (GDScript).
-    *   CI/CD: GitLab/GitHub Actions.
-    *   Timezone: EST (Quebec).
-    *   Rate: ~$30 USD/h.
+**Vấn đề:** Mismatch giữa yêu cầu đầu vào (Fix Bug) và dữ liệu đầu vào (Job Posting).
+**Phân tích:**
+-   **Không có lỗi kỹ thuật:** Dữ liệu đầu vào là văn bản mô tả năng lực của một ứng viên (u/pe1uca) và yêu cầu công việc. Không có stack trace, không có mã lỗi, không có repository.
+-   **Tính khả thi kỹ thuật (Technical Fit):**
+    -   **Stack yêu cầu:** PHP (Symfony), JS (Svelte), CI/CD (GitLab/GitHub Actions), Godot (GDScript).
+    -   **Năng lực ứng viên:** 7 năm PHP/Symfony, 2 năm Godot. Có kinh nghiệm CI/CD và Docker.
+    -   **Rủi ro kỹ thuật:** Ứng viên thiếu kinh nghiệm về *Real-time Multiplayer* và *Matchmaking* (tuy nhiên, yêu cầu công việc chỉ cần "server side game components: accounts, leaderboards, APIs", nên rủi ro này thấp).
+    -   **Hạn chế:** Chỉ làm việc tối và cuối tuần (20h/tuần). Điều này ảnh hưởng lớn đến tốc độ phản hồi và xử lý sự cố khẩn cấp (incident response).
 
 ### 2. SURGICAL CODE SOLUTION
-Vì không có code nào để sửa, "Code" ở đây là **Script tự động hóa gửi Proposal** và **Nội dung Proposal chuẩn SEO/Technical**.
+**Lưu ý:** Không có code để sửa. Thay vào đó, đây là **Script Tự động hóa Phân tích Lead** (Python) để hệ thống của bạn đánh giá và phân loại lead này một cách tự động, tránh việc gửi đi những proposal không phù hợp.
 
-Dưới đây là script Python để chuẩn bị và lưu trữ proposal vào database, sẵn sàng để gửi qua API (ví dụ: Reddit API hoặc Email).
+```python
+import re
+from dataclasses import dataclass
+from enum import Enum
 
-<pre><code>
-import json
-import datetime
-from typing import Dict, Any
+class LeadStatus(Enum):
+    HIGH_FIT = "HIGH_FIT"
+    MEDIUM_FIT = "MEDIUM_FIT"
+    LOW_FIT = "LOW_FIT"
+    REJECT = "REJECT"
 
-class FreelanceLeadHandler:
-    def __init__(self, task_id: str, platform: str):
-        self.task_id = task_id
-        self.platform = platform
-        self.proposal_data = {}
+@dataclass
+class LeadAnalysis:
+    title: str
+    description: str
+    status: LeadStatus
+    score: int
+    reasons: list
 
-    def generate_proposal(self, agent_profile: Dict[str, Any]) -> str:
-        """
-        Generate a tailored proposal based on the job description.
-        """
-        # Extract key requirements from description
-        requirements = {
-            "backend": ["PHP", "Symfony", "REST APIs"],
-            "frontend": ["Svelte", "JavaScript"],
-            "game_dev": ["Godot", "GDScript"],
-            "devops": ["CI/CD", "GitLab", "GitHub Actions", "Docker"],
-            "availability": "Remote, max 20hrs/week, EST timezone",
-            "rate": "~$30 USD/hour"
-        }
-
-        # Construct the message
-        subject = f"Proposal: Backend & Game Dev Support (PHP/Svelte/Godot) - {self.task_id}"
-        
-        body = f"""
-Hi [Name/pe1uca],
-
-I came across your post regarding your search for a remote Backend and Web Developer with Godot experience. I am highly interested in this opportunity.
-
-**Why I am a good fit:**
-1. **Backend & Web:** Extensive experience with PHP (Symfony) and modern JavaScript frameworks (Svelte/React). I specialize in building robust REST APIs and handling technical debt.
-2. **Game Development:** Proficient in Godot and GDScript. I have experience with gameplay mechanics, state machines, and server-side components (accounts, leaderboards).
-3. **DevOps & CI/CD:** I implement automated pipelines using GitHub Actions and GitLab CI/CD to ensure clean code, automated testing, and seamless Docker deployments.
-4. **Workflow:** I am comfortable working in the EST timezone (evenings/weekends) and can provide weekly deliverables with progress reports via Git or documentation sites.
-
-**My Approach:**
-- I focus on code quality and maintainability.
-- I can help modernize legacy codebases or build new features from scratch.
-- I am available for up to 20 hours/week, which aligns with your requirements.
-
-I have reviewed your portfolio (pe1uca.itch.io and godot_wfc_editor) and am impressed by your work. I would love to discuss how I can help you finish your prototype or ease your workflow.
-
-Best regards,
-[Your Name]
-[Your Portfolio/LinkedIn]
-"""
-        return subject, body
-
-    def process_lead(self, agent_profile: Dict[str, Any]) -> Dict[str, Any]:
-        subject, body = self.generate_proposal(agent_profile)
-        
-        self.proposal_data = {
-            "task_id": self.task_id,
-            "status": "PROPOSAL_READY",
-            "created_at": datetime.datetime.now().isoformat(),
-            "subject": subject,
-            "body": body,
-            "target_user": "pe1uca",
-            "platform": self.platform
-        }
-        
-        # In a real system, this would trigger an API call to send the message
-        # e.g., reddit_api.send_message(to="pe1uca", subject=subject, body=body)
-        
-        return self.proposal_data
-
-# Example Usage
-if __name__ == "__main__":
-    # Simulate agent profile
-    agent_profile = {
-        "name": "Antigravity Agent",
-        "skills": ["PHP", "Svelte", "Godot", "CI/CD"]
-    }
+def analyze_freelance_lead(title: str, description: str) -> LeadAnalysis:
+    """
+    Phân tích tính phù hợp kỹ thuật của một lead freelance.
+    """
+    desc_lower = description.lower()
+    title_lower = title.lower()
     
-    handler = FreelanceLeadHandler("freelance-65520d470925", "freelance_lead")
+    # Keywords kỹ thuật chính
+    required_skills = ["php", "symfony", "svelte", "godot", "ci/cd", "docker"]
+    preferred_skills = ["rest api", "linux", "gitlab", "github actions"]
+    
+    # Keywords loại trừ (Red Flags)
+    red_flags = ["urgent", "immediately", "24/7", "full time only"]
+    
+    score = 0
+    reasons = []
+    
+    # Kiểm tra kỹ năng bắt buộc
+    for skill in required_skills:
+        if skill in desc_lower or skill in title_lower:
+            score += 10
+            reasons.append(f"Found required skill: {skill}")
+        else:
+            score -= 5
+            reasons.append(f"Missing required skill: {skill}")
+            
+    # Kiểm tra kỹ năng ưu tiên
+    for skill in preferred_skills:
+        if skill in desc_lower:
+            score += 5
+            reasons.append(f"Found preferred skill: {skill}")
+            
+    # Kiểm tra red flags
+    for flag in red_flags:
+        if flag in desc_lower:
+            score -= 20
+            reasons.append(f"Red flag detected: {flag}")
+            
+    # Kiểm tra mô hình làm việc (Remote, Hourly, etc.)
+    if "remote" in desc_lower:
+        score += 5
+        reasons.append("Remote friendly")
+        
+    if "hourly" in desc_lower or "milestone" in desc_lower:
+        score += 5
+        reasons.append("Flexible payment model")
 
-⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.18s • $0.00)</i>
+    # Xác định trạng thái
+    if score >= 30:
+        status = LeadStatus.HIGH_FIT
+    elif score >= 15:
+        status = LeadStatus.MEDIUM_FIT
+    elif score >= 0:
+        status = LeadStatus.LOW_FIT
+    else:
+        status = LeadStatus.REJECT
+        
+    return LeadAnalysis(title, description, status, score, reasons)
+
+# Chạy phân tích với dữ liệu thực tế
+if __name__ == "__main__":
+    title = "[High-Ticket Contract: $500] [For Hire] Backend and web developer plus game dev (PHP, JS/Svelte, CI/CD, Godot) remote 2"
+    description = """
+    Timezone: EST (Québec) Availability: Remote max 20hrs/week Rate: $42CAD (~30USD) open to negotiate. 
+    Backend developer with 7 years of professional experience on REST APIs and website functionality, 
+    plus ~2 years with Godot on personal projects and game jams as a solo dev. 
+    What I can do Websites: using PHP (symfony) and JS (svelte). 
+    CI/CD: Implement pipelines with both GitLab CI/CD and Github Actions to automate testing, code review, building Docker images, and deploy projects. 
+    Basic manual server configuration: spin up a linux machine in a cloud provider and configure it to run a project. 
+    Tackle technical debt: Take current code base and
+
+⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.10s • $0.00)</i>
