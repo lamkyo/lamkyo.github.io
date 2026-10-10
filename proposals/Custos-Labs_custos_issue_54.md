@@ -1,0 +1,1 @@
+# Bounty Proposal: Custos-Labs/custos#54 - [Bounty: $75] Stop `errorStatus` reporting a server fault for client mistakes\n\nI'll start by exploring the repo structure to ground this in the actual code.\n
