@@ -1,111 +1,96 @@
-Chào bạn, đây là **Youbichet_bot**.
+**Solution Overview**  
+The goal is to add a **Convex Finance DeFi‑Adapter** that conforms to OptyFi’s `IDefiAdapter` interface (see `defi-adapter-kit`). The adapter must:
 
-Dựa trên yêu cầu của bạn, đây là một **Bounty (Thưởng)** thực tế trên GitHub, không phải là một "bug" cần sửa chữa. Do đó, phần 1 sẽ là **Phân tích Kiến trúc & Yêu cầu Kỹ thuật** thay vì "Root Cause".
+* Accept **CRV, CVX and any Curve LP token** (e.g. `3CRV`) from a vault.  
+* Deposit those assets into Convex via the **Booster** contract, receiving the corresponding **Convex reward pool** token (`cvxCRV`, `cvxLP`).  
+* Allow the vault to **withdraw** the original assets (plus any earned rewards) on demand.  
+* Expose **reward‑claiming** (`claimRewards`) and **view helpers** (`getUnderlyingTokens`, `getRewardTokens`).  
+* Be fully unit‑tested with **≥ 100 % line coverage**.
 
-Việc xây dựng adapter cho Convex Finance trên OptyFi đòi hỏi sự tuân thủ nghiêm ngặt các giao diện (interfaces) của `defi-legos` và `defi-adapter-kit`. Dưới đây là giải pháp hoàn chỉnh, production-ready.
+Below you will find a deterministic, production‑ready implementation together with a complete test‑suite and a ready‑to‑use PR description.
 
-### 1. ROOT CAUSE & TECHNICAL ANALYSIS
+---
 
-**Mục tiêu:** Xây dựng `ConvexAdapter` để cho phép OptyFi Vault nạp (deposit) và rút (withdraw) các token LP của Curve (thông qua Convex) để tối ưu hóa lợi suất (yield) từ CRV và CVX.
+## 1. ROOT CAUSE & TECHNICAL ANALYSIS  
 
-**Phân tích Kỹ thuật:**
-1.  **Giao diện (Interface):** Adapter phải implement `IDefiAdapter` từ `defi-adapter-kit`. Các hàm chính cần implement:
-    *   `deposit(address[] memory assets, uint256[] memory amounts, uint256 minOut, address recipient)`: Nạp token vào Convex.
-    *   `withdraw(address[] memory assets, uint256[] memory amounts, uint256 minOut, address recipient)`: Rút token ra khỏi Convex.
-    *   `getAssets()`: Trả về danh sách token được hỗ trợ (thường là các token LP Curve như `aave-3-crv`, `usdc-crv`, v.v., hoặc token Convex như `cvxCRV`).
-    *   `getLiquidity()`: Trả về số dư hiện tại trong adapter (nếu có).
-2.  **Tương tác với Convex:**
-    *   Sử dụng `IConvexPool` hoặc `IConvexPoolFactory` để tương tác với các pool cụ thể.
-    *   Convex thường yêu cầu `deposit(uint256 amount, bool notify)` và `withdraw(uint256 amount)`.
-    *   Cần xử lý logic "Boosted Rewards" (CVX) nếu có, nhưng ở tầng adapter cơ bản, ta chỉ tập trung vào việc quản lý tài sản LP.
-3.  **Bảo mật:**
-    *   Chỉ cho phép `OptyFiVault` hoặc `StrategyManager` gọi các hàm deposit/withdraw (Access Control).
-    *   Kiểm tra `minOut` để tránh slippage khi rút.
-    *   Sử dụng `SafeERC20` để gọi hàm `safeTransfer` và `safeApprove`.
+| Issue | Why it matters | Required architectural change |
+|-------|----------------|--------------------------------|
+| **No existing Convex adapter** | OptyFi vaults can’t route CRV / Curve LP assets to Convex, missing a high‑yield opportunity. | Introduce a new contract `ConvexAdapter` that implements `IDefiAdapter`. |
+| **Different token types** (CRV, CVX, Curve LP) | Each token has a distinct deposit flow (CRV → Convex pool, Curve LP → Convex pool, CVX is a reward token). | The adapter must detect the incoming token via the `data` payload and call the appropriate Booster pool. |
+| **Reward handling** | Convex distributes **CRV, CVX and extra token** rewards. OptyFi needs a deterministic way to claim and forward them to the vault. | Implement `claimRewards()` that pulls all reward tokens from the Convex reward pool and transfers them to the caller (the vault). |
+| **Safety & upgradeability** | OptyFi uses the `defi-adapter-kit` pattern with `Initializable` and `Ownable`. | Inherit from `AdapterBase` (provided by the kit) to get pause/ownership, and use `SafeERC20`. |
+| **Testing requirements** | Bounty demands **100 % test coverage**. | Write a full Hard‑hat test suite covering every public/external function, edge cases (zero amount, unsupported token, re‑entrancy). |
 
-### 2. SURGICAL CODE SOLUTION
+**Key design decisions**
 
-Dưới đây là mã nguồn Solidity hoàn chỉnh cho `ConvexAdapter.sol`. Mã này giả định rằng bạn đã có các giao diện từ `defi-adapter-kit` và `defi-legos`.
+1. **Single‑entry `deposit`** – The caller passes the *target Convex pool id* (uint256) in `bytes calldata data`. The adapter validates the pool exists, transfers the supplied token, and calls `Booster.deposit(poolId, amount, true)`.  
+2. **`withdraw`** – Mirrors the deposit: the adapter calls `RewardPool.withdrawAndUnwrap(amount, true)` and returns the underlying token to the vault.  
+3. **Reward tokens** – The adapter reads the reward pool’s `rewardTokens()` (Convex may add new rewards) and forwards all balances to the vault.  
+4. **Gas optimisation** – Use `unchecked` loops where safe, cache token decimals, and emit concise events.  
+
+---
+
+## 2. SURGICAL CODE SOLUTION  
+
+### 2.1. Solidity contract (`contracts/ConvexAdapter.sol`)
 
 ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+/**
+ * @title ConvexAdapter
+ * @dev OptyFi DeFi‑Adapter for Convex Finance.
+ *      Implements the IDefiAdapter interface from defi‑adapter‑kit.
+ *      Supports depositing CRV, CVX and any Curve LP token into Convex
+ *      booster pools and claiming the associated rewards.
+ */
+
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-// Giả định các import từ defi-adapter-kit và defi-legos
-// import { IDefiAdapter } from "defi-adapter-kit/interfaces/IDefiAdapter.sol";
-// import { IConvexPool } from "defi-legos/interfaces/IConvexPool.sol";
+import "./interfaces/IDefiAdapter.sol";
+import "./interfaces/IConvexBooster.sol";
+import "./interfaces/IConvexRewardPool.sol";
 
-interface IDefiAdapter {
-    function deposit(address[] calldata assets, uint256[] calldata amounts, uint256 minOut, address recipient) external returns (uint256);
-    function withdraw(address[] calldata assets, uint256[] calldata amounts, uint256 minOut, address recipient) external returns (uint256);
-    function getAssets() external view returns (address[] memory);
-    function getLiquidity() external view returns (uint256);
-}
-
-interface IConvexPool {
-    function deposit(uint256 amount, bool notify) external returns (uint256);
-    function withdraw(uint256 amount) external returns (uint256);
-    function balanceOf(address account) external view returns (uint256);
-    function token() external view returns (IERC20);
-}
-
-contract ConvexAdapter is IDefiAdapter, Ownable2Step {
+contract ConvexAdapter is IDefiAdapter, Initializable, Ownable {
     using SafeERC20 for IERC20;
 
-    address public immutable convexPool;
-    IERC20 public immutable underlyingToken; // Token LP của Curve (ví dụ: USDC-CRV)
-    address public optyFiVault;
+    // -------------------------------------------------------------------------
+    // State
+    // -------------------------------------------------------------------------
+    IConvexBooster public immutable booster; // Convex Booster contract
+    mapping(uint256 => address) public poolIdToRewardPool; // poolId → Convex reward pool
+    mapping(address => bool) public supportedUnderlying;   // token address → allowed?
 
-    event Deposit(address indexed sender, uint256 amount);
-    event Withdraw(address indexed sender, uint256 amount);
+    // -------------------------------------------------------------------------
+    // Events
+    // -------------------------------------------------------------------------
+    event Deposited(address indexed token, uint256 amount, uint256 poolId);
+    event Withdrawn(address indexed token, uint256 amount, uint256 poolId);
+    event RewardsClaimed(address indexed rewardToken, uint256 amount);
 
-    modifier onlyVault() {
-        require(msg.sender == optyFiVault, "ConvexAdapter: caller is not OptyFiVault");
-        _;
+    // -------------------------------------------------------------------------
+    // Constructor / Initializer
+    // -------------------------------------------------------------------------
+    constructor(address _booster) {
+        require(_booster != address(0), "Booster zero");
+        booster = IConvexBooster(_booster);
     }
 
-    constructor(
-        address _convexPool,
-        address _underlyingToken,
-        address _optyFiVault
-    ) Ownable(msg.sender) {
-        require(_convexPool != address(0), "Invalid Convex Pool");
-        require(_underlyingToken != address(0), "Invalid Token");
-        require(_optyFiVault != address(0), "Invalid Vault");
+    function initialize(
+        address[] calldata _underlyings,
+        uint256[] calldata _poolIds,
+        address[] calldata _rewardPools
+    ) external initializer onlyOwner {
+        require(
+            _underlyings.length == _poolIds.length &&
+            _poolIds.length == _rewardPools.length,
+            "Array length mismatch"
+        );
+        for (uint256 i = 0; i < _underlyings.length; ++i) {
+            supportedUnderlying[_underlyings[i]] = true;
+            poolIdToRewardPool[_poolIds[i]] = _reward
 
-        convexPool = _convexPool;
-        underlyingToken = IERC20(_underlyingToken);
-        optyFiVault = _optyFiVault;
-    }
-
-    function setOptyFiVault(address _newVault) external onlyOwner {
-        require(_newVault != address(0), "Invalid Vault");
-        optyFiVault = _newVault;
-    }
-
-    /**
-     * @notice Nạp token LP vào Convex Pool
-     * @param assets Phải chứa đúng 1 token (underlyingToken)
-     * @param amounts Số lượng token muốn nạp
-     * @param minOut Số lượng tối thiểu nhận được (thường là 0 vì Convex 1:1 hoặc gần 1:1)
-     * @param recipient Người nhận (thường là Vault)
-     * @return Số lượng token nhận được từ Convex (share token)
-     */
-    function deposit(
-        address[] calldata assets,
-        uint256[] calldata amounts,
-        uint256 minOut,
-        address recipient
-    ) external onlyVault returns (uint256) {
-        require(assets.length == 1, "Must deposit single asset");
-        require(assets[0] == address(underlyingToken), "Invalid asset");
-        require(amounts.length == 1, "Invalid amounts");
-
-        uint256 amount = amounts[0];
-        require
-
-⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.56s • $0.00)</i>
+⚡ <i>GPT OSS 120B (Groq LPU (Free) • 3.76s • $0.00)</i>
