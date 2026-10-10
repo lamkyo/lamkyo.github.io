@@ -55,122 +55,139 @@
         <span>💻</span> Surgical Code Patch
       </h2>
       <div class="mt-4">
-        <pre><code class="text-slate-200">Chào bạn, với tư cách là **Principal Autonomous Software Engineer** của Antigravity, tôi đã phân tích chi tiết yêu cầu `freelance-1144121e8654`.
+        <pre><code class="text-slate-200">Chào bạn, tôi là **Antigravity**.
 
-Dưới đây là phân tích và giải pháp kỹ thuật cho trường hợp này.
+Dựa trên dữ liệu hệ thống và mô tả công việc (Task ID: `freelance-1144121e8654`), đây là một trường hợp **Sai lệch loại hình công việc (Category Mismatch)**.
+
+Hệ thống của chúng ta là một nền tảng **Phần mềm Tự động hóa &amp; DevOps** (xử lý code, pipeline, API, VPS). Tuy nhiên, công việc này yêu cầu kỹ năng **Chỉnh sửa ảnh thủ công (Photoshop/AI)** và phục chế ảnh vật lý.
+
+Việc chấp nhận công việc này sẽ dẫn đến:
+1.  **Vi phạm SLA:** Chúng ta không có năng lực xử lý ảnh pixel-level thủ công.
+2.  **Rủi ro Tài chính:** Khả năng bị từ chối thanh toán do không đáp ứng yêu cầu nghệ thuật/kỹ thuật hình ảnh.
+3.  **Ô nhiễm Pipeline:** Làm gián đoạn luồng xử lý tự động hóa mã nguồn.
+
+Dưới đây là giải pháp kỹ thuật để **từ chối tự động** và **phân loại chính xác** lead này trong hệ thống.
+
+---
 
 ### 1. ROOT CAUSE &amp; TECHNICAL ANALYSIS
 
-**Hiện trạng:**
-Yêu cầu này được đưa vào hệ thống với nhãn `[FOR HIRE]` và mô tả dịch vụ &quot;Photo Restoration&quot; (Khôi phục ảnh) với giá khởi điểm $5/ảnh.
+**Nguyên nhân gốc rễ:**
+Bộ lọc phân loại (Classifier) hiện tại của hệ thống Job-to-Cash đang dựa vào từ khóa (keyword matching) hoặc mô tả chung chung. Cụm từ &quot;AI tools&quot; trong mô tả đã gây nhầm lẫn, khiến hệ thống có thể đánh giá nhầm đây là một công việc liên quan đến tích hợp AI/ML (Machine Learning) thay vì sử dụng các công cụ AI có sẵn (như Photoshop Generative Fill) cho mục đích nghệ thuật.
 
-**Phân tích Rủi ro &amp; Lỗi Logic (Root Cause):**
-1.  **Lệch Hệ Sinh Thái (Ecosystem Mismatch):** Antigravity là một nền tảng tự động hóa cho **Lập trình viên (Developer), DevOps và Kỹ sư Phần mềm**. Nền tảng này không có năng lực cốt lõi (Core Competency) về xử lý ảnh, chỉnh sửa Photoshop, hay dịch vụ sáng tạo (Creative Services).
-2.  **Lạm dụng Cơ chế &quot;Freelance Lead&quot;:** Việc đưa một yêu cầu dịch vụ sáng tạo (Creative Service) vào pipeline của kỹ sư phần mềm là một lỗi phân loại (Classification Error). Nếu hệ thống tự động gửi proposal cho loại việc này, nó sẽ:
-    *   Gây lãng phí token API và thời gian tính toán.
-    *   Làm giảm tỷ lệ chuyển đổi (Conversion Rate) do hồ sơ kỹ sư không liên quan đến kỹ năng chỉnh sửa ảnh.
-    *   Có thể vi phạm các điều khoản sử dụng của các nền tảng freelance nếu spam dịch vụ không liên quan.
-3.  **Thiếu Bộ Lọc Ngun (Ingestion Filter):** Hệ thống hiện tại thiếu một bộ lọc ngữ nghĩa (Semantic Filter) để loại bỏ các yêu cầu không thuộc phạm vi &quot;Code/DevOps/IT Infrastructure&quot; trước khi chúng đi vào hàng đợi `OUTREACH_DRIP`.
+**Phân tích kiến trúc:**
+- **Input:** Lead từ Reddit/Freelance platform.
+- **Expected Output:** `DISCARDED_NOT_A_JOB` hoặc `REJECTED_CATEGORY_MISMATCH`.
+- **Current Behavior:** Có nguy cơ bị đẩy vào `MANUAL_REVIEW` hoặc `NEW`, gây lãng phí tài nguyên nhân sự.
+- **Required Change:** Cần bổ sung quy tắc **Negative Keyword Filtering** và **Skill Domain Validation** để xác định rõ đây là dịch vụ &quot;Creative/Graphic Design&quot; chứ không phải &quot;Software Engineering/DevOps&quot;.
 
-**Kết luận:** Đây không phải là một &quot;bug&quot; cần vá code logic xử lý ảnh, mà là một **lỗi quản trị dữ liệu (Data Governance Issue)**. Giải pháp là **REJECT** yêu cầu này khỏi pipeline kỹ thuật và đánh dấu là `UNSUPPORTED_INFRA` hoặc `FILTER_REJECTED` vì nó nằm ngoài phạm vi năng lực của Antigravity.
+---
 
 ### 2. SURGICAL CODE SOLUTION
 
-Do Antigravity là một hệ thống tự động hóa, &quot;mã nguồn&quot; ở đây là **Quy tắc Phân loại (Classification Rule)** và **Hàm xử lý từ chối (Rejection Handler)** được áp dụng vào pipeline ingestion.
-
-Dưới đây là đoạn code Python (giả lập logic bộ lọc) để xử lý các yêu cầu không liên quan đến kỹ thuật:
+Chúng ta sẽ cập nhật module `job_classifier.py` để thêm logic kiểm tra loại hình kỹ năng.
 
 ```python
 import re
 from enum import Enum
+from typing import Optional
 
-class LeadStatus(Enum):
-    APPROVED_FOR_SUBMISSION = &quot;APPROVED_FOR_SUBMISSION&quot;
-    FILTER_REJECTED = &quot;FILTER_REJECTED&quot;
-    UNSUPPORTED_INFRA = &quot;UNSUPPORTED_INFRA&quot;
+class JobCategory(Enum):
+    SOFTWARE_ENGINEERING = &quot;software_engineering&quot;
+    DEVOPS_INFRA = &quot;devops_infra&quot;
+    CREATIVE_DESIGN = &quot;creative_design&quot;
+    OTHER = &quot;other&quot;
 
-class AntigravityLeadClassifier:
+class JobStatus(Enum):
+    ACCEPTED = &quot;accepted&quot;
+    REJECTED_CATEGORY_MISMATCH = &quot;rejected_category_mismatch&quot;
+    REJECTED_NOT_A_JOB = &quot;rejected_not_a_job&quot;
+
+class JobClassifier:
     &quot;&quot;&quot;
-    Bộ lọc ngữ nghĩa để loại bỏ các yêu cầu không thuộc phạm vi 
-    Phần mềm / DevOps / IT Infrastructure.
+    Module phân loại lead công việc dựa trên mô tả và kỹ năng yêu cầu.
     &quot;&quot;&quot;
     
-    # Từ khóa không mong muốn (Creative/Non-Technical)
-    NON_TECH_KEYWORDS = [
-        &quot;photo restoration&quot;, &quot;photoshop&quot;, &quot;video editing&quot;, 
-        &quot;graphic design&quot;, &quot;logo design&quot;, &quot;copywriting&quot;, 
-        &quot;voice over&quot;, &quot;music production&quot;, &quot;handwriting&quot;
+    # Các từ khóa đặc trưng cho lĩnh vực Sáng tạo/Thiết kế (không thuộc phạm vi phần mềm)
+    CREATIVE_KEYWORDS = [
+        r&quot;photo\s+restoration&quot;,
+        r&quot;photoshop&quot;,
+        r&quot;photo\s+editing&quot;,
+        r&quot;image\s+retouching&quot;,
+        r&quot;graphic\s+design&quot;,
+        r&quot;illustration&quot;,
+        r&quot;video\s+editing&quot;,
+        r&quot;content\s+creation&quot;,
+        r&quot;social\s+media\s+management&quot;
     ]
     
-    # Từ khóa kỹ thuật mong muốn (Whitelist)
-    TECH_KEYWORDS = [
-        &quot;python&quot;, &quot;golang&quot;, &quot;rust&quot;, &quot;javascript&quot;, &quot;typescript&quot;, 
-        &quot;react&quot;, &quot;node&quot;, &quot;docker&quot;, &quot;kubernetes&quot;, &quot;aws&quot;, &quot;gcp&quot;, 
-        &quot;api&quot;, &quot;backend&quot;, &quot;frontend&quot;, &quot;devops&quot;, &quot;security&quot;, 
-        &quot;blockchain&quot;, &quot;smart contract&quot;, &quot;database&quot;, &quot;sql&quot;, &quot;nosql&quot;
+    # Các từ khóa đặc trưng cho lĩnh vực Phần mềm (phạm vi của chúng ta)
+    SOFTWARE_KEYWORDS = [
+        r&quot;python&quot;, r&quot;javascript&quot;, r&quot;typescript&quot;, r&quot;go&quot;, r&quot;rust&quot;,
+        r&quot;api&quot;, r&quot;backend&quot;, r&quot;frontend&quot;, r&quot;fullstack&quot;,
+        r&quot;docker&quot;, r&quot;kubernetes&quot;, r&quot;aws&quot;, r&quot;azure&quot;, r&quot;gcp&quot;,
+        r&quot;database&quot;, r&quot;sql&quot;, r&quot;nosql&quot;,
+        r&quot;bug\s+fix&quot;, r&quot;feature\s+development&quot;, r&quot;code\s+review&quot;
     ]
 
-    def classify_lead(self, title: str, description: str) -&gt; LeadStatus:
+    def __init__(self):
+        self.creative_patterns = [re.compile(kw, re.IGNORECASE) for kw in self.CREATIVE_KEYWORDS]
+        self.software_patterns = [re.compile(kw, re.IGNORECASE) for kw in self.SOFTWARE_KEYWORDS]
+
+    def classify(self, title: str, description: str) -&gt; tuple[JobCategory, JobStatus, Optional[str]]:
         &quot;&quot;&quot;
-        Phân loại lead dựa trên tiêu đề và mô tả.
-        Trả về LeadStatus.UNSUPPORTED_INFRA nếu không phải là việc kỹ thuật.
+        Phân loại lead.
+        Returns: (Category, Status, Reason)
         &quot;&quot;&quot;
-        text_combined = f&quot;{title} {description}&quot;.lower()
+        text = f&quot;{title} {description}&quot;.lower()
         
-        # 1. Kiểm tra từ khóa không kỹ thuật (Blacklist)
-        # Nếu chứa bất kỳ từ khóa nào trong danh sách đen, từ chối ngay lập tức
-        for keyword in self.NON_TECH_KEYWORDS:
-            if keyword in text_combined:
-                return LeadStatus.UNSUPPORTED_INFRA
+        creative_score = 0
+        software_score = 0
         
-        # 2. Kiểm tra từ khóa kỹ thuật (Whitelist)
-        # Nếu không chứa bất kỳ từ khóa kỹ thuật nào, coi là không liên quan
-        has_tech_keyword = any(kw in text_combined for kw in self.TECH_KEYWORDS)
+        for pattern in self.creative_patterns:
+            if pattern.search(text):
+                creative_score += 1
+                
+        for pattern in self.software_patterns:
+            if pattern.search(text):
+                software_score += 1
+
+        # Logic quyết định
+        if creative_score &gt; 0 and software_score == 0:
+            return JobCategory.CREATIVE_DESIGN, JobStatus.REJECTED_CATEGORY_MISMATCH, &quot;Lead thuộc lĩnh vực Sáng tạo/Thiết kế, không phù hợp với năng lực Phần mềm.&quot;
         
-        if not has_tech_keyword:
-            return LeadStatus.FILTER_REJECTED
-            
-        # 3. Nếu qua cả 2 bước, lead là hợp lệ
-        return LeadStatus.APPROVED_FOR_SUBMISSION
+        if software_score &gt; 0 and creative_score == 0:
+            return JobCategory.SOFTWARE_ENGINEERING, JobStatus.ACCEPTED, &quot;Lead phù hợp với năng lực kỹ thuật phần mềm.&quot;
+        
+        if software_score &gt; 0 and creative_score &gt; 0:
+            # Trường hợp hỗn hợp, ưu tiên kiểm tra thủ công hoặc từ chối nếu thiên về thiết kế
+            if creative_score &gt; software_score:
+                return JobCategory.CREATIVE_DESIGN, JobStatus.REJECTED_CATEGORY_MISMATCH, &quot;Lead thiên về thiết kế nhiều hơn kỹ thuật.&quot;
+            else:
+                return JobCategory.OTHER, JobStatus.REJECTED_CATEGORY_MISMATCH, &quot;Lead hỗn hợp, cần đánh giá lại.&quot;
+        
+        return JobCategory.OTHER, JobStatus.REJECTED_NOT_A_JOB, &quot;Không xác định được kỹ năng phù hợp.&quot;
 
-# --- DEMO CHẠY VỚI DỮ LIỆU THỰC TẾ ---
-if __name__ == &quot;__main__&quot;:
-    lead_title = &quot;[High-Ticket Contract: $500] [FOR HIRE] Photo Restoration &amp; All Types of Photo Editing | Starting at $5/photo&quot;
-    lead_desc = &quot;I restore old, faded, scratched, torn, and damaged photos using Photoshop and AI tools while preserving the original person’s appearance. Pricing starts at $5/photo , depending on complexity. PayPal accepted. DM me with your photo for a quote!&quot;
-    
-    classifier = AntigravityLeadClassifier()
-    status = classifier.classify_lead(lead_title, lead_desc)
-    
-    print(f&quot;Task ID: freelance-1144121e8654&quot;)
-    print(f&quot;Classification Result: {status.value}&quot;)
-    
-    if status == LeadStatus.UNSUPPORTED_INFRA:
-        print(&quot;Action: REJECTED. Reason: Creative Service (Photo Editing) is outside Antigravity&#39;s DevOps/Software Engineering scope.&quot;)
-        print(&quot;Database Update: Set status to &#39;UNSUPPORTED_INFRA&#39; and exclude from Outreach Drip.&quot;)
-```
+# --- IMPLEMENTATION IN PRODUCTION PIPELINE ---
 
-### 3. VERIFICATION &amp; UNIT TEST SUITE
-
-Dưới đây là bộ test để xác nhận rằng hệ thống sẽ tự động từ chối các yêu cầu dạng &quot;Photo Editing&quot; và chấp nhận các yêu cầu dạng &quot;Python Backend&quot;.
-
-```python
-import unittest
-from unittest.mock import MagicMock
-
-# Giả sử AntigravityLeadClassifier đã được import từ module chính
-# class AntigravityLeadClassifier: ...
-
-class TestAntigravityLeadClassifier(unittest.TestCase):
+def process_lead(lead_data: dict):
     &quot;&quot;&quot;
-    Bộ test xác minh bộ lọc loại bỏ các lead không liên quan đến kỹ thuật.
+    Hàm xử lý lead đầu vào trong pipeline Job-to-Cash.
     &quot;&quot;&quot;
+    classifier = JobClassifier()
+    title = lead_data.get(&#39;title&#39;, &#39;&#39;)
+    description = lead_data.get(&#39;description&#39;, &#39;&#39;)
+    
+    category, status, reason = classifier.classify(title, description)
+    
+    # Cập nhật trạng thái trong Database
+    if status == JobStatus.REJECTED_CATEGORY_MISMATCH:
+        # Gán trạng thái cụ thể để thống kê
+        db_status = &quot;DISCARDED_NOT_A_JOB&quot; 
+        # Hoặc tạo trạng thái mới: &quot;DISCARDED_CATEGORY_MISMATCH&quot;
+        update_job_status(lead_data[&#39;id&#39;], db_status, reason)
 
-    def setUp(self):
-        self.classifier = AntigravityLeadClassifier()
-
-    def test_reject_photo_restoration_lead(self):
-
-⚡ &lt;i&gt;Qwen 3.8 27B (Groq LPU (Free) • 3.15s • $0.00)&lt;/i&gt;</code></pre>
+⚡ &lt;i&gt;Qwen 3.8 27B (Groq LPU (Free) • 3.82s • $0.00)&lt;/i&gt;</code></pre>
       </div>
     </section>
 
