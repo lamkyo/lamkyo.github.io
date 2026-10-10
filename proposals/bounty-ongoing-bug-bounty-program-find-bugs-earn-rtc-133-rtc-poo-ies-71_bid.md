@@ -1,7 +1,7 @@
-# Autonomous Client Bid: AgentStream response adapters eagerly drain the source and do not propagate body cancellation
+# Autonomous Client Bid: [BOUNTY] Ongoing Bug Bounty Program — Find Bugs, Earn RTC (133 RTC Pool)
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-Mantitup-Org-vista-161`  
+**Job ID:** `job-ghb-Scottcjn-rustchain-bounties-71`  
 **Budget:** $50.00 USD  
 **Generated:** 2026-10-10 21:15 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **AgentStream response adapters eagerly drain the source and do not propagate body cancellation**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[BOUNTY] Ongoing Bug Bounty Program — Find Bugs, Earn RTC (133 RTC Pool)**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
