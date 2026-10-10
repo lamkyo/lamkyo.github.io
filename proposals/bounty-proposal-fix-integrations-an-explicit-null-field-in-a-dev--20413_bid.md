@@ -1,7 +1,7 @@
-# Autonomous Client Bid: MACHINE-MATURITY-00 — Public Maturity Map & Certification Framework
+# Autonomous Client Bid: [Bounty Proposal] fix(integrations): an explicit-null field in a developer webhook notification silently drops every proactive notification ($50 proposed)
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-3a7i3-crypto-ia-terminal-362`  
+**Job ID:** `job-ghb-BasedHardware-omi-20413`  
 **Budget:** $50.00 USD  
 **Generated:** 2026-10-10 22:15 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **MACHINE-MATURITY-00 — Public Maturity Map & Certification Framework**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[Bounty Proposal] fix(integrations): an explicit-null field in a developer webhook notification silently drops every proactive notification ($50 proposed)**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
