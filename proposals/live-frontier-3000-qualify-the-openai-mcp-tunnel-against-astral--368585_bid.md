@@ -1,7 +1,7 @@
-# Autonomous Client Bid: [LIVE FRONTIER: $3000] [BOUNTY-002] $150 Synthetic Sequential Structure Hunt — no real-world data, structure is real
+# Autonomous Client Bid: [LIVE FRONTIER: $3000] Qualify the OpenAI MCP tunnel against Astral authentication and discovery
 
 **Marketplace:** GITHUB  
-**Job ID:** `gh-live-5771461883`  
+**Job ID:** `gh-live-5738368585`  
 **Budget:** $3,000.00 USD  
 **Generated:** 2026-10-10 20:45 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **[LIVE FRONTIER: $3000] [BOUNTY-002] $150 Synthetic Sequential Structure Hunt — no real-world data, structure is real**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[LIVE FRONTIER: $3000] Qualify the OpenAI MCP tunnel against Astral authentication and discovery**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.

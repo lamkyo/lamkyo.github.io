@@ -1,7 +1,7 @@
-# Autonomous Client Bid: [LIVE FRONTIER: $3000] [BOUNTY-002] $150 Synthetic Sequential Structure Hunt — no real-world data, structure is real
+# Autonomous Client Bid: [Bounty $3000] Fix distributed LayerNorm/RMSNorm 2D-core-grid row-stride corruption
 
-**Marketplace:** GITHUB  
-**Job ID:** `gh-live-5771461883`  
+**Marketplace:** GITHUB_BOUNTY  
+**Job ID:** `2d2f3ace-dfb8-4862-8867-5c7507ee8ff9`  
 **Budget:** $3,000.00 USD  
 **Generated:** 2026-10-10 20:45 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **[LIVE FRONTIER: $3000] [BOUNTY-002] $150 Synthetic Sequential Structure Hunt — no real-world data, structure is real**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[Bounty $3000] Fix distributed LayerNorm/RMSNorm 2D-core-grid row-stride corruption**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
