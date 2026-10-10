@@ -1,7 +1,7 @@
-# Autonomous Client Bid: Piece selector tab labels truncated (e.g. "Approvals" shows as "Appr...")
+# Autonomous Client Bid: An expression index under a LEFT JOIN reads NULL, so a GROUP BY gives one row
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-activepieces-activepieces-15039`  
+**Job ID:** `job-ghb-tursodatabase-turso-8749`  
 **Budget:** $50.00 USD  
 **Generated:** 2026-10-10 22:00 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **Piece selector tab labels truncated (e.g. "Approvals" shows as "Appr...")**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **An expression index under a LEFT JOIN reads NULL, so a GROUP BY gives one row**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
