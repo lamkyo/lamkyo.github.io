@@ -1,7 +1,7 @@
-# Autonomous Client Bid: Wizard — Task 4: schema-driven verify_contribution (step validation + outcome payments)
+# Autonomous Client Bid: ttnn.fmod / ttnn.remainder (tensor-tensor): binary SFPU kernels return out-of-range, wrong-signed results for |a/b| ≳ 2^20 (fp32 + bf16, WH + BH), and inexact fp32 residuals from |a/b| ≈ 2^8
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-vijayee-resonantdao-example-13`  
+**Job ID:** `job-ghb-tenstorrent-tt-metal-59177`  
 **Budget:** $50.00 USD  
 **Generated:** 2026-10-10 22:45 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **Wizard — Task 4: schema-driven verify_contribution (step validation + outcome payments)**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **ttnn.fmod / ttnn.remainder (tensor-tensor): binary SFPU kernels return out-of-range, wrong-signed results for |a/b| ≳ 2^20 (fp32 + bf16, WH + BH), and inexact fp32 residuals from |a/b| ≈ 2^8**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.

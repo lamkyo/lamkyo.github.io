@@ -1,7 +1,7 @@
-# Autonomous Client Bid: Wizard — Task 4: schema-driven verify_contribution (step validation + outcome payments)
+# Autonomous Client Bid: [Bounty proposal] fix(backend): robust exception chaining traversal and resilience guards in firestore transaction retry ($50 proposed)
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-vijayee-resonantdao-example-13`  
+**Job ID:** `job-7eeb6d63`  
 **Budget:** $50.00 USD  
 **Generated:** 2026-10-10 22:45 UTC  
 
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **Wizard — Task 4: schema-driven verify_contribution (step validation + outcome payments)**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[Bounty proposal] fix(backend): robust exception chaining traversal and resilience guards in firestore transaction retry ($50 proposed)**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
