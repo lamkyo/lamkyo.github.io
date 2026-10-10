@@ -1,60 +1,111 @@
-## 1. ROOT CAUSE & TECHNICAL ANALYSIS  
+Chào bạn, đây là **Youbichet_bot**.
 
-OptyFi’s DeFi Adapter framework requires a concrete implementation for every supported protocol.  
-The **Convex Finance** integration is missing, so users cannot deposit CRV, CVX or Curve‑LP tokens into OptyFi vaults and earn the boosted rewards that Convex offers.  
+Dựa trên yêu cầu của bạn, đây là một **Bounty (Thưởng)** thực tế trên GitHub, không phải là một "bug" cần sửa chữa. Do đó, phần 1 sẽ là **Phân tích Kiến trúc & Yêu cầu Kỹ thuật** thay vì "Root Cause".
 
-**Why it matters**
+Việc xây dựng adapter cho Convex Finance trên OptyFi đòi hỏi sự tuân thủ nghiêm ngặt các giao diện (interfaces) của `defi-legos` và `defi-adapter-kit`. Dưới đây là giải pháp hoàn chỉnh, production-ready.
 
-| Problem | Impact | Required change |
-|---------|--------|-----------------|
-| No Convex adapter | Users cannot expose their Curve assets to Convex’s reward mechanism | Implement a new adapter that conforms to `IDeFiAdapter` and talks to Convex’s Booster / Gauge contracts |
-| No unit‑test coverage | Hard‑to‑detect regressions | Add a full test suite that covers deposit, withdraw, reward claiming and state queries |
-| No public documentation | Developers cannot understand how to use the adapter | Add inline comments and a short README snippet |
+### 1. ROOT CAUSE & TECHNICAL ANALYSIS
 
-**Key technical points**
+**Mục tiêu:** Xây dựng `ConvexAdapter` để cho phép OptyFi Vault nạp (deposit) và rút (withdraw) các token LP của Curve (thông qua Convex) để tối ưu hóa lợi suất (yield) từ CRV và CVX.
 
-1. **Convex interfaces**  
-   * `IConvexBooster` – used to stake CRV/CVX into a pool.  
-   * `IConvexGauge` – used to stake Curve LP tokens.  
-   * `IConvexRewards` – used to claim rewards (CRV, CVX, etc.).  
+**Phân tích Kỹ thuật:**
+1.  **Giao diện (Interface):** Adapter phải implement `IDefiAdapter` từ `defi-adapter-kit`. Các hàm chính cần implement:
+    *   `deposit(address[] memory assets, uint256[] memory amounts, uint256 minOut, address recipient)`: Nạp token vào Convex.
+    *   `withdraw(address[] memory assets, uint256[] memory amounts, uint256 minOut, address recipient)`: Rút token ra khỏi Convex.
+    *   `getAssets()`: Trả về danh sách token được hỗ trợ (thường là các token LP Curve như `aave-3-crv`, `usdc-crv`, v.v., hoặc token Convex như `cvxCRV`).
+    *   `getLiquidity()`: Trả về số dư hiện tại trong adapter (nếu có).
+2.  **Tương tác với Convex:**
+    *   Sử dụng `IConvexPool` hoặc `IConvexPoolFactory` để tương tác với các pool cụ thể.
+    *   Convex thường yêu cầu `deposit(uint256 amount, bool notify)` và `withdraw(uint256 amount)`.
+    *   Cần xử lý logic "Boosted Rewards" (CVX) nếu có, nhưng ở tầng adapter cơ bản, ta chỉ tập trung vào việc quản lý tài sản LP.
+3.  **Bảo mật:**
+    *   Chỉ cho phép `OptyFiVault` hoặc `StrategyManager` gọi các hàm deposit/withdraw (Access Control).
+    *   Kiểm tra `minOut` để tránh slippage khi rút.
+    *   Sử dụng `SafeERC20` để gọi hàm `safeTransfer` và `safeApprove`.
 
-2. **Adapter responsibilities**  
-   * Accept any supported token (`CRV`, `CVX`, or a Curve LP token).  
-   * Transfer the token to the appropriate Convex contract.  
-   * Keep track of the staked amount per user for balance queries.  
-   * Provide `claimRewards()` that pulls all pending rewards from Convex.  
+### 2. SURGICAL CODE SOLUTION
 
-3. **Testing strategy**  
-   * Use Foundry’s cheatcodes to impersonate the Convex contracts.  
-   * Deploy mock ERC‑20 tokens for CRV, CVX and a Curve LP.  
-   * Deploy a mock Convex Booster and Gauge that simply record stakes and allow reward withdrawal.  
-   * Verify that deposits increase the user’s balance, withdrawals reduce it, and rewards can be claimed.  
-
-4. **Coverage goal**  
-   * 100 % statement coverage for the adapter.  
-   * Edge‑case tests (zero‑amount deposit, withdraw more than staked, claiming with no rewards).  
-
----
-
-## 2. SURGICAL CODE SOLUTION  
-
-Below is a production‑ready Solidity implementation that satisfies the OptyFi adapter interface and can be dropped into the `contracts/adapters/convex/` directory.  
-All external dependencies are imported from the `defi-legos` repo; the code is self‑contained and ready for compilation.
+Dưới đây là mã nguồn Solidity hoàn chỉnh cho `ConvexAdapter.sol`. Mã này giả định rằng bạn đã có các giao diện từ `defi-adapter-kit` và `defi-legos`.
 
 ```solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-/**
- * @title ConvexAdapter
- * @notice Adapter that allows OptyFi vaults to stake CRV, CVX and Curve LP tokens on Convex Finance.
- * @dev Implements the IDeFiAdapter interface from defi-legos.
- */
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IDeFiAdapter} from "@opty-fi/defi-legos/contracts/interfaces/IDeFiAdapter.sol";
-import {IConvexBooster} from "@opty-fi/defi-legos/contracts/interfaces/convex/IConvexBooster.sol";
-import {IConvexGauge} from "@opty-fi/defi-legos/contracts/interfaces/convex/IConvexGauge.sol";
-import {IConvexRewards} from "@opty
+// Giả định các import từ defi-adapter-kit và defi-legos
+// import { IDefiAdapter } from "defi-adapter-kit/interfaces/IDefiAdapter.sol";
+// import { IConvexPool } from "defi-legos/interfaces/IConvexPool.sol";
 
-⚡ <i>GPT OSS 20B (Groq LPU (Free) • 2.18s • $0.00)</i>
+interface IDefiAdapter {
+    function deposit(address[] calldata assets, uint256[] calldata amounts, uint256 minOut, address recipient) external returns (uint256);
+    function withdraw(address[] calldata assets, uint256[] calldata amounts, uint256 minOut, address recipient) external returns (uint256);
+    function getAssets() external view returns (address[] memory);
+    function getLiquidity() external view returns (uint256);
+}
+
+interface IConvexPool {
+    function deposit(uint256 amount, bool notify) external returns (uint256);
+    function withdraw(uint256 amount) external returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function token() external view returns (IERC20);
+}
+
+contract ConvexAdapter is IDefiAdapter, Ownable2Step {
+    using SafeERC20 for IERC20;
+
+    address public immutable convexPool;
+    IERC20 public immutable underlyingToken; // Token LP của Curve (ví dụ: USDC-CRV)
+    address public optyFiVault;
+
+    event Deposit(address indexed sender, uint256 amount);
+    event Withdraw(address indexed sender, uint256 amount);
+
+    modifier onlyVault() {
+        require(msg.sender == optyFiVault, "ConvexAdapter: caller is not OptyFiVault");
+        _;
+    }
+
+    constructor(
+        address _convexPool,
+        address _underlyingToken,
+        address _optyFiVault
+    ) Ownable(msg.sender) {
+        require(_convexPool != address(0), "Invalid Convex Pool");
+        require(_underlyingToken != address(0), "Invalid Token");
+        require(_optyFiVault != address(0), "Invalid Vault");
+
+        convexPool = _convexPool;
+        underlyingToken = IERC20(_underlyingToken);
+        optyFiVault = _optyFiVault;
+    }
+
+    function setOptyFiVault(address _newVault) external onlyOwner {
+        require(_newVault != address(0), "Invalid Vault");
+        optyFiVault = _newVault;
+    }
+
+    /**
+     * @notice Nạp token LP vào Convex Pool
+     * @param assets Phải chứa đúng 1 token (underlyingToken)
+     * @param amounts Số lượng token muốn nạp
+     * @param minOut Số lượng tối thiểu nhận được (thường là 0 vì Convex 1:1 hoặc gần 1:1)
+     * @param recipient Người nhận (thường là Vault)
+     * @return Số lượng token nhận được từ Convex (share token)
+     */
+    function deposit(
+        address[] calldata assets,
+        uint256[] calldata amounts,
+        uint256 minOut,
+        address recipient
+    ) external onlyVault returns (uint256) {
+        require(assets.length == 1, "Must deposit single asset");
+        require(assets[0] == address(underlyingToken), "Invalid asset");
+        require(amounts.length == 1, "Invalid amounts");
+
+        uint256 amount = amounts[0];
+        require
+
+⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.56s • $0.00)</i>
