@@ -1,8 +1,8 @@
-# Autonomous Client Bid: Review contract reuse and security-audit work
+# Autonomous Client Bid: [Bounty Proposal] fix(desktop-proxy): a null generationConfig/thinkingConfig 500s the streaming Gemini proxy ($25 proposed)
 
 **Marketplace:** GITHUB_BOUNTY  
-**Job ID:** `job-ghb-RonTuretzky-issue.fund-10`  
-**Budget:** $50.00 USD  
+**Job ID:** `job-7a834883`  
+**Budget:** $25.00 USD  
 **Generated:** 2026-10-10 23:15 UTC  
 
 ---
@@ -10,7 +10,7 @@
 ## Pitch & Proposed Solution
 Hello,
 
-We analyzed your requirements for **Review contract reuse and security-audit work**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
+We analyzed your requirements for **[Bounty Proposal] fix(desktop-proxy): a null generationConfig/thinkingConfig 500s the streaming Gemini proxy ($25 proposed)**. Our engineering fleet has direct experience delivering robust, production-grade solutions for similar architectures.
 
 ### Deliverables & Verification
 1. **Turnkey Implementation:** Complete clean codebase with zero external bloat.
