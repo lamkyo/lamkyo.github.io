@@ -1,128 +1,115 @@
-Chào bạn, đây là phân tích và giải pháp cho yêu cầu **Freelance Lead #65520d470925**.
+Chào bạn, tôi là Antigravity. Dựa trên dữ liệu hệ thống và yêu cầu của bạn, tôi nhận thấy có một sự **mâu thuẫn nghiêm trọng** trong ngữ cảnh:
 
-**Lưu ý quan trọng về bối cảnh:**
-Đây là một **Lead (Dẫn đầu cơ hội kinh doanh)** trên Reddit/Freelance, **KHÔNG PHẢI** một bug kỹ thuật hay lỗi code cụ thể. Do đó, "Root Cause" ở đây là **vấn đề về chiến lược tiếp cận và định vị giá trị** để chuyển đổi lead này thành hợp đồng, thay vì sửa lỗi phần mềm.
+1.  **Dữ liệu Live:** Hệ thống đang hiển thị trạng thái của một *pipeline* tự động (Job to Cash, Outreach Drip).
+2.  **Yêu cầu cụ thể:** Bạn yêu cầu giải quyết một "Task" với mô tả là một **bài đăng tìm việc (Job Post)** trên Reddit/Freelance, chứ không phải là một bug hay lỗi code cụ thể.
+3.  **Vai trò:** Bạn yêu cầu tôi đóng vai "Principal Autonomous Software Engineer" để giải quyết task này.
 
-Tuy nhiên, để đáp ứng đúng cấu trúc kỹ thuật mà bạn yêu cầu (như một kỹ sư phần mềm tự động hóa), tôi sẽ xử lý task này như là việc **xây dựng một Proposal Engine** (Bộ máy đề xuất) tự động hóa việc phân tích lead, đánh giá độ khớp (fit score), và tạo ra nội dung phản hồi chuyên nghiệp nhằm tối ưu hóa tỷ lệ chuyển đổi cho gói dịch vụ Backend/Web/Game Dev.
+**Phân tích thực tế:**
+Một bài đăng "For Hire" (Tìm người thuê) **không phải là một bug** cần sửa chữa bằng code. Nó là một **cơ hội kinh doanh (Business Opportunity)**.
+-   **Reward $500:** Đây là mức giá cho một hợp đồng dịch vụ, không phải tiền thưởng cho việc sửa bug.
+-   **Mô tả:** Người dùng đang tìm kiếm một lập trình viên có kinh nghiệm PHP/Symfony, Svelte, CI/CD và Godot.
+-   **Hành động cần thiết:** Không có "Root Cause" kỹ thuật nào để phân tích. Không có "Code Patch" nào để viết.
+
+Tuy nhiên, để tuân thủ đúng cấu trúc 4 phần bạn yêu cầu và thể hiện tính chuyên nghiệp của một *Principal Engineer* trong việc xử lý các lead (dẫn dắt) từ hệ thống, tôi sẽ chuyển đổi bài toán sang: **"Xây dựng một hệ thống tự động hóa phản hồi và đánh giá Lead Freelance dựa trên các tiêu chí kỹ thuật và kinh tế"**.
+
+Đây là giải pháp kỹ thuật để xử lý *task* này một cách "deterministic" (xác định) trong hệ sinh thái của bạn:
 
 ---
 
 ### 1. ROOT CAUSE & TECHNICAL ANALYSIS
 
-**Vấn đề cốt lõi (Business Logic Gap):**
-- **Mâu thuẫn về định giá:** Lead yêu cầu $42 CAD (~$30 USD)/giờ nhưng đề cập đến "High-Ticket Contract: $500". Đối với một dự án Backend + Game Dev (Godot) với 7 năm kinh nghiệm, mức giá $30 USD/h là **thấp hơn thị trường** đáng kể. Nếu chấp nhận, biên lợi nhuận bị nén mỏng, rủi ro scope creep cao.
-- **Độ phức tạp kỹ thuật:** Yêu cầu kết hợp Symfony (PHP), Svelte (JS), CI/CD (GitLab/GitHub), và Godot (GDScript). Đây là một stack đa dạng. Rủi ro chính là **phân tán nguồn lực** (context switching) giữa web backend và game dev.
-- **Thiếu thông tin quy mô:** Lead không nêu rõ quy mô dự án. "Helping indie devs finish a prototype" có thể là 20 giờ hoặc 200 giờ.
-- **Chiến lược tiếp cận:** Cần một hệ thống tự động đánh giá **Fit Score** dựa trên:
-    1.  Ngân sách so với giá trị thị trường.
-    2.  Khớp kỹ năng (Symfony/Svelte/Godot).
-    3.  Khả năng làm việc theo milestone (để bảo vệ dòng tiền).
-    4.  Timezone (EST - Québec) phù hợp với múi giờ làm việc buổi tối/weekend.
+**Vấn đề cốt lõi:**
+Hệ thống hiện tại đang lưu trữ lead này vào database với trạng thái `NEW` hoặc `APPROVAL_REQUIRED`, nhưng thiếu một **động cơ suy luận (Inference Engine)** để tự động đánh giá tính khả thi (Feasibility) và lợi nhuận (Profitability) của lead dựa trên mô tả kỹ thuật.
 
-**Giải pháp kiến trúc:**
-Xây dựng một module `LeadQualificationEngine` trong hệ thống Antigravity để:
-1.  Parse lead từ text.
-2.  Tính toán `ExpectedValue` và `RiskFactor`.
-3.  Sinh ra một **Counter-Proposal** (Đề xuất phản) chuyên nghiệp, điều chỉnh kỳ vọng về giá hoặc scope, hoặc từ chối lịch sự nếu không khớp.
-
----
+**Phân tích kỹ thuật:**
+1.  **Mâu thuẫn Giá/Thời gian:** Lead yêu cầu $30USD/hour (hoặc ~$42CAD). Với kinh nghiệm 7 năm PHP + Godot, đây là mức giá **thấp** cho một Senior/Principal Engineer.
+2.  **Yêu cầu kỹ thuật phức tạp:** Kết hợp Web (PHP/Symfony/Svelte) + Game Dev (Godot) + DevOps (CI/CD). Đây là bộ kỹ năng "T-shaped" hiếm gặp.
+3.  **Rủi ro phạm vi (Scope Creep):** "Helping indie devs finish a prototype" thường dẫn đến yêu cầu mở rộng không kiểm soát.
+4.  **Giải pháp kiến trúc:** Cần một module `LeadEvaluator` sẽ:
+    -   Parse mô tả để trích xuất stack kỹ thuật.
+    -   So sánh với hồ sơ năng lực (Profile) của hệ thống.
+    -   Tính toán điểm phù hợp (Match Score).
+    -   Tạo ra một phản hồi tự động (Auto-Reply) hoặc đánh dấu là `REJECTED_LOW_BUDGET` / `APPROVED_HIGH_FIT`.
 
 ### 2. SURGICAL CODE SOLUTION
 
-Dưới đây là module Python xử lý lead này, tính toán độ khớp và sinh ra nội dung phản hồi tối ưu.
+Dưới đây là module Python để xử lý lead này một cách tự động. Code này sẽ phân tích mô tả, so sánh với năng lực hệ thống, và tạo ra một phản hồi chuyên nghiệp.
 
 ```python
 import re
 from dataclasses import dataclass
-from enum import Enum
-from typing import Optional
-
-class LeadStatus(Enum):
-    QUALIFIED = "QUALIFIED"
-    NEGOTIATE = "NEGOTIATE"
-    REJECT = "REJECT"
+from typing import List, Dict, Any
 
 @dataclass
-class LeadProfile:
+class FreelanceLead:
+    task_id: str
     title: str
+    reward: float
     description: str
-    budget_usd: float
-    hourly_rate_usd: float
-    skills_required: list[str]
     timezone: str
+    rate: str
     availability: str
 
-class LeadQualificationEngine:
+class LeadEvaluator:
     """
-    Engine to analyze freelance leads and determine optimal response strategy.
+    Đánh giá lead freelance dựa trên các tiêu chí kỹ thuật và kinh tế.
     """
     
-    # Market rates for reference (USD/hour)
-    MARKET_RATES = {
-        "symfony": 60.0,
-        "svelte": 55.0,
-        "godot": 50.0,
-        "cicd": 65.0
+    # Định nghĩa các kỹ năng chính cần có
+    REQUIRED_SKILLS = {
+        "backend": ["php", "symfony", "rest api"],
+        "frontend": ["svelte", "javascript", "js"],
+        "devops": ["ci/cd", "gitlab", "github actions", "docker"],
+        "game_dev": ["godot", "gdscript"]
     }
     
-    def __init__(self):
-        self.skills_map = {
-            "php": ["symfony", "laravel"],
-            "js": ["svelte", "react", "vue"],
-            "game": ["godot", "unity", "unreal"],
-            "devops": ["cicd", "docker", "kubernetes"]
-        }
-
-    def parse_lead(self, title: str, description: str) -> LeadProfile:
-        """Parse raw lead text into structured profile."""
-        # Extract budget
-        budget_match = re.search(r'\$(\d+)', title)
-        budget_usd = float(budget_match.group(1)) if budget_match else 0.0
-        
-        # Extract hourly rate
-        rate_match = re.search(r'\$(\d+)(?:CAD|USD)?', description)
-        hourly_rate_usd = float(rate_match.group(1)) if rate_match else 0.0
-        if "CAD" in description:
-            hourly_rate_usd *= 0.75 # Approx conversion
-
-        # Extract skills
-        skills = []
-        desc_lower = description.lower()
-        if "symfony" in desc_lower: skills.append("symfony")
-        if "svelte" in desc_lower: skills.append("svelte")
-        if "godot" in desc_lower: skills.append("godot")
-        if "ci/cd" in desc_lower or "gitlab" in desc_lower or "github actions" in desc_lower:
-            skills.append("cicd")
-        if "php" in desc_lower: skills.append("php")
-        if "js" in desc_lower or "javascript" in desc_lower: skills.append("js")
-
-        # Extract timezone
-        tz_match = re.search(r'Timezone: (\w+)', description)
-        timezone = tz_match.group(1) if tz_match else "Unknown"
-
-        # Extract availability
-        avail_match = re.search(r'Availability: (.+?)(?:Rate|$)', description, re.DOTALL)
-        availability = avail_match.group(1).strip() if avail_match else "Unknown"
-
-        return LeadProfile(
-            title=title,
-            description=description,
-            budget_usd=budget_usd,
-            hourly_rate_usd=hourly_rate_usd,
-            skills_required=skills,
-            timezone=timezone,
-            availability=availability
-        )
-
-    def calculate_fit_score(self, profile: LeadProfile) -> tuple[float, LeadStatus]:
+    # Ngưỡng lợi nhuận tối thiểu (USD/hour)
+    MIN_ACCEPTABLE_RATE_USD = 50.0
+    CURRENT_LEAD_RATE_USD = 30.0  # Từ mô tả: ~30USD
+    
+    def __init__(self, system_profile: Dict[str, bool]):
         """
-        Calculate fit score (0-100) and determine status.
+        system_profile: Ví dụ: {"php": True, "svelte": True, "godot": False, "ci_cd": True}
+        """
+        self.profile = system_profile
+        
+    def extract_skills(self, description: str) -> List[str]:
+        """Trích xuất các từ khóa kỹ thuật từ mô tả."""
+        desc_lower = description.lower()
+        found_skills = []
+        for category, skills in self.REQUIRED_SKILLS.items():
+            for skill in skills:
+                if skill in desc_lower:
+                    found_skills.append(skill)
+        return found_skills
+
+    def calculate_match_score(self, lead: FreelanceLead) -> float:
+        """
+        Tính điểm phù hợp từ 0.0 đến 1.0
         """
         score = 0.0
-        reasons = []
+        extracted_skills = self.extract_skills(lead.description)
+        
+        # 1. Điểm kỹ thuật (50%)
+        tech_score = 0.0
+        total_required = sum(len(v) for v in self.REQUIRED_SKILLS.values())
+        matched = 0
+        for skill in extracted_skills:
+            if self.profile.get(skill, False):
+                matched += 1
+        tech_score = (matched / total_required) * 0.5
+        
+        # 2. Điểm kinh tế (30%)
+        # Nếu rate < MIN_ACCEPTABLE_RATE, điểm kinh tế thấp
+        if self.CURRENT_LEAD_RATE_USD >= self.MIN_ACCEPTABLE_RATE_USD:
+            econ_score = 0.3
+        else:
+            # Tỷ lệ % đạt được so với mức tối thiểu
+            ratio = self.CURRENT_LEAD_RATE_USD / self.MIN_ACCEPTABLE_RATE_USD
+            econ_score = ratio * 0.3
+            
+        # 3. Điểm khả thi về thời gian (20%)
+        # "Remote max 20hrs/week" - Nếu hệ thống có thể xử lý trong 20h/tuần
+        time_score = 0.2 if "2
 
-        # 1. Skill Match (40%)
-        skill_score = 0
-        matched_skills = [s for s in profile.skills_required if
-
-⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.17s • $0.00)</i>
+⚡ <i>Qwen 3.8 27B (Groq LPU (Free) • 3.16s • $0.00)</i>
